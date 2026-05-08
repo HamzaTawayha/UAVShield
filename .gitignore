@@ -1,0 +1,40 @@
+.venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Local secrets/tokens
+.env
+.env.*
+*.pem
+*.key
+
+# Runtime logs
+*.log
+streamlit_stdout.log
+streamlit_stderr.log
+
+# LaTeX/build byproducts
+*.aux
+*.out
+*.toc
+*.synctex.gz
+
+# Local tool binaries/caches
+.tools/tectonic/
+.tools/tectonic.exe
+.tools/tectonic-*.zip
+
+# Raw datasets are too large for GitHub; keep scripts/metadata instead.
+data/px4_flight_review/logs/
+data/px4_flight_review/anomaly_logs/
+data/px4_flight_review/crash_logs/
+data/uav_sead/cache/
+data/uav_sead/raw/
+data/uav_sead/ulg_files/
+
+# Optional local model/download caches
+.cache/
+models/

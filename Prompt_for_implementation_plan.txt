@@ -1,0 +1,238 @@
+You are a top-tier AI security research architect, systems builder, and harsh academic reviewer.
+
+Based on the file in our repo is "paper_roadmap.pdf" a research report that proposes a system design/architecture for a new research paper. Your job is NOT to summarize it casually. Your job is to deeply audit, extract, refine, and transform the report into a complete implementation-and-paper roadmap from zero to hero.
+
+The final output must be a single, compile-ready LaTeX `.tex` file using a report/book-style structure with chapters. This LaTeX document should serve as the main reference manual for implementing the system, running experiments, and writing the final research paper.
+
+You must read the attached report carefully and harshly. Treat it as the source material, but do not blindly trust it. Identify what is strong, what is weak, what is underspecified, what is missing, and what must be clarified before coding or writing the paper.
+
+Your output must include all of the following:
+
+1. Executive Research Vision
+- What is the core research idea?
+- What problem does it solve?
+- Why is the problem important now?
+- What is the expected paper-level contribution?
+- What makes the idea publishable rather than just an engineering project?
+
+2. Novelty and Contribution Analysis
+- Extract the strongest novelty claims from the report.
+- Identify which novelty claims are weak, risky, or already covered by prior work.
+- Rewrite the final novelty into strong publishable claims.
+- Define 3–5 concrete paper contributions.
+- Explain what the paper must prove experimentally to make each contribution credible.
+
+3. System Design and Architecture
+- Convert the report into a clear system architecture.
+- Define every component, module, input, output, and dependency.
+- Explain the data flow step by step.
+- Define the trust boundaries and attacker interaction points.
+- Identify which components must be implemented first.
+- Include architecture diagrams as LaTeX/TikZ placeholders or textual figure specifications.
+- Explain what each figure in the final paper should show.
+
+4. Threat Model
+- Define the attacker’s capabilities.
+- Define the attacker’s goals.
+- Define the defender’s assumptions.
+- Define what is in scope and out of scope.
+- Define the victim system/environment.
+- Define realistic attack surfaces.
+- Explain why this threat model is credible and not exaggerated.
+
+5. Research Questions
+- Formulate precise research questions.
+- Each research question must map to:
+  a. a system component,
+  b. an experiment,
+  c. a metric,
+  d. an expected result,
+  e. a paper contribution.
+
+6. Implementation Plan from Zero to Hero
+Create a complete implementation roadmap that a developer can follow.
+
+Include:
+- Repository structure.
+- Files and folders to create.
+- Core classes/modules.
+- APIs and interfaces.
+- Data schemas.
+- Configuration files.
+- Logging design.
+- Experiment runner design.
+- Reproducibility design.
+- Baseline implementation.
+- Attack/defense implementation.
+- Evaluation pipeline.
+- Result aggregation scripts.
+- Plot/table generation scripts.
+
+For each implementation phase, include:
+- Goal.
+- Required modules.
+- Exact tasks.
+- Expected outputs.
+- How to verify correctness.
+- Common failure points.
+- What evidence/logs should be saved for the paper.
+
+7. Experimental Design
+Design the full experimental section.
+
+Include:
+- Experimental setup.
+- Datasets or simulated environment.
+- Models/frameworks/tools to test.
+- Baselines.
+- Ablations.
+- Main scenarios.
+- Stress tests.
+- Sensitivity analysis.
+- Repeated trials/seeds.
+- Evaluation stages.
+- Clean vs. attacked vs. defended conditions.
+- What tables and figures should be produced.
+
+8. Scenarios and Test Cases
+Convert the report into concrete scenarios.
+
+For each scenario, specify:
+- Scenario name.
+- Purpose.
+- System state before the experiment.
+- Attacker action.
+- Defender behavior.
+- Expected failure or success mode.
+- Metrics collected.
+- Logs needed.
+- Table/figure output.
+- What claim this scenario supports.
+
+9. Metrics
+Define all metrics needed for the paper.
+
+For each metric:
+- Name.
+- Formal definition.
+- Intuition.
+- How to compute it.
+- Required logs/data.
+- Expected value range.
+- What result would support the paper’s claim.
+- What result would weaken the paper.
+
+Also identify whether new metrics are needed and whether existing metrics from prior work are enough.
+
+10. Baselines and Comparative Evaluation
+Identify what the system should be compared against.
+
+Include:
+- Simple baselines.
+- Strong baselines.
+- Prior-defense baselines.
+- No-defense baseline.
+- Random/heuristic baseline if useful.
+- Why each baseline is fair.
+- What comparison would make the paper convincing.
+
+11. Paper Skeleton
+Create a full research paper skeleton.
+
+Include:
+- Title candidates.
+- Abstract draft structure.
+- Introduction outline.
+- Related work map.
+- Background section.
+- System design section.
+- Threat model section.
+- Methodology section.
+- Evaluation section.
+- Defense/analysis section if applicable.
+- Discussion.
+- Limitations.
+- Ethics.
+- Conclusion.
+- Appendix plan.
+
+For each section, explain:
+- What must be written there.
+- What evidence must support it.
+- What figures/tables belong there.
+- What reviewer objections must be preempted.
+
+12. Chapter-by-Chapter Execution Manual
+The LaTeX report must be organized as a practical manual.
+
+Use chapters such as:
+- Chapter 1: Research Vision and Paper Thesis
+- Chapter 2: Novelty, Gaps, and Contributions
+- Chapter 3: System Architecture
+- Chapter 4: Threat Model
+- Chapter 5: Implementation Blueprint
+- Chapter 6: Scenario Design
+- Chapter 7: Experimental Methodology
+- Chapter 8: Metrics and Evaluation Logic
+- Chapter 9: Baselines and Ablations
+- Chapter 10: Paper Skeleton
+- Chapter 11: Timeline and Execution Checklist
+- Chapter 12: Risks, Reviewer Objections, and Mitigations
+
+13. Harsh Reviewer Audit
+Act like three reviewers:
+- Reviewer 1: Security/system design reviewer.
+- Reviewer 2: Machine learning/LLM evaluation reviewer.
+- Reviewer 3: Conference acceptance reviewer.
+
+For each reviewer, list:
+- Major concerns.
+- Minor concerns.
+- Missing evidence.
+- Weak claims.
+- Required fixes.
+- What would make the paper borderline.
+- What would make the paper strong accept.
+
+14. Timeline
+Create a realistic execution timeline.
+
+Assume the goal is to complete a submission-quality paper quickly.
+
+Include:
+- Day-by-day or phase-by-phase plan.
+- Coding milestones.
+- Experiment milestones.
+- Writing milestones.
+- Figure/table milestones.
+- Risk buffer.
+- Minimum viable paper path.
+- Strong version path.
+
+15. Final Deliverable Checklist
+End with a checklist of everything needed before submission:
+- Code complete.
+- Experiments complete.
+- Tables generated.
+- Figures generated.
+- Logs saved.
+- Claims validated.
+- Related work checked.
+- Paper compiled.
+- Reviewer objections addressed.
+- Comparing tables we could put it to show we outperform others frameworks if applicable
+
+Important rules:
+- Do not merely summarize the attached report.
+- Do not produce vague advice.
+- Do not hallucinate missing details. If the report does not specify something, clearly mark it as “Missing / Must Decide.”
+- Be harsh and realistic.
+- Prioritize publishability, reproducibility, and claim-evidence alignment.
+- Make the roadmap actionable enough that a developer can start coding immediately.
+- Make the paper skeleton strong enough that a researcher can start writing immediately.
+- Keep the work standalone and publishable.
+- Do not assume the reader already knows the attached report.
+- Do not rely on unpublished work as a cited foundation unless the attached report explicitly says it is allowed.
+- The final answer must be one single LaTeX file only, with no explanation outside the LaTeX.
+
+Now read the attached report and produce the complete Single LaTeX implementation-and-paper roadmap.

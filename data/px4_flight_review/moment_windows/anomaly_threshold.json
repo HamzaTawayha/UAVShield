@@ -1,0 +1,39 @@
+{
+  "threshold": 0.61201025,
+  "normal_label": "normal_good",
+  "calibration_quantile": 0.95,
+  "interpretation": "score > threshold is anomalous",
+  "source_scores": "data\\px4_flight_review\\moment_windows\\anomaly_scores.csv",
+  "summary": {
+    "crash": {
+      "n": 65,
+      "mean_score": 0.4849299846153846,
+      "p50_score": 0.499894,
+      "p95_score": 0.5732608,
+      "max_score": 0.677915,
+      "flagged_count": 1,
+      "flagged_rate": 0.015384615384615385,
+      "role": "detection_estimate"
+    },
+    "normal_good": {
+      "n": 70,
+      "mean_score": 0.4050308285714286,
+      "p50_score": 0.389216,
+      "p95_score": 0.61201025,
+      "max_score": 0.646808,
+      "flagged_count": 4,
+      "flagged_rate": 0.05714285714285714,
+      "role": "false_positive_estimate"
+    },
+    "unsatisfactory": {
+      "n": 72,
+      "mean_score": 0.3970496666666667,
+      "p50_score": 0.3861325,
+      "p95_score": 0.45056785,
+      "max_score": 0.518815,
+      "flagged_count": 0,
+      "flagged_rate": 0.0,
+      "role": "detection_estimate"
+    }
+  }
+}

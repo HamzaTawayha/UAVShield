@@ -1,0 +1,1745 @@
+{
+  "test": {
+    "accuracy": 0.5566037735849056,
+    "precision": 0.7272727272727273,
+    "recall": 0.15384615384615385,
+    "f1": 0.25396825396825395,
+    "roc_auc": 0.7297008547008548,
+    "normal_threshold_quantile": 0.95,
+    "windows": 212
+  },
+  "by_label": {
+    "crash": {
+      "n": 42,
+      "mean_score": 0.7372299866508872,
+      "p95_score": 0.9997973079395701,
+      "flagged_count": 8,
+      "flagged_rate": 0.19047619047619047
+    },
+    "normal_good": {
+      "n": 108,
+      "mean_score": 0.44060623509237046,
+      "p95_score": 0.9981450828408557,
+      "flagged_count": 6,
+      "flagged_rate": 0.05555555555555555
+    },
+    "unsatisfactory": {
+      "n": 62,
+      "mean_score": 0.7911049312461931,
+      "p95_score": 0.9992950709598224,
+      "flagged_count": 8,
+      "flagged_rate": 0.12903225806451613
+    }
+  },
+  "predictions": [
+    {
+      "label": "normal_good",
+      "y_true": 0,
+      "file": "0004dbb9-c57b-442c-be97-3d24d722d5fa.ulg",
+      "window_start_s": 0.0,
+      "anomaly_probability": 0.7814416855771595,
+      "flagged": 0
+    },
+    {
+      "label": "normal_good",
+      "y_true": 0,
+      "file": "0004dbb9-c57b-442c-be97-3d24d722d5fa.ulg",
+      "window_start_s": 16.0,
+      "anomaly_probability": 0.22325840018873722,
+      "flagged": 0
+    },
+    {
+      "label": "normal_good",
+      "y_true": 0,
+      "file": "0004dbb9-c57b-442c-be97-3d24d722d5fa.ulg",
+      "window_start_s": 32.0,
+      "anomaly_probability": 0.17190205078246296,
+      "flagged": 0
+    },
+    {
+      "label": "normal_good",
+      "y_true": 0,
+      "file": "0004dbb9-c57b-442c-be97-3d24d722d5fa.ulg",
+      "window_start_s": 48.0,
+      "anomaly_probability": 0.48209340438019205,
+      "flagged": 0
+    },
+    {
+      "label": "normal_good",
+      "y_true": 0,
+      "file": "0004dbb9-c57b-442c-be97-3d24d722d5fa.ulg",
+      "window_start_s": 64.0,
+      "anomaly_probability": 0.031594775800303454,
+      "flagged": 0
+    },
+    {
+      "label": "normal_good",
+      "y_true": 0,
+      "file": "0004dbb9-c57b-442c-be97-3d24d722d5fa.ulg",
+      "window_start_s": 80.0,
+      "anomaly_probability": 0.06639314847285294,
+      "flagged": 0
+    },
+    {
+      "label": "normal_good",
+      "y_true": 0,
+      "file": "0004dbb9-c57b-442c-be97-3d24d722d5fa.ulg",
+      "window_start_s": 96.0,
+      "anomaly_probability": 0.12198036724598926,
+      "flagged": 0
+    },
+    {
+      "label": "normal_good",
+      "y_true": 0,
+      "file": "0004dbb9-c57b-442c-be97-3d24d722d5fa.ulg",
+      "window_start_s": 112.0,
+      "anomaly_probability": 0.016048064131379814,
+      "flagged": 0
+    },
+    {
+      "label": "normal_good",
+      "y_true": 0,
+      "file": "01f55399-84d2-497a-8ed5-9a92abc9ac73.ulg",
+      "window_start_s": 0.0,
+      "anomaly_probability": 0.7633680925229642,
+      "flagged": 0
+    },
+    {
+      "label": "normal_good",
+      "y_true": 0,
+      "file": "01f55399-84d2-497a-8ed5-9a92abc9ac73.ulg",
+      "window_start_s": 16.0,
+      "anomaly_probability": 0.9964589091809336,
+      "flagged": 0
+    },
+    {
+      "label": "normal_good",
+      "y_true": 0,
+      "file": "01f55399-84d2-497a-8ed5-9a92abc9ac73.ulg",
+      "window_start_s": 32.0,
+      "anomaly_probability": 0.038863275185701915,
+      "flagged": 0
+    },
+    {
+      "label": "normal_good",
+      "y_true": 0,
+      "file": "01f55399-84d2-497a-8ed5-9a92abc9ac73.ulg",
+      "window_start_s": 48.0,
+      "anomaly_probability": 0.05165884393253144,
+      "flagged": 0
+    },
+    {
+      "label": "normal_good",
+      "y_true": 0,
+      "file": "01f55399-84d2-497a-8ed5-9a92abc9ac73.ulg",
+      "window_start_s": 64.0,
+      "anomaly_probability": 0.36777043229158574,
+      "flagged": 0
+    },
+    {
+      "label": "normal_good",
+      "y_true": 0,
+      "file": "01f55399-84d2-497a-8ed5-9a92abc9ac73.ulg",
+      "window_start_s": 80.0,
+      "anomaly_probability": 0.01838770737199167,
+      "flagged": 0
+    },
+    {
+      "label": "normal_good",
+      "y_true": 0,
+      "file": "01f55399-84d2-497a-8ed5-9a92abc9ac73.ulg",
+      "window_start_s": 96.0,
+      "anomaly_probability": 0.015443733079372681,
+      "flagged": 0
+    },
+    {
+      "label": "normal_good",
+      "y_true": 0,
+      "file": "01f55399-84d2-497a-8ed5-9a92abc9ac73.ulg",
+      "window_start_s": 112.0,
+      "anomaly_probability": 0.4800737946458324,
+      "flagged": 0
+    },
+    {
+      "label": "normal_good",
+      "y_true": 0,
+      "file": "03c7415d-6d6a-4bdf-82be-fa427cc6c250.ulg",
+      "window_start_s": 0.0,
+      "anomaly_probability": 0.09704457652870627,
+      "flagged": 0
+    },
+    {
+      "label": "normal_good",
+      "y_true": 0,
+      "file": "03c7415d-6d6a-4bdf-82be-fa427cc6c250.ulg",
+      "window_start_s": 16.0,
+      "anomaly_probability": 0.8817188093884546,
+      "flagged": 0
+    },
+    {
+      "label": "normal_good",
+      "y_true": 0,
+      "file": "03c7415d-6d6a-4bdf-82be-fa427cc6c250.ulg",
+      "window_start_s": 32.0,
+      "anomaly_probability": 0.97253976976309,
+      "flagged": 0
+    },
+    {
+      "label": "normal_good",
+      "y_true": 0,
+      "file": "03c7415d-6d6a-4bdf-82be-fa427cc6c250.ulg",
+      "window_start_s": 48.0,
+      "anomaly_probability": 0.6386882729942854,
+      "flagged": 0
+    },
+    {
+      "label": "normal_good",
+      "y_true": 0,
+      "file": "03c7415d-6d6a-4bdf-82be-fa427cc6c250.ulg",
+      "window_start_s": 64.0,
+      "anomaly_probability": 0.8866416903194102,
+      "flagged": 0
+    },
+    {
+      "label": "normal_good",
+      "y_true": 0,
+      "file": "05873753-2643-41c3-90da-4d8a5c4ec471.ulg",
+      "window_start_s": 0.0,
+      "anomaly_probability": 0.9999159181043713,
+      "flagged": 1
+    },
+    {
+      "label": "normal_good",
+      "y_true": 0,
+      "file": "05873753-2643-41c3-90da-4d8a5c4ec471.ulg",
+      "window_start_s": 16.0,
+      "anomaly_probability": 0.9890810808635143,
+      "flagged": 0
+    },
+    {
+      "label": "normal_good",
+      "y_true": 0,
+      "file": "05873753-2643-41c3-90da-4d8a5c4ec471.ulg",
+      "window_start_s": 32.0,
+      "anomaly_probability": 0.9136998607270771,
+      "flagged": 0
+    },
+    {
+      "label": "normal_good",
+      "y_true": 0,
+      "file": "0b1a730d-147b-47e3-b25e-c56fe27dacf8.ulg",
+      "window_start_s": 0.0,
+      "anomaly_probability": 0.47687572662410294,
+      "flagged": 0
+    },
+    {
+      "label": "normal_good",
+      "y_true": 0,
+      "file": "0b1a730d-147b-47e3-b25e-c56fe27dacf8.ulg",
+      "window_start_s": 16.0,
+      "anomaly_probability": 0.05403317308687145,
+      "flagged": 0
+    },
+    {
+      "label": "normal_good",
+      "y_true": 0,
+      "file": "0b1a730d-147b-47e3-b25e-c56fe27dacf8.ulg",
+      "window_start_s": 32.0,
+      "anomaly_probability": 0.23372658772910065,
+      "flagged": 0
+    },
+    {
+      "label": "normal_good",
+      "y_true": 0,
+      "file": "0b1a730d-147b-47e3-b25e-c56fe27dacf8.ulg",
+      "window_start_s": 48.0,
+      "anomaly_probability": 0.9745305813354099,
+      "flagged": 0
+    },
+    {
+      "label": "normal_good",
+      "y_true": 0,
+      "file": "0b1a730d-147b-47e3-b25e-c56fe27dacf8.ulg",
+      "window_start_s": 64.0,
+      "anomaly_probability": 0.9965187912395964,
+      "flagged": 0
+    },
+    {
+      "label": "normal_good",
+      "y_true": 0,
+      "file": "0b7217d4-92e0-4479-bfb3-6b1b4422f249.ulg",
+      "window_start_s": 0.0,
+      "anomaly_probability": 0.49565583637082966,
+      "flagged": 0
+    },
+    {
+      "label": "normal_good",
+      "y_true": 0,
+      "file": "0b7217d4-92e0-4479-bfb3-6b1b4422f249.ulg",
+      "window_start_s": 16.0,
+      "anomaly_probability": 0.9926951987223385,
+      "flagged": 0
+    },
+    {
+      "label": "normal_good",
+      "y_true": 0,
+      "file": "0b7217d4-92e0-4479-bfb3-6b1b4422f249.ulg",
+      "window_start_s": 32.0,
+      "anomaly_probability": 0.47236069775110284,
+      "flagged": 0
+    },
+    {
+      "label": "normal_good",
+      "y_true": 0,
+      "file": "0b7217d4-92e0-4479-bfb3-6b1b4422f249.ulg",
+      "window_start_s": 48.0,
+      "anomaly_probability": 0.9958162147233185,
+      "flagged": 0
+    },
+    {
+      "label": "normal_good",
+      "y_true": 0,
+      "file": "0b7217d4-92e0-4479-bfb3-6b1b4422f249.ulg",
+      "window_start_s": 64.0,
+      "anomaly_probability": 0.9999738621317648,
+      "flagged": 1
+    },
+    {
+      "label": "normal_good",
+      "y_true": 0,
+      "file": "0b7217d4-92e0-4479-bfb3-6b1b4422f249.ulg",
+      "window_start_s": 80.0,
+      "anomaly_probability": 0.985024820231619,
+      "flagged": 0
+    },
+    {
+      "label": "normal_good",
+      "y_true": 0,
+      "file": "0b7217d4-92e0-4479-bfb3-6b1b4422f249.ulg",
+      "window_start_s": 96.0,
+      "anomaly_probability": 0.998588576596981,
+      "flagged": 1
+    },
+    {
+      "label": "normal_good",
+      "y_true": 0,
+      "file": "0b7217d4-92e0-4479-bfb3-6b1b4422f249.ulg",
+      "window_start_s": 112.0,
+      "anomaly_probability": 0.8498206898279149,
+      "flagged": 0
+    },
+    {
+      "label": "normal_good",
+      "y_true": 0,
+      "file": "0b7217d4-92e0-4479-bfb3-6b1b4422f249.ulg",
+      "window_start_s": 128.0,
+      "anomaly_probability": 0.9955313226443491,
+      "flagged": 0
+    },
+    {
+      "label": "normal_good",
+      "y_true": 0,
+      "file": "0b7217d4-92e0-4479-bfb3-6b1b4422f249.ulg",
+      "window_start_s": 144.0,
+      "anomaly_probability": 0.9999919869276112,
+      "flagged": 1
+    },
+    {
+      "label": "normal_good",
+      "y_true": 0,
+      "file": "0b7217d4-92e0-4479-bfb3-6b1b4422f249.ulg",
+      "window_start_s": 160.0,
+      "anomaly_probability": 0.0157250674355334,
+      "flagged": 0
+    },
+    {
+      "label": "normal_good",
+      "y_true": 0,
+      "file": "0de32cb0-a86a-4a44-b8c4-4c1a6b7146a1.ulg",
+      "window_start_s": 0.0,
+      "anomaly_probability": 0.9987057188475389,
+      "flagged": 1
+    },
+    {
+      "label": "normal_good",
+      "y_true": 0,
+      "file": "0de32cb0-a86a-4a44-b8c4-4c1a6b7146a1.ulg",
+      "window_start_s": 16.0,
+      "anomaly_probability": 0.8169427502627027,
+      "flagged": 0
+    },
+    {
+      "label": "normal_good",
+      "y_true": 0,
+      "file": "0ec04a15-ed3d-48c1-942d-77411802d359.ulg",
+      "window_start_s": 0.0,
+      "anomaly_probability": 0.941779282037179,
+      "flagged": 0
+    },
+    {
+      "label": "normal_good",
+      "y_true": 0,
+      "file": "0ec04a15-ed3d-48c1-942d-77411802d359.ulg",
+      "window_start_s": 16.0,
+      "anomaly_probability": 0.9546629640366852,
+      "flagged": 0
+    },
+    {
+      "label": "normal_good",
+      "y_true": 0,
+      "file": "108e5729-67b7-4d93-ae8e-ff0f5df5a63c.ulg",
+      "window_start_s": 0.0,
+      "anomaly_probability": 0.03244580670553067,
+      "flagged": 0
+    },
+    {
+      "label": "normal_good",
+      "y_true": 0,
+      "file": "108e5729-67b7-4d93-ae8e-ff0f5df5a63c.ulg",
+      "window_start_s": 16.0,
+      "anomaly_probability": 0.00025821469484957473,
+      "flagged": 0
+    },
+    {
+      "label": "normal_good",
+      "y_true": 0,
+      "file": "108e5729-67b7-4d93-ae8e-ff0f5df5a63c.ulg",
+      "window_start_s": 32.0,
+      "anomaly_probability": 0.1746769977713873,
+      "flagged": 0
+    },
+    {
+      "label": "normal_good",
+      "y_true": 0,
+      "file": "108e5729-67b7-4d93-ae8e-ff0f5df5a63c.ulg",
+      "window_start_s": 48.0,
+      "anomaly_probability": 0.0006775467916770389,
+      "flagged": 0
+    },
+    {
+      "label": "normal_good",
+      "y_true": 0,
+      "file": "108e5729-67b7-4d93-ae8e-ff0f5df5a63c.ulg",
+      "window_start_s": 64.0,
+      "anomaly_probability": 0.3477757626545476,
+      "flagged": 0
+    },
+    {
+      "label": "normal_good",
+      "y_true": 0,
+      "file": "108e5729-67b7-4d93-ae8e-ff0f5df5a63c.ulg",
+      "window_start_s": 80.0,
+      "anomaly_probability": 0.9961673991610467,
+      "flagged": 0
+    },
+    {
+      "label": "normal_good",
+      "y_true": 0,
+      "file": "108e5729-67b7-4d93-ae8e-ff0f5df5a63c.ulg",
+      "window_start_s": 96.0,
+      "anomaly_probability": 0.6855711985103162,
+      "flagged": 0
+    },
+    {
+      "label": "normal_good",
+      "y_true": 0,
+      "file": "108e5729-67b7-4d93-ae8e-ff0f5df5a63c.ulg",
+      "window_start_s": 112.0,
+      "anomaly_probability": 0.33309366792990897,
+      "flagged": 0
+    },
+    {
+      "label": "normal_good",
+      "y_true": 0,
+      "file": "108e5729-67b7-4d93-ae8e-ff0f5df5a63c.ulg",
+      "window_start_s": 128.0,
+      "anomaly_probability": 0.004099891532018187,
+      "flagged": 0
+    },
+    {
+      "label": "normal_good",
+      "y_true": 0,
+      "file": "108e5729-67b7-4d93-ae8e-ff0f5df5a63c.ulg",
+      "window_start_s": 144.0,
+      "anomaly_probability": 0.5153603941266172,
+      "flagged": 0
+    },
+    {
+      "label": "normal_good",
+      "y_true": 0,
+      "file": "108e5729-67b7-4d93-ae8e-ff0f5df5a63c.ulg",
+      "window_start_s": 160.0,
+      "anomaly_probability": 0.9066948008524137,
+      "flagged": 0
+    },
+    {
+      "label": "normal_good",
+      "y_true": 0,
+      "file": "108e5729-67b7-4d93-ae8e-ff0f5df5a63c.ulg",
+      "window_start_s": 176.0,
+      "anomaly_probability": 0.0021681562643064505,
+      "flagged": 0
+    },
+    {
+      "label": "normal_good",
+      "y_true": 0,
+      "file": "108e5729-67b7-4d93-ae8e-ff0f5df5a63c.ulg",
+      "window_start_s": 192.0,
+      "anomaly_probability": 0.7605772159915197,
+      "flagged": 0
+    },
+    {
+      "label": "normal_good",
+      "y_true": 0,
+      "file": "13b49ba9-33a6-4354-b7f0-151ea12a8829.ulg",
+      "window_start_s": 0.0,
+      "anomaly_probability": 0.04807507061900002,
+      "flagged": 0
+    },
+    {
+      "label": "normal_good",
+      "y_true": 0,
+      "file": "13b49ba9-33a6-4354-b7f0-151ea12a8829.ulg",
+      "window_start_s": 16.0,
+      "anomaly_probability": 0.2793147143919751,
+      "flagged": 0
+    },
+    {
+      "label": "normal_good",
+      "y_true": 0,
+      "file": "13b49ba9-33a6-4354-b7f0-151ea12a8829.ulg",
+      "window_start_s": 32.0,
+      "anomaly_probability": 0.08849450392962233,
+      "flagged": 0
+    },
+    {
+      "label": "normal_good",
+      "y_true": 0,
+      "file": "13d1f0b9-85a4-41f2-a347-5ad8efe44088.ulg",
+      "window_start_s": 0.0,
+      "anomaly_probability": 0.8816366227445849,
+      "flagged": 0
+    },
+    {
+      "label": "normal_good",
+      "y_true": 0,
+      "file": "13d1f0b9-85a4-41f2-a347-5ad8efe44088.ulg",
+      "window_start_s": 16.0,
+      "anomaly_probability": 0.9916507136780722,
+      "flagged": 0
+    },
+    {
+      "label": "normal_good",
+      "y_true": 0,
+      "file": "13d1f0b9-85a4-41f2-a347-5ad8efe44088.ulg",
+      "window_start_s": 32.0,
+      "anomaly_probability": 0.4093896619319291,
+      "flagged": 0
+    },
+    {
+      "label": "normal_good",
+      "y_true": 0,
+      "file": "13d1f0b9-85a4-41f2-a347-5ad8efe44088.ulg",
+      "window_start_s": 48.0,
+      "anomaly_probability": 0.9967540311058689,
+      "flagged": 0
+    },
+    {
+      "label": "normal_good",
+      "y_true": 0,
+      "file": "13d1f0b9-85a4-41f2-a347-5ad8efe44088.ulg",
+      "window_start_s": 64.0,
+      "anomaly_probability": 0.972695847286188,
+      "flagged": 0
+    },
+    {
+      "label": "normal_good",
+      "y_true": 0,
+      "file": "164765f1-28ff-460b-bc45-1e53a7154cce.ulg",
+      "window_start_s": 0.0,
+      "anomaly_probability": 0.010275026406434526,
+      "flagged": 0
+    },
+    {
+      "label": "normal_good",
+      "y_true": 0,
+      "file": "164765f1-28ff-460b-bc45-1e53a7154cce.ulg",
+      "window_start_s": 16.0,
+      "anomaly_probability": 0.5658253887203837,
+      "flagged": 0
+    },
+    {
+      "label": "normal_good",
+      "y_true": 0,
+      "file": "164765f1-28ff-460b-bc45-1e53a7154cce.ulg",
+      "window_start_s": 32.0,
+      "anomaly_probability": 0.38678310908749747,
+      "flagged": 0
+    },
+    {
+      "label": "normal_good",
+      "y_true": 0,
+      "file": "164765f1-28ff-460b-bc45-1e53a7154cce.ulg",
+      "window_start_s": 48.0,
+      "anomaly_probability": 0.47281065999113875,
+      "flagged": 0
+    },
+    {
+      "label": "normal_good",
+      "y_true": 0,
+      "file": "164765f1-28ff-460b-bc45-1e53a7154cce.ulg",
+      "window_start_s": 64.0,
+      "anomaly_probability": 0.0012806587567161815,
+      "flagged": 0
+    },
+    {
+      "label": "normal_good",
+      "y_true": 0,
+      "file": "164765f1-28ff-460b-bc45-1e53a7154cce.ulg",
+      "window_start_s": 80.0,
+      "anomaly_probability": 0.19567948301993596,
+      "flagged": 0
+    },
+    {
+      "label": "normal_good",
+      "y_true": 0,
+      "file": "164765f1-28ff-460b-bc45-1e53a7154cce.ulg",
+      "window_start_s": 96.0,
+      "anomaly_probability": 0.002250926295370284,
+      "flagged": 0
+    },
+    {
+      "label": "normal_good",
+      "y_true": 0,
+      "file": "164765f1-28ff-460b-bc45-1e53a7154cce.ulg",
+      "window_start_s": 112.0,
+      "anomaly_probability": 0.02819923854360235,
+      "flagged": 0
+    },
+    {
+      "label": "normal_good",
+      "y_true": 0,
+      "file": "19960f9c-0917-4512-ac89-4c03f7f2fc47.ulg",
+      "window_start_s": 0.0,
+      "anomaly_probability": 0.06566580100439975,
+      "flagged": 0
+    },
+    {
+      "label": "normal_good",
+      "y_true": 0,
+      "file": "19960f9c-0917-4512-ac89-4c03f7f2fc47.ulg",
+      "window_start_s": 16.0,
+      "anomaly_probability": 0.0393625473890801,
+      "flagged": 0
+    },
+    {
+      "label": "normal_good",
+      "y_true": 0,
+      "file": "19960f9c-0917-4512-ac89-4c03f7f2fc47.ulg",
+      "window_start_s": 32.0,
+      "anomaly_probability": 0.035059772016643224,
+      "flagged": 0
+    },
+    {
+      "label": "normal_good",
+      "y_true": 0,
+      "file": "19960f9c-0917-4512-ac89-4c03f7f2fc47.ulg",
+      "window_start_s": 48.0,
+      "anomaly_probability": 0.023902657243930762,
+      "flagged": 0
+    },
+    {
+      "label": "normal_good",
+      "y_true": 0,
+      "file": "19960f9c-0917-4512-ac89-4c03f7f2fc47.ulg",
+      "window_start_s": 64.0,
+      "anomaly_probability": 0.02890596726042232,
+      "flagged": 0
+    },
+    {
+      "label": "normal_good",
+      "y_true": 0,
+      "file": "19960f9c-0917-4512-ac89-4c03f7f2fc47.ulg",
+      "window_start_s": 80.0,
+      "anomaly_probability": 0.29399658518034466,
+      "flagged": 0
+    },
+    {
+      "label": "normal_good",
+      "y_true": 0,
+      "file": "19960f9c-0917-4512-ac89-4c03f7f2fc47.ulg",
+      "window_start_s": 96.0,
+      "anomaly_probability": 0.05002027375690306,
+      "flagged": 0
+    },
+    {
+      "label": "normal_good",
+      "y_true": 0,
+      "file": "19960f9c-0917-4512-ac89-4c03f7f2fc47.ulg",
+      "window_start_s": 112.0,
+      "anomaly_probability": 0.03009268801368255,
+      "flagged": 0
+    },
+    {
+      "label": "normal_good",
+      "y_true": 0,
+      "file": "1d3a18d4-3c9f-4e49-9b96-2b330fe6a21b.ulg",
+      "window_start_s": 0.0,
+      "anomaly_probability": 0.0022705093165975533,
+      "flagged": 0
+    },
+    {
+      "label": "normal_good",
+      "y_true": 0,
+      "file": "1d3a18d4-3c9f-4e49-9b96-2b330fe6a21b.ulg",
+      "window_start_s": 16.0,
+      "anomaly_probability": 0.4142643583224881,
+      "flagged": 0
+    },
+    {
+      "label": "normal_good",
+      "y_true": 0,
+      "file": "1d3a18d4-3c9f-4e49-9b96-2b330fe6a21b.ulg",
+      "window_start_s": 32.0,
+      "anomaly_probability": 0.15385173135309704,
+      "flagged": 0
+    },
+    {
+      "label": "normal_good",
+      "y_true": 0,
+      "file": "20467322-4006-4d9b-b6cd-463e2272fa3e.ulg",
+      "window_start_s": 0.0,
+      "anomaly_probability": 0.018899128377085888,
+      "flagged": 0
+    },
+    {
+      "label": "normal_good",
+      "y_true": 0,
+      "file": "21d72038-ba58-4299-a6d9-a7e543ace4d0.ulg",
+      "window_start_s": 0.0,
+      "anomaly_probability": 0.11015582222365057,
+      "flagged": 0
+    },
+    {
+      "label": "normal_good",
+      "y_true": 0,
+      "file": "21d72038-ba58-4299-a6d9-a7e543ace4d0.ulg",
+      "window_start_s": 16.0,
+      "anomaly_probability": 0.012651363560177044,
+      "flagged": 0
+    },
+    {
+      "label": "normal_good",
+      "y_true": 0,
+      "file": "21d72038-ba58-4299-a6d9-a7e543ace4d0.ulg",
+      "window_start_s": 32.0,
+      "anomaly_probability": 0.671631457807293,
+      "flagged": 0
+    },
+    {
+      "label": "normal_good",
+      "y_true": 0,
+      "file": "21d72038-ba58-4299-a6d9-a7e543ace4d0.ulg",
+      "window_start_s": 48.0,
+      "anomaly_probability": 0.16094730554600445,
+      "flagged": 0
+    },
+    {
+      "label": "normal_good",
+      "y_true": 0,
+      "file": "2216828d-2fb5-40b0-afd7-d8cb8f536be9.ulg",
+      "window_start_s": 0.0,
+      "anomaly_probability": 0.003755938935247868,
+      "flagged": 0
+    },
+    {
+      "label": "normal_good",
+      "y_true": 0,
+      "file": "2216828d-2fb5-40b0-afd7-d8cb8f536be9.ulg",
+      "window_start_s": 16.0,
+      "anomaly_probability": 0.23461185606744517,
+      "flagged": 0
+    },
+    {
+      "label": "normal_good",
+      "y_true": 0,
+      "file": "2216828d-2fb5-40b0-afd7-d8cb8f536be9.ulg",
+      "window_start_s": 32.0,
+      "anomaly_probability": 0.6262881343497623,
+      "flagged": 0
+    },
+    {
+      "label": "normal_good",
+      "y_true": 0,
+      "file": "2216828d-2fb5-40b0-afd7-d8cb8f536be9.ulg",
+      "window_start_s": 48.0,
+      "anomaly_probability": 0.08551816118003588,
+      "flagged": 0
+    },
+    {
+      "label": "normal_good",
+      "y_true": 0,
+      "file": "2348c673-a441-48a0-ba48-40583c381c99.ulg",
+      "window_start_s": 0.0,
+      "anomaly_probability": 0.728763491099929,
+      "flagged": 0
+    },
+    {
+      "label": "normal_good",
+      "y_true": 0,
+      "file": "2348c673-a441-48a0-ba48-40583c381c99.ulg",
+      "window_start_s": 16.0,
+      "anomaly_probability": 0.7986043228529978,
+      "flagged": 0
+    },
+    {
+      "label": "normal_good",
+      "y_true": 0,
+      "file": "2348c673-a441-48a0-ba48-40583c381c99.ulg",
+      "window_start_s": 32.0,
+      "anomaly_probability": 0.4309660533052154,
+      "flagged": 0
+    },
+    {
+      "label": "normal_good",
+      "y_true": 0,
+      "file": "2348c673-a441-48a0-ba48-40583c381c99.ulg",
+      "window_start_s": 48.0,
+      "anomaly_probability": 0.008211043117634965,
+      "flagged": 0
+    },
+    {
+      "label": "normal_good",
+      "y_true": 0,
+      "file": "2348c673-a441-48a0-ba48-40583c381c99.ulg",
+      "window_start_s": 64.0,
+      "anomaly_probability": 0.5422629833059255,
+      "flagged": 0
+    },
+    {
+      "label": "normal_good",
+      "y_true": 0,
+      "file": "2348c673-a441-48a0-ba48-40583c381c99.ulg",
+      "window_start_s": 80.0,
+      "anomaly_probability": 0.9941292242939885,
+      "flagged": 0
+    },
+    {
+      "label": "normal_good",
+      "y_true": 0,
+      "file": "2348c673-a441-48a0-ba48-40583c381c99.ulg",
+      "window_start_s": 96.0,
+      "anomaly_probability": 0.21192463914858664,
+      "flagged": 0
+    },
+    {
+      "label": "normal_good",
+      "y_true": 0,
+      "file": "2348c673-a441-48a0-ba48-40583c381c99.ulg",
+      "window_start_s": 112.0,
+      "anomaly_probability": 0.005232571146865027,
+      "flagged": 0
+    },
+    {
+      "label": "normal_good",
+      "y_true": 0,
+      "file": "2348c673-a441-48a0-ba48-40583c381c99.ulg",
+      "window_start_s": 128.0,
+      "anomaly_probability": 0.1549208116573285,
+      "flagged": 0
+    },
+    {
+      "label": "normal_good",
+      "y_true": 0,
+      "file": "2348c673-a441-48a0-ba48-40583c381c99.ulg",
+      "window_start_s": 144.0,
+      "anomaly_probability": 0.9063541944822897,
+      "flagged": 0
+    },
+    {
+      "label": "normal_good",
+      "y_true": 0,
+      "file": "2348c673-a441-48a0-ba48-40583c381c99.ulg",
+      "window_start_s": 160.0,
+      "anomaly_probability": 0.999588627484979,
+      "flagged": 1
+    },
+    {
+      "label": "normal_good",
+      "y_true": 0,
+      "file": "2348c673-a441-48a0-ba48-40583c381c99.ulg",
+      "window_start_s": 176.0,
+      "anomaly_probability": 0.3841578036875019,
+      "flagged": 0
+    },
+    {
+      "label": "normal_good",
+      "y_true": 0,
+      "file": "2348c673-a441-48a0-ba48-40583c381c99.ulg",
+      "window_start_s": 192.0,
+      "anomaly_probability": 0.002734428205022621,
+      "flagged": 0
+    },
+    {
+      "label": "normal_good",
+      "y_true": 0,
+      "file": "2348c673-a441-48a0-ba48-40583c381c99.ulg",
+      "window_start_s": 208.0,
+      "anomaly_probability": 0.01274046416805977,
+      "flagged": 0
+    },
+    {
+      "label": "normal_good",
+      "y_true": 0,
+      "file": "2348c673-a441-48a0-ba48-40583c381c99.ulg",
+      "window_start_s": 224.0,
+      "anomaly_probability": 0.9973214515794802,
+      "flagged": 0
+    },
+    {
+      "label": "unsatisfactory",
+      "y_true": 1,
+      "file": "009441e0-ccf0-4682-8a71-37102de8d856.ulg",
+      "window_start_s": 0.0,
+      "anomaly_probability": 0.9105880411638677,
+      "flagged": 0
+    },
+    {
+      "label": "unsatisfactory",
+      "y_true": 1,
+      "file": "009441e0-ccf0-4682-8a71-37102de8d856.ulg",
+      "window_start_s": 16.0,
+      "anomaly_probability": 0.8817727342022099,
+      "flagged": 0
+    },
+    {
+      "label": "unsatisfactory",
+      "y_true": 1,
+      "file": "009441e0-ccf0-4682-8a71-37102de8d856.ulg",
+      "window_start_s": 32.0,
+      "anomaly_probability": 0.9913787626329151,
+      "flagged": 0
+    },
+    {
+      "label": "unsatisfactory",
+      "y_true": 1,
+      "file": "009441e0-ccf0-4682-8a71-37102de8d856.ulg",
+      "window_start_s": 48.0,
+      "anomaly_probability": 0.9468484060679679,
+      "flagged": 0
+    },
+    {
+      "label": "unsatisfactory",
+      "y_true": 1,
+      "file": "009441e0-ccf0-4682-8a71-37102de8d856.ulg",
+      "window_start_s": 64.0,
+      "anomaly_probability": 0.560756107649147,
+      "flagged": 0
+    },
+    {
+      "label": "unsatisfactory",
+      "y_true": 1,
+      "file": "0fb584d4-2b83-4738-9516-76c80ffb0800.ulg",
+      "window_start_s": 0.0,
+      "anomaly_probability": 0.9931738775001964,
+      "flagged": 0
+    },
+    {
+      "label": "unsatisfactory",
+      "y_true": 1,
+      "file": "0fb584d4-2b83-4738-9516-76c80ffb0800.ulg",
+      "window_start_s": 16.0,
+      "anomaly_probability": 0.9803666751467586,
+      "flagged": 0
+    },
+    {
+      "label": "unsatisfactory",
+      "y_true": 1,
+      "file": "0fb584d4-2b83-4738-9516-76c80ffb0800.ulg",
+      "window_start_s": 32.0,
+      "anomaly_probability": 0.9457768978622856,
+      "flagged": 0
+    },
+    {
+      "label": "unsatisfactory",
+      "y_true": 1,
+      "file": "0fb584d4-2b83-4738-9516-76c80ffb0800.ulg",
+      "window_start_s": 48.0,
+      "anomaly_probability": 0.7341924725003813,
+      "flagged": 0
+    },
+    {
+      "label": "unsatisfactory",
+      "y_true": 1,
+      "file": "0fb584d4-2b83-4738-9516-76c80ffb0800.ulg",
+      "window_start_s": 64.0,
+      "anomaly_probability": 0.8470812943389491,
+      "flagged": 0
+    },
+    {
+      "label": "unsatisfactory",
+      "y_true": 1,
+      "file": "0fb584d4-2b83-4738-9516-76c80ffb0800.ulg",
+      "window_start_s": 80.0,
+      "anomaly_probability": 0.9166327519319987,
+      "flagged": 0
+    },
+    {
+      "label": "unsatisfactory",
+      "y_true": 1,
+      "file": "0fb584d4-2b83-4738-9516-76c80ffb0800.ulg",
+      "window_start_s": 96.0,
+      "anomaly_probability": 0.9768897566269674,
+      "flagged": 0
+    },
+    {
+      "label": "unsatisfactory",
+      "y_true": 1,
+      "file": "0fb584d4-2b83-4738-9516-76c80ffb0800.ulg",
+      "window_start_s": 112.0,
+      "anomaly_probability": 0.9949994207450618,
+      "flagged": 0
+    },
+    {
+      "label": "unsatisfactory",
+      "y_true": 1,
+      "file": "0fb584d4-2b83-4738-9516-76c80ffb0800.ulg",
+      "window_start_s": 128.0,
+      "anomaly_probability": 0.9071017967124209,
+      "flagged": 0
+    },
+    {
+      "label": "unsatisfactory",
+      "y_true": 1,
+      "file": "0fb584d4-2b83-4738-9516-76c80ffb0800.ulg",
+      "window_start_s": 144.0,
+      "anomaly_probability": 0.9933212882638902,
+      "flagged": 0
+    },
+    {
+      "label": "unsatisfactory",
+      "y_true": 1,
+      "file": "0fb584d4-2b83-4738-9516-76c80ffb0800.ulg",
+      "window_start_s": 160.0,
+      "anomaly_probability": 0.998542216988123,
+      "flagged": 1
+    },
+    {
+      "label": "unsatisfactory",
+      "y_true": 1,
+      "file": "0fb584d4-2b83-4738-9516-76c80ffb0800.ulg",
+      "window_start_s": 176.0,
+      "anomaly_probability": 0.9908034801941563,
+      "flagged": 0
+    },
+    {
+      "label": "unsatisfactory",
+      "y_true": 1,
+      "file": "0fb584d4-2b83-4738-9516-76c80ffb0800.ulg",
+      "window_start_s": 192.0,
+      "anomaly_probability": 0.9956859130065566,
+      "flagged": 0
+    },
+    {
+      "label": "unsatisfactory",
+      "y_true": 1,
+      "file": "0fb584d4-2b83-4738-9516-76c80ffb0800.ulg",
+      "window_start_s": 208.0,
+      "anomaly_probability": 0.9494430198434084,
+      "flagged": 0
+    },
+    {
+      "label": "unsatisfactory",
+      "y_true": 1,
+      "file": "0fb584d4-2b83-4738-9516-76c80ffb0800.ulg",
+      "window_start_s": 224.0,
+      "anomaly_probability": 0.912664991092258,
+      "flagged": 0
+    },
+    {
+      "label": "unsatisfactory",
+      "y_true": 1,
+      "file": "1d652f6e-e128-4a6b-a2a2-f4c4a74093b5.ulg",
+      "window_start_s": 0.0,
+      "anomaly_probability": 0.35828795437409,
+      "flagged": 0
+    },
+    {
+      "label": "unsatisfactory",
+      "y_true": 1,
+      "file": "1d652f6e-e128-4a6b-a2a2-f4c4a74093b5.ulg",
+      "window_start_s": 16.0,
+      "anomaly_probability": 0.9993043433144697,
+      "flagged": 1
+    },
+    {
+      "label": "unsatisfactory",
+      "y_true": 1,
+      "file": "1d652f6e-e128-4a6b-a2a2-f4c4a74093b5.ulg",
+      "window_start_s": 32.0,
+      "anomaly_probability": 0.8065999623729695,
+      "flagged": 0
+    },
+    {
+      "label": "unsatisfactory",
+      "y_true": 1,
+      "file": "1d652f6e-e128-4a6b-a2a2-f4c4a74093b5.ulg",
+      "window_start_s": 48.0,
+      "anomaly_probability": 0.9095363320361965,
+      "flagged": 0
+    },
+    {
+      "label": "unsatisfactory",
+      "y_true": 1,
+      "file": "1d652f6e-e128-4a6b-a2a2-f4c4a74093b5.ulg",
+      "window_start_s": 64.0,
+      "anomaly_probability": 0.27852859629991145,
+      "flagged": 0
+    },
+    {
+      "label": "unsatisfactory",
+      "y_true": 1,
+      "file": "1d652f6e-e128-4a6b-a2a2-f4c4a74093b5.ulg",
+      "window_start_s": 80.0,
+      "anomaly_probability": 0.015267847844342972,
+      "flagged": 0
+    },
+    {
+      "label": "unsatisfactory",
+      "y_true": 1,
+      "file": "1d652f6e-e128-4a6b-a2a2-f4c4a74093b5.ulg",
+      "window_start_s": 96.0,
+      "anomaly_probability": 0.029920976896180094,
+      "flagged": 0
+    },
+    {
+      "label": "unsatisfactory",
+      "y_true": 1,
+      "file": "1d652f6e-e128-4a6b-a2a2-f4c4a74093b5.ulg",
+      "window_start_s": 112.0,
+      "anomaly_probability": 0.7700374655295283,
+      "flagged": 0
+    },
+    {
+      "label": "unsatisfactory",
+      "y_true": 1,
+      "file": "1d652f6e-e128-4a6b-a2a2-f4c4a74093b5.ulg",
+      "window_start_s": 128.0,
+      "anomaly_probability": 0.30271931924545054,
+      "flagged": 0
+    },
+    {
+      "label": "unsatisfactory",
+      "y_true": 1,
+      "file": "1d652f6e-e128-4a6b-a2a2-f4c4a74093b5.ulg",
+      "window_start_s": 144.0,
+      "anomaly_probability": 0.32727712613851356,
+      "flagged": 0
+    },
+    {
+      "label": "unsatisfactory",
+      "y_true": 1,
+      "file": "271df769-7d58-49a4-8ceb-a7e6736064f8.ulg",
+      "window_start_s": 0.0,
+      "anomaly_probability": 0.8177442285839117,
+      "flagged": 0
+    },
+    {
+      "label": "unsatisfactory",
+      "y_true": 1,
+      "file": "271df769-7d58-49a4-8ceb-a7e6736064f8.ulg",
+      "window_start_s": 16.0,
+      "anomaly_probability": 0.17845998618868222,
+      "flagged": 0
+    },
+    {
+      "label": "unsatisfactory",
+      "y_true": 1,
+      "file": "271df769-7d58-49a4-8ceb-a7e6736064f8.ulg",
+      "window_start_s": 32.0,
+      "anomaly_probability": 0.5199729828073933,
+      "flagged": 0
+    },
+    {
+      "label": "unsatisfactory",
+      "y_true": 1,
+      "file": "271df769-7d58-49a4-8ceb-a7e6736064f8.ulg",
+      "window_start_s": 48.0,
+      "anomaly_probability": 0.9771120594654149,
+      "flagged": 0
+    },
+    {
+      "label": "unsatisfactory",
+      "y_true": 1,
+      "file": "271df769-7d58-49a4-8ceb-a7e6736064f8.ulg",
+      "window_start_s": 64.0,
+      "anomaly_probability": 0.00877999631919462,
+      "flagged": 0
+    },
+    {
+      "label": "unsatisfactory",
+      "y_true": 1,
+      "file": "2990cd6a-8d83-4683-8183-ac789d800f70.ulg",
+      "window_start_s": 0.0,
+      "anomaly_probability": 0.640915142108593,
+      "flagged": 0
+    },
+    {
+      "label": "unsatisfactory",
+      "y_true": 1,
+      "file": "2990cd6a-8d83-4683-8183-ac789d800f70.ulg",
+      "window_start_s": 16.0,
+      "anomaly_probability": 0.948008149914932,
+      "flagged": 0
+    },
+    {
+      "label": "unsatisfactory",
+      "y_true": 1,
+      "file": "2f74b9df-4d1c-4a88-b6bb-b65ad5cab486.ulg",
+      "window_start_s": 0.0,
+      "anomaly_probability": 0.9833652588697439,
+      "flagged": 0
+    },
+    {
+      "label": "unsatisfactory",
+      "y_true": 1,
+      "file": "2f74b9df-4d1c-4a88-b6bb-b65ad5cab486.ulg",
+      "window_start_s": 16.0,
+      "anomaly_probability": 0.9989276885734912,
+      "flagged": 1
+    },
+    {
+      "label": "unsatisfactory",
+      "y_true": 1,
+      "file": "3e0c4a83-ccc8-4d5d-82bb-50867a2f06fc.ulg",
+      "window_start_s": 0.0,
+      "anomaly_probability": 0.9999921742651807,
+      "flagged": 1
+    },
+    {
+      "label": "unsatisfactory",
+      "y_true": 1,
+      "file": "3fe4f6f2-3f2c-4876-9a76-acfc97896446.ulg",
+      "window_start_s": 0.0,
+      "anomaly_probability": 0.9936649179889692,
+      "flagged": 0
+    },
+    {
+      "label": "unsatisfactory",
+      "y_true": 1,
+      "file": "3fe4f6f2-3f2c-4876-9a76-acfc97896446.ulg",
+      "window_start_s": 16.0,
+      "anomaly_probability": 0.997718079510778,
+      "flagged": 0
+    },
+    {
+      "label": "unsatisfactory",
+      "y_true": 1,
+      "file": "3fe4f6f2-3f2c-4876-9a76-acfc97896446.ulg",
+      "window_start_s": 32.0,
+      "anomaly_probability": 0.9128569706891744,
+      "flagged": 0
+    },
+    {
+      "label": "unsatisfactory",
+      "y_true": 1,
+      "file": "3fe4f6f2-3f2c-4876-9a76-acfc97896446.ulg",
+      "window_start_s": 48.0,
+      "anomaly_probability": 0.661935695019948,
+      "flagged": 0
+    },
+    {
+      "label": "unsatisfactory",
+      "y_true": 1,
+      "file": "3fe4f6f2-3f2c-4876-9a76-acfc97896446.ulg",
+      "window_start_s": 64.0,
+      "anomaly_probability": 0.9993426196564172,
+      "flagged": 1
+    },
+    {
+      "label": "unsatisfactory",
+      "y_true": 1,
+      "file": "3fe4f6f2-3f2c-4876-9a76-acfc97896446.ulg",
+      "window_start_s": 80.0,
+      "anomaly_probability": 0.9814649292300567,
+      "flagged": 0
+    },
+    {
+      "label": "unsatisfactory",
+      "y_true": 1,
+      "file": "3fe4f6f2-3f2c-4876-9a76-acfc97896446.ulg",
+      "window_start_s": 96.0,
+      "anomaly_probability": 0.9974702931739846,
+      "flagged": 0
+    },
+    {
+      "label": "unsatisfactory",
+      "y_true": 1,
+      "file": "3fe4f6f2-3f2c-4876-9a76-acfc97896446.ulg",
+      "window_start_s": 112.0,
+      "anomaly_probability": 0.9991188962215224,
+      "flagged": 1
+    },
+    {
+      "label": "unsatisfactory",
+      "y_true": 1,
+      "file": "3fe4f6f2-3f2c-4876-9a76-acfc97896446.ulg",
+      "window_start_s": 128.0,
+      "anomaly_probability": 0.9997036754655524,
+      "flagged": 1
+    },
+    {
+      "label": "unsatisfactory",
+      "y_true": 1,
+      "file": "3fe4f6f2-3f2c-4876-9a76-acfc97896446.ulg",
+      "window_start_s": 144.0,
+      "anomaly_probability": 0.9879439071594041,
+      "flagged": 0
+    },
+    {
+      "label": "unsatisfactory",
+      "y_true": 1,
+      "file": "3fe4f6f2-3f2c-4876-9a76-acfc97896446.ulg",
+      "window_start_s": 160.0,
+      "anomaly_probability": 0.9942651890135519,
+      "flagged": 0
+    },
+    {
+      "label": "unsatisfactory",
+      "y_true": 1,
+      "file": "3fe4f6f2-3f2c-4876-9a76-acfc97896446.ulg",
+      "window_start_s": 176.0,
+      "anomaly_probability": 0.2588075339154265,
+      "flagged": 0
+    },
+    {
+      "label": "unsatisfactory",
+      "y_true": 1,
+      "file": "3fe4f6f2-3f2c-4876-9a76-acfc97896446.ulg",
+      "window_start_s": 192.0,
+      "anomaly_probability": 0.9800115592819593,
+      "flagged": 0
+    },
+    {
+      "label": "unsatisfactory",
+      "y_true": 1,
+      "file": "3fe4f6f2-3f2c-4876-9a76-acfc97896446.ulg",
+      "window_start_s": 208.0,
+      "anomaly_probability": 0.9610208665480197,
+      "flagged": 0
+    },
+    {
+      "label": "unsatisfactory",
+      "y_true": 1,
+      "file": "3fe4f6f2-3f2c-4876-9a76-acfc97896446.ulg",
+      "window_start_s": 224.0,
+      "anomaly_probability": 0.5126743892232319,
+      "flagged": 0
+    },
+    {
+      "label": "unsatisfactory",
+      "y_true": 1,
+      "file": "4325afe2-cc70-4819-a521-5796cbbf4bae.ulg",
+      "window_start_s": 0.0,
+      "anomaly_probability": 0.9990243261647662,
+      "flagged": 1
+    },
+    {
+      "label": "unsatisfactory",
+      "y_true": 1,
+      "file": "4325afe2-cc70-4819-a521-5796cbbf4bae.ulg",
+      "window_start_s": 16.0,
+      "anomaly_probability": 0.8986853269728898,
+      "flagged": 0
+    },
+    {
+      "label": "unsatisfactory",
+      "y_true": 1,
+      "file": "447430c8-ecaa-4d6c-a6a1-7665bd5b2116.ulg",
+      "window_start_s": 0.0,
+      "anomaly_probability": 0.6270220412957408,
+      "flagged": 0
+    },
+    {
+      "label": "unsatisfactory",
+      "y_true": 1,
+      "file": "447430c8-ecaa-4d6c-a6a1-7665bd5b2116.ulg",
+      "window_start_s": 16.0,
+      "anomaly_probability": 0.11782252327288535,
+      "flagged": 0
+    },
+    {
+      "label": "unsatisfactory",
+      "y_true": 1,
+      "file": "457680cb-4e1e-4605-aa41-7c1ee1354782.ulg",
+      "window_start_s": 0.0,
+      "anomaly_probability": 0.949819226828511,
+      "flagged": 0
+    },
+    {
+      "label": "unsatisfactory",
+      "y_true": 1,
+      "file": "457680cb-4e1e-4605-aa41-7c1ee1354782.ulg",
+      "window_start_s": 16.0,
+      "anomaly_probability": 0.9433393168865245,
+      "flagged": 0
+    },
+    {
+      "label": "unsatisfactory",
+      "y_true": 1,
+      "file": "457680cb-4e1e-4605-aa41-7c1ee1354782.ulg",
+      "window_start_s": 32.0,
+      "anomaly_probability": 0.976015958126964,
+      "flagged": 0
+    },
+    {
+      "label": "crash",
+      "y_true": 1,
+      "file": "05206c31-4fb4-4f27-b4a5-8334dcbd94c8.ulg",
+      "window_start_s": 0.0,
+      "anomaly_probability": 0.2319947477141147,
+      "flagged": 0
+    },
+    {
+      "label": "crash",
+      "y_true": 1,
+      "file": "05206c31-4fb4-4f27-b4a5-8334dcbd94c8.ulg",
+      "window_start_s": 16.0,
+      "anomaly_probability": 0.9976090884273711,
+      "flagged": 0
+    },
+    {
+      "label": "crash",
+      "y_true": 1,
+      "file": "20a4948a-4325-4e62-bb7c-d39d866fb569.ulg",
+      "window_start_s": 0.0,
+      "anomaly_probability": 0.576713158752232,
+      "flagged": 0
+    },
+    {
+      "label": "crash",
+      "y_true": 1,
+      "file": "20a4948a-4325-4e62-bb7c-d39d866fb569.ulg",
+      "window_start_s": 16.0,
+      "anomaly_probability": 0.10472925879984414,
+      "flagged": 0
+    },
+    {
+      "label": "crash",
+      "y_true": 1,
+      "file": "20a4948a-4325-4e62-bb7c-d39d866fb569.ulg",
+      "window_start_s": 32.0,
+      "anomaly_probability": 0.9998914795199855,
+      "flagged": 1
+    },
+    {
+      "label": "crash",
+      "y_true": 1,
+      "file": "20a4948a-4325-4e62-bb7c-d39d866fb569.ulg",
+      "window_start_s": 48.0,
+      "anomaly_probability": 0.3315628644529859,
+      "flagged": 0
+    },
+    {
+      "label": "crash",
+      "y_true": 1,
+      "file": "20a4948a-4325-4e62-bb7c-d39d866fb569.ulg",
+      "window_start_s": 64.0,
+      "anomaly_probability": 0.8628878643835589,
+      "flagged": 0
+    },
+    {
+      "label": "crash",
+      "y_true": 1,
+      "file": "20a4948a-4325-4e62-bb7c-d39d866fb569.ulg",
+      "window_start_s": 80.0,
+      "anomaly_probability": 0.42160934441996345,
+      "flagged": 0
+    },
+    {
+      "label": "crash",
+      "y_true": 1,
+      "file": "20a4948a-4325-4e62-bb7c-d39d866fb569.ulg",
+      "window_start_s": 96.0,
+      "anomaly_probability": 0.9793218974638458,
+      "flagged": 0
+    },
+    {
+      "label": "crash",
+      "y_true": 1,
+      "file": "20a4948a-4325-4e62-bb7c-d39d866fb569.ulg",
+      "window_start_s": 112.0,
+      "anomaly_probability": 0.7263160039902521,
+      "flagged": 0
+    },
+    {
+      "label": "crash",
+      "y_true": 1,
+      "file": "20a4948a-4325-4e62-bb7c-d39d866fb569.ulg",
+      "window_start_s": 128.0,
+      "anomaly_probability": 0.9994819712902974,
+      "flagged": 1
+    },
+    {
+      "label": "crash",
+      "y_true": 1,
+      "file": "24f78bdf-c061-4f5c-8080-c53dd26f5df7.ulg",
+      "window_start_s": 0.0,
+      "anomaly_probability": 0.5799112111689535,
+      "flagged": 0
+    },
+    {
+      "label": "crash",
+      "y_true": 1,
+      "file": "24f78bdf-c061-4f5c-8080-c53dd26f5df7.ulg",
+      "window_start_s": 16.0,
+      "anomaly_probability": 0.8435715686916724,
+      "flagged": 0
+    },
+    {
+      "label": "crash",
+      "y_true": 1,
+      "file": "24f78bdf-c061-4f5c-8080-c53dd26f5df7.ulg",
+      "window_start_s": 32.0,
+      "anomaly_probability": 0.9990273108471134,
+      "flagged": 1
+    },
+    {
+      "label": "crash",
+      "y_true": 1,
+      "file": "33a47432-46c8-4cf5-ad8f-9ba3c1d05f03.ulg",
+      "window_start_s": 0.0,
+      "anomaly_probability": 0.0062804943612351245,
+      "flagged": 0
+    },
+    {
+      "label": "crash",
+      "y_true": 1,
+      "file": "33a47432-46c8-4cf5-ad8f-9ba3c1d05f03.ulg",
+      "window_start_s": 16.0,
+      "anomaly_probability": 0.997415511845196,
+      "flagged": 0
+    },
+    {
+      "label": "crash",
+      "y_true": 1,
+      "file": "33a47432-46c8-4cf5-ad8f-9ba3c1d05f03.ulg",
+      "window_start_s": 32.0,
+      "anomaly_probability": 0.9187066056729092,
+      "flagged": 0
+    },
+    {
+      "label": "crash",
+      "y_true": 1,
+      "file": "33a47432-46c8-4cf5-ad8f-9ba3c1d05f03.ulg",
+      "window_start_s": 48.0,
+      "anomaly_probability": 0.6760178582586219,
+      "flagged": 0
+    },
+    {
+      "label": "crash",
+      "y_true": 1,
+      "file": "33a47432-46c8-4cf5-ad8f-9ba3c1d05f03.ulg",
+      "window_start_s": 64.0,
+      "anomaly_probability": 0.9894400874916306,
+      "flagged": 0
+    },
+    {
+      "label": "crash",
+      "y_true": 1,
+      "file": "5b7f1df3-48b2-4e7b-9394-b5eacaa79d10.ulg",
+      "window_start_s": 0.0,
+      "anomaly_probability": 0.2948986450889011,
+      "flagged": 0
+    },
+    {
+      "label": "crash",
+      "y_true": 1,
+      "file": "5b7f1df3-48b2-4e7b-9394-b5eacaa79d10.ulg",
+      "window_start_s": 16.0,
+      "anomaly_probability": 0.0012369594826106389,
+      "flagged": 0
+    },
+    {
+      "label": "crash",
+      "y_true": 1,
+      "file": "62e7654f-c1dc-4a40-b30e-7e5ac48d55dc.ulg",
+      "window_start_s": 0.0,
+      "anomaly_probability": 0.9580341114304163,
+      "flagged": 0
+    },
+    {
+      "label": "crash",
+      "y_true": 1,
+      "file": "62e7654f-c1dc-4a40-b30e-7e5ac48d55dc.ulg",
+      "window_start_s": 16.0,
+      "anomaly_probability": 0.17365570959714904,
+      "flagged": 0
+    },
+    {
+      "label": "crash",
+      "y_true": 1,
+      "file": "62e7654f-c1dc-4a40-b30e-7e5ac48d55dc.ulg",
+      "window_start_s": 32.0,
+      "anomaly_probability": 0.867721472974765,
+      "flagged": 0
+    },
+    {
+      "label": "crash",
+      "y_true": 1,
+      "file": "62e7654f-c1dc-4a40-b30e-7e5ac48d55dc.ulg",
+      "window_start_s": 48.0,
+      "anomaly_probability": 0.8646868519606998,
+      "flagged": 0
+    },
+    {
+      "label": "crash",
+      "y_true": 1,
+      "file": "64eae2fa-c906-478b-a426-3eeb59de307b.ulg",
+      "window_start_s": 0.0,
+      "anomaly_probability": 0.9607807778323177,
+      "flagged": 0
+    },
+    {
+      "label": "crash",
+      "y_true": 1,
+      "file": "64eae2fa-c906-478b-a426-3eeb59de307b.ulg",
+      "window_start_s": 16.0,
+      "anomaly_probability": 0.9997678215014258,
+      "flagged": 1
+    },
+    {
+      "label": "crash",
+      "y_true": 1,
+      "file": "763359a0-d310-4c94-ac3d-3db16ac8652b.ulg",
+      "window_start_s": 0.0,
+      "anomaly_probability": 0.8100627884605821,
+      "flagged": 0
+    },
+    {
+      "label": "crash",
+      "y_true": 1,
+      "file": "763359a0-d310-4c94-ac3d-3db16ac8652b.ulg",
+      "window_start_s": 16.0,
+      "anomaly_probability": 0.3343062559673313,
+      "flagged": 0
+    },
+    {
+      "label": "crash",
+      "y_true": 1,
+      "file": "763359a0-d310-4c94-ac3d-3db16ac8652b.ulg",
+      "window_start_s": 32.0,
+      "anomaly_probability": 0.05487079377291589,
+      "flagged": 0
+    },
+    {
+      "label": "crash",
+      "y_true": 1,
+      "file": "763359a0-d310-4c94-ac3d-3db16ac8652b.ulg",
+      "window_start_s": 48.0,
+      "anomaly_probability": 0.9996887751401946,
+      "flagged": 1
+    },
+    {
+      "label": "crash",
+      "y_true": 1,
+      "file": "763359a0-d310-4c94-ac3d-3db16ac8652b.ulg",
+      "window_start_s": 64.0,
+      "anomaly_probability": 0.6937409266056817,
+      "flagged": 0
+    },
+    {
+      "label": "crash",
+      "y_true": 1,
+      "file": "763359a0-d310-4c94-ac3d-3db16ac8652b.ulg",
+      "window_start_s": 80.0,
+      "anomaly_probability": 0.9853671340686339,
+      "flagged": 0
+    },
+    {
+      "label": "crash",
+      "y_true": 1,
+      "file": "763359a0-d310-4c94-ac3d-3db16ac8652b.ulg",
+      "window_start_s": 96.0,
+      "anomaly_probability": 0.7774394832624144,
+      "flagged": 0
+    },
+    {
+      "label": "crash",
+      "y_true": 1,
+      "file": "763359a0-d310-4c94-ac3d-3db16ac8652b.ulg",
+      "window_start_s": 112.0,
+      "anomaly_probability": 0.9997988598573672,
+      "flagged": 1
+    },
+    {
+      "label": "crash",
+      "y_true": 1,
+      "file": "763359a0-d310-4c94-ac3d-3db16ac8652b.ulg",
+      "window_start_s": 128.0,
+      "anomaly_probability": 0.9950491689266431,
+      "flagged": 0
+    },
+    {
+      "label": "crash",
+      "y_true": 1,
+      "file": "763359a0-d310-4c94-ac3d-3db16ac8652b.ulg",
+      "window_start_s": 144.0,
+      "anomaly_probability": 0.9686187552061545,
+      "flagged": 0
+    },
+    {
+      "label": "crash",
+      "y_true": 1,
+      "file": "763359a0-d310-4c94-ac3d-3db16ac8652b.ulg",
+      "window_start_s": 160.0,
+      "anomaly_probability": 0.9931380471224723,
+      "flagged": 0
+    },
+    {
+      "label": "crash",
+      "y_true": 1,
+      "file": "763359a0-d310-4c94-ac3d-3db16ac8652b.ulg",
+      "window_start_s": 176.0,
+      "anomaly_probability": 0.9959067767948676,
+      "flagged": 0
+    },
+    {
+      "label": "crash",
+      "y_true": 1,
+      "file": "763359a0-d310-4c94-ac3d-3db16ac8652b.ulg",
+      "window_start_s": 192.0,
+      "anomaly_probability": 0.9927162712000397,
+      "flagged": 0
+    },
+    {
+      "label": "crash",
+      "y_true": 1,
+      "file": "763359a0-d310-4c94-ac3d-3db16ac8652b.ulg",
+      "window_start_s": 208.0,
+      "anomaly_probability": 0.9997580196487338,
+      "flagged": 1
+    },
+    {
+      "label": "crash",
+      "y_true": 1,
+      "file": "763359a0-d310-4c94-ac3d-3db16ac8652b.ulg",
+      "window_start_s": 224.0,
+      "anomaly_probability": 0.9999267058831617,
+      "flagged": 1
+    }
+  ],
+  "train": {
+    "windows": 346,
+    "normal_windows": 99,
+    "anomaly_windows": 247
+  },
+  "calibration": {
+    "windows": 117,
+    "normal_windows": 33,
+    "anomaly_windows": 84
+  },
+  "model": "AutonLab/MOMENT-1-large embeddings + logistic head",
+  "threshold": 0.9982859501953053,
+  "interpretation": "anomaly_probability > threshold is anomalous"
+}

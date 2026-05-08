@@ -1,0 +1,1027 @@
+Standalone Research Roadmap for a Publishable
+        Agent Memory Defense Paper
+Abstract
+The strongest two-week paper is not another attack paper and not another vector-store-
+only RAG defense. It is a compact, defense-first systems paper that asks a sharper question:
+can a single, framework-agnostic runtime layer reduce poisoned writes, unsafe retrieval,
+contradiction-induced failures, and cross-agent propagation across several agent memory
+subsystems without destroying utility or scalability? That paper is independently
+publishable because the public literature is now rich enough to define the problem, but still
+fragmented enough that a clear cross-subsystem defense with real framework adapters and
+scalability evidence would fill an obvious gap. Public work already documents modular
+agent memory architectures, persistent memory stacks, and multiple attack families
+spanning indirect prompt injection, RAG poisoning, long-term memory injection, and multi-
+agent propagation. [1]
+The best paper direction is a memory firewall that operates on the write path, the
+retrieval path, and the propagation path. The core claim should be modest but meaningful:
+a provenance-aware, quarantine-capable, risk-gated memory middleware can materially
+lower unsafe retrieval and propagation across public agent frameworks and four stable
+memory subsystems—vector/RAG memory, semantic fact memory, episodic/example
+memory, and shared coordination memory—while preserving clean-task success and
+exhibiting controlled scaling as memory size and agent count grow. That is a far better
+short-paper contribution than trying to invent a novel attack, a new benchmark from
+scratch, or a heavyweight formal system you cannot finish by May 16. [2]
+Scope note: the attached unpublished draft was not retrievable in this chat session, so the
+roadmap below is intentionally grounded only in public literature, public frameworks, and
+public threat models. That constraint also makes the proposed paper cleaner and more
+standalone.
+
+Recommended paper direction
+Proposed paper
+Item                Recommendation
+Proposed title      MemSieve: A Provenance-Aware Memory Firewall for LLM
+                    Agents
+Exact problem       Defend mutable agent memory against contaminated writes, unsafe
+                    retrieval, contradiction collisions, and cross-agent propagation across
+                    heterogeneous memory subsystems.
+Central             A lightweight middleware layer over public memory APIs can reduce
+Item                Recommendation
+hypothesis          unsafe retrieval and propagation substantially, without large clean-task
+                    or latency penalties.
+Paper type          Short systems/security paper with real implementations and stress-
+                    tested evaluation, not a theory paper and not a novel attack paper.
+Memory             Vector/RAG memory, semantic fact memory, episodic/example
+subsystems      in memory, shared coordination memory.
+scope
+Frameworks in LangGraph, LlamaIndex, CrewAI. AutoGen is a strong optional fourth.
+MVP           Letta/MemGPT is a stretch target.
+Best venue fit in Realistically strongest as a compact systems/security paper or
+two weeks         workshop/short-paper submission. It is not a credible 13-page main-
+                  track IEEE S&P / ACM CCS / USENIX Security package in two weeks
+                  unless you already have most of the code.
+
+The research problem should be stated exactly like this: modern LLM agents
+increasingly treat memory as a writable runtime subsystem rather than a passive
+retrieval index, but current defenses are fragmented across corpus filtering,
+prompt separation, or tool-time checks; there is no compact, public, cross-
+framework demonstration that one middleware layer can make memory writes,
+memory retrieval, and memory propagation simultaneously safer across multiple
+memory types.
+That makes the paper independently publishable because the novelty is not “memory can
+be attacked.” Public work already established that. The publishable unit is instead: a
+reusable defense architecture plus a public, cross-framework, scalability-first
+evaluation. The paper stands on public sources alone and does not need any private
+benchmark, unpublished baseline, or unpublished scenario to make sense. [3]
+This is also not merely a hidden rewrite of your private draft, by construction. The paper’s
+contribution is defined against public frameworks, documented public memory interfaces,
+public threat models, and new generic metrics. It should not reuse any unpublished attack
+narrative, private metric, or draft-specific setup. If you keep the title, threat model,
+scenarios, metrics, and baselines within the public space outlined below, reviewers can
+evaluate the paper without knowing anything about the private draft.
+
+Why this defense problem is timely
+The defense problem is timely because the public agent ecosystem now exposes durable
+memory primitives as first-class features. LangGraph distinguishes short-term and long-
+term memory and explicitly discusses semantic, episodic, and procedural memory;
+LlamaIndex exposes a Memory class with FIFO short-term state and long-term memory
+blocks; CrewAI documents unified memory with semantic, recency, and importance
+scoring plus shared and scoped views; AutoGen exposes explicit memory query,
+update_context, and add interfaces; and Letta/MemGPT uses core, archival, recall, and
+shared memory abstractions. In other words, the architecture trend is moving toward
+more writable state, more retrieval, and more cross-session persistence, not less. [4]
+At the same time, public security work already spans the relevant threat surface: indirect
+prompt injection through retrieved data, poisoning of RAG corpora, backdoor-style
+poisoning of memory or knowledge bases, query-only memory injection, self-reinforcing
+persistent compromise through long-term memory, and cross-agent infection dynamics.
+Benchmarks such as InjecAgent, AgentDojo, and Agent Security Bench show that these
+failures are not toy-only phenomena and that many current defenses remain brittle or
+narrowly scoped. That is exactly why a defense-first memory middleware paper is
+timely now. [5]
+
+Novelty and research gaps
+Core novelty
+The paper’s novelty should be stated in one precise paragraph:
+      MemSieve is a framework-agnostic defense pipeline that treats agent memory as
+      a write–retrieve–propagate system rather than only a retriever or a prompt. It
+      normalizes heterogeneous memory records into a common schema with
+      provenance, trust priors, contradiction signals, and lineage edges; validates or
+      quarantines records at write time; reranks and diversifies candidates at retrieval
+      time using risk-aware scoring; rewrites retrieved context into typed, provenance-
+      marked evidence before reasoning; and blocks memory-conditioned tool actions
+      or agent-to-agent propagation when support is weak, contradictory, or
+      quarantine-tainted. The novelty is therefore the combination of cross-
+      subsystem defense coverage, public framework adapters, generic defense
+      metrics, and central scalability evaluation, not a new attack or a model-
+      specific filter.
+That novelty is real because current public work is split into disconnected islands. One
+island covers memory architectures and agent design; another covers attacks such as RAG
+poisoning, memory injection, and multi-agent infection; another covers inference-time
+defenses such as provenance cueing, structured queries, task-alignment gating, or
+traceback of poisoned RAG documents. What public work still does not provide is a
+compact, cross-framework demonstration that one lightweight layer can secure multiple
+memory subsystems and propagation paths under realistic scale pressures. [6]
+
+Concrete gaps in public research
+                                                   How          the Evidence needed
+                       Why existing public work is proposed paper to        convince
+Gap                    insufficient                addresses it     reviewers
+Persistent            PoisonedRAG              and Make persistent Show     strong
+memory             is RAGForensics are valuable, memory defense results on at least
+defended         too but they are centered on RAG the main object: one   non-RAG
+                                                       How              the   Evidence needed
+                     Why existing public work is       proposed paper         to      convince
+Gap                  insufficient                      addresses it           reviewers
+narrowly             corpora;              MINJA,      semantic,              subsystem in the
+                     AgentPoison, Zombie Agents,       episodic,       and    main table, not
+                     and other memory-poisoning        shared memory          appendix.
+                     work show persistent agent-       are     first-class,
+                     memory compromise, yet            not side cases.
+                     public     defenses   remain
+                     architecture-specific     or
+                     domain-specific. [7]
+Cross-memory-        Public     frameworks      and    Cover four stable      A single table
+subsystem            CoALA-style         taxonomies    subsystems with        that        spans
+security analysis    distinguish           semantic,   one      defense       subsystems, not
+is missing           episodic, procedural, archival,   schema and one         four
+                     and shared memory, but            metric family.         disconnected
+                     attack/defense           papers                          mini-evals.
+                     usually       evaluate     one
+                     substrate at a time. [8]
+Multi-agent          Prompt Infection and G-           Add       lineage-     Show     reduced
+propagation    is    Safeguard show multi-agent        aware                  propagation
+underconnected       infection and remediation,        propagation            depth/fan-out as
+to memory            but the central object is         controls       for     agent      count
+                     conversation or utterance         shared memory          grows.
+                     topology;   memory-specific       and      agent-to-
+                     propagation across shared         agent        write
+                     notes, summaries, and team        paths.
+                     memory              remains
+                     understudied. [9]
+Defense pipelines Spotlighting, StruQ, f-secure        Make the design        Strong ablations
+usually stop too systems, Task Shield, and             explicitly multi-      showing that no
+early             RAGForensics               attack    stage: write-time,     single     stage
+                  different        stages—source       retrieval-time,        explains      all
+                  separation, structured input,        pre-reasoning,         gains.
+                  system-level planning, task          pre-tool,      and
+                  alignment, or traceback—but          cross-agent.
+                  there is still no small, reusable
+                  defense that jointly covers
+                  write admission, retrieval
+                  gating, and action gating for
+                  memory-heavy agents. [10]
+Scalable,            InjecAgent, AgentDojo, and Make scalability Separate
+memory-centric       ASB    are   large   public one of     the scalability
+                                                    How            the      Evidence needed
+                     Why existing public work is proposed paper             to      convince
+Gap                  insufficient                   addresses it            reviewers
+evaluation        is benchmarks, but they are paper’s            three      section      with
+weak                 broad           agent-security headline claims.        curves       over
+                     harnesses      rather    than                          memory       size,
+                     dedicated memory-defense                               agent      count,
+                     studies, and they do not                               poison ratio, and
+                     make memory-scale or agent-                            top-k.
+                     count scaling the main result.
+                     [11]
+
+The harsh reviewer view is simple: if the paper only shows vector-store filtering, it will read
+as “another RAG defense.” If it only shows propagation in a tiny team, it will read as
+synthetic. The differentiator is breadth across memory subsystems plus disciplined
+scalability evidence.
+
+Defense design
+Threat model to freeze early
+Use a crisp, public threat model and do not let it balloon.
+The attacker should have four realistic capabilities, all already represented in public work:
+query-only write inducement that causes the agent to store malicious or misleading
+memory; corpus or passage poisoning of a retrievable memory source; indirect
+prompt injection through retrieved or tool-returned content; and compromised
+peer-agent output that gets written into shared or coordination memory. These
+capabilities are grounded in prior public work on indirect prompt injection, PoisonedRAG,
+AgentPoison, MINJA, Prompt Infection, and Zombie Agents. [12]
+Keep the out-of-scope list short and explicit: model-weight poisoning, host compromise,
+embedding-model attacks, covert channels, prompt leakage from vendor internals, and
+human-in-the-loop social engineering. If you do not freeze scope, reviewers will say the
+threat model is vague.
+
+Memory subsystems to cover
+Do not try to cover every conceivable memory category. The strongest paper covers four
+subsystems and treats procedural/scratchpad memory as an extension, not the MVP core.
+
+                   Concrete
+                   representation in the                            Why it belongs in the
+Subsystem          paper                 Main attack pressure       MVP
+Vector/RAG         Retrieved passages, Poisoned passages, Public literature already
+memory             docs, notes, external hidden instructions, shows this is a real
+                 Concrete
+                 representation in the                              Why it belongs in the
+Subsystem        paper                 Main attack pressure         MVP
+                 KB items              top-k domination             attack surface, and every
+                                                                    reviewer understands it.
+Semantic         User/project        facts, False fact insertion,   This        is       where
+memory           profiles,          stable policy      overwrite,   persistence            and
+                 preferences,        long- contradiction            personalization      create
+                 term facts                 collisions              sticky failures.
+Episodic         Prior      trajectories,   Unsafe plan replay,     This is how poisoning
+memory           demonstrations,            poisoned exemplars,     affects agent behavior
+                 successful examples,       imitation of bad        even without explicit
+                 action traces              sequences               tool prompts.
+Shared           Crew notes, shared         Cross-agent        This     is   the   most
+coordination     blocks,         team       contamination,     distinctive subsystem for
+memory           branches, inter-agent      cascading          propagation claims.
+                 summaries                  summaries, shared-
+                                            note infection
+Procedural or Editable     prompt Rule drift and tool-              Mention as an extension,
+scratchpad    fragments, reflective policy edits                    but do not make it
+memory        rules,      working                                   central unless a stable
+              summaries                                             implementation falls out
+                                                                    “for free.”
+
+This subsystem choice is defensible because public agent memory work and public
+frameworks already distinguish fact memory, experience memory, instruction memory,
+archival memory, and shared memory patterns. [13]
+
+Proposed system architecture
+Architecture in one sentence: MemSieve sits between the framework’s memory API and
+the agent/runtime, forcing every memory event through a canonical record schema and a
+sequence of defensive gates.
+
+                                                                       What     it   blocks   or
+Stage            What it does                                          limits
+Adapter layer    Wraps framework memory interfaces and Framework-specific
+                 converts writes/retrievals to a canonical record fragmentation.
+                 format:   {content,    subsystem,   source_type,
+                 source_id,     actor_id,   timestamp,   parent_ids,
+                 trust_prior, tags}.
+Write-time       Scores incoming records for provenance, Poisoned insertions,
+admission        instructionality, contradiction with high-trust false facts, hidden tool
+                 memory, duplication/flooding, and sensitivity. directives,         near-
+                                                                     What it blocks       or
+Stage             What it does                                       limits
+                  Either commits, down-trusts, or quarantines.       duplicate floods.
+Quarantine        Stores suspicious records in a separated Silent contamination
+and audit         namespace/store; keeps append-only audit logs and poor forensics.
+                  of write/retrieve/decision events.
+Retrieval-time    Computes utility score = relevance + trust + Top-k           domination,
+risk scoring      corroboration – contradiction – lineage risk – recency-biased
+                  duplication; enforces source/lineage diversity in poisoning,
+                  top-k.                                            contradiction collapse.
+Pre-reasoning     Renders retrieved memory as typed evidence Treating        arbitrary
+context           blocks (trusted facts, trusted examples, shared retrieved text    as
+shaping           notes, contradictions, quarantined excerpts) executable instruction.
+                  instead of raw free text.
+Pre-tool          Before tool execution, checks whether the          Tool-use    poisoning
+verification      action is explicitly user-authorized or            and         memory-
+                  corroborated by at least one trusted memory        conditioned    unsafe
+                  source; otherwise asks for confirmation,           actions.
+                  abstains, or degrades to read-only behavior.
+Propagation       Carries lineage across shared memory and Cross-agent infection
+controller        agent-to-agent writes; decays trust on and                 memory
+                  summarization hops; freezes rapid low-trust fan- cascades.
+                  out.
+
+The key design choice is to avoid a monolithic learned detector. That is a schedule trap
+and a review trap. Use interpretable, calibratable features plus optional second-pass
+LLM checks only where necessary. In two weeks, the paper wins on architecture and
+evaluation discipline, not on a fancy classifier.
+
+What each stage should do
+At write time, MemSieve should assign a source trust prior by origin: seeded system
+memory and curated corpus sources start high; user free text, web retrievals, tool outputs,
+and peer-agent summaries start lower; recursively summarized content receives decayed
+trust. It should also scan for instructionality, policy-edit language, near duplicates, and
+contradictions against high-trust semantic memory. High-risk records go to quarantine;
+medium-risk records stay committed but marked low-trust; low-risk records are committed
+normally.
+At retrieval time, MemSieve should refuse to treat similarity as enough. It should retrieve
+candidates from the native framework, but rerank them by trust, corroboration,
+contradiction penalties, lineage penalties, and diversity constraints. This is where you make
+the paper feel different from “just another filter.” A reviewer should be able to see that
+retrieval now optimizes task utility under risk, not cosine similarity alone.
+Before reasoning, retrieved memory should be transformed into structured evidence. The
+agent should see that some memory is “trusted factual memory,” some is “episodic
+example memory,” some is “shared note from another agent,” and some is “flagged
+contradictory or quarantined.” Low-trust content should enter as data to reason about, not
+as instructions to follow.
+Before tool execution, the defense should verify that high-impact tool arguments are
+supported by either explicit user intent or corroborated trusted memory. If the action
+depends only on low-trust memory, the system should confirm or abstain. This keeps the
+contribution defense-first rather than retrieval-only.
+For multi-agent propagation, every shared-memory write or inter-agent summary
+should carry parent record IDs and source trust. Trust should decay across summarization
+hops. Rapid fan-out of a low-trust claim should trigger a freeze or quarantine. That is how
+you convert “propagation” from hand-wavy rhetoric into a measurable systems claim.
+
+Why the design generalizes across frameworks
+The generalization argument must be implementation-based, not philosophical. LangGraph
+documents       short-term       and      namespace        long-term memory       with
+semantic/episodic/procedural framing; LlamaIndex documents explicit short-term and
+long-term memory objects; CrewAI exposes shared, scoped, and sliced memory with
+composite scoring; AutoGen exposes memory query, add, and update_context; and
+Letta/MemGPT exposes core, archival, and shared memory paths. That means a thin
+middleware adapter is realistic across public stacks. [14]
+
+Baselines, scenarios, and metrics
+Public framework and defense baselines
+Use public, implementable baselines. Do not burn a week on heroic reproduction.
+Framework comparison targets
+                                                                               Two-week
+Framework       Why it is fair                                                 decision
+LangGraph       Public docs explicitly define short-term and long-term Include
+                memory and discuss semantic, episodic, and procedural
+                memory, making it a strong “conceptually rich” baseline. [15]
+LlamaIndex      Public docs expose a concrete Memory class with short-term Include
+                FIFO buffering and long-term memory blocks, which is ideal
+                for adapter-based defense insertion. [16]
+CrewAI          Public docs expose unified memory, scoped views, shared Include
+                crew memory, read-only slices, and composite scoring over
+                semantic similarity, recency, and importance. That makes it
+                the best public baseline for coordination-memory evaluation.
+                [17]
+                                                                                     Two-week
+Framework        Why it is fair                                                      decision
+AutoGen          Public docs expose explicit memory interfaces and multi- Optional
+                 agent runtime patterns, so it is a fair public target; however, fourth
+                 the project’s maintenance-mode status means integration
+                 risk is real. [18]
+Letta        / Public research and docs expose memory hierarchy, archival Stretch
+MemGPT         retrieval, and shared blocks, making it architecturally only
+               relevant for long-term memory; deployment/API complexity
+               makes it a stretch target. [19]
+
+Harsh call: the MVP should be LangGraph + LlamaIndex + CrewAI. Add AutoGen
+only if it works fast. Add Letta only if it is practically zero-friction. If Letta costs more than
+half a day, cut it.
+Defense comparison targets
+                                                                    Realistic in two
+Defense baseline     Why it is fair                                 weeks            Decision
+No defense           Necessary lower bound.                         Trivial.           Include
+Provenance-          Strong industry-style sanity baseline: tag Easy.                  Include
+only filter          source types, but no contradiction or
+                     action gating.
+Spotlighting         Public    provenance-cueing     defense Easy to adapt Include
+                     against indirect prompt injection with as     retrieval-
+                     minimal utility loss. [20]              context
+                                                             wrapper.
+Trust-threshold      Matches the strongest lightweight current Easy enough.            Include
+sanitizer            public memory-defense direction: trust-
+                     aware      retrieval/sanitization    and
+                     threshold calibration. [21]
+RAGForensics         Public traceback defense for vector-store Moderate        if Optional
+                     poisoning; fair for vector/RAG rows only. code is usable.
+                     [22]
+Task Shield          Public tool-time task-alignment defense; Moderate.                Optional
+                     fair for action-gating comparison, not
+                     write-path defense. [23]
+StruQ                Strong public defense idea, but it requires Schedule trap.        Exclude
+                     structured-query support plus a specially
+                     trained model. [24]
+
+The mistake to avoid is obvious: a five-defense comparison with shaky reproductions is
+weaker than a three-defense comparison with clean ablations and real scaling results.
+Standalone attack and stress scenarios
+Ground the scenario family in public attack categories—RAG poisoning, memory injection,
+indirect prompt injection, agent-poisoning of memory/knowledge bases, prompt infection,
+and persistent self-evolving memory compromise—but make the concrete scenarios
+generic, safe, and new. [25]
+
+                                                           Success and
+                                                           defense-
+            Attacker         Target       Expected failure success     Data          to
+Scenario    capability       subsystem    mode             criteria    collect
+Poisoned    Query-only or Semantic        Later answer or Attack           write
+fact        low-trust        memory       plan uses the success:           outcome,
+insertion   content causes                false fact.     poisoned fact    trust score,
+            a          false                              is written and   retrieval
+            persistent fact                               later            presence,
+            to be stored.                                 retrieved/us     downstream
+                                                          ed. Defense      answer
+                                                          success: fact    correctness
+                                                          is
+                                                          quarantined,
+                                                          down-
+                                                          trusted,
+                                                          contradicted,
+                                                          or ignored.
+Retrieved Attacker inserts Vector/RA Retrieved text is     Attack          top-k
+instructio a      poisoned G memory treated        as      success:        records,
+n hijack   chunk/docume              instruction           unsafe          final
+           nt likely to be           rather      than      retrieved       context, risk
+           retrieved.                evidence.             context         scores, task
+                                                           changes         outcome
+                                                           answer/tool
+                                                           plan.
+                                                           Defense
+                                                           success:
+                                                           chunk      is
+                                                           quarantined,
+                                                           down-
+                                                           ranked,    or
+                                                           rendered
+                                                           inert.
+Experien    Attacker seeds Episodic       Agent imitates a Attack          retrieved
+ce graft    an             memory         bad prior plan success:          exemplars,
+            episodic/exam                 or example.      poisoned        plan
+                                                           Success and
+                                                           defense-
+            Attacker         Target       Expected failure success          Data        to
+Scenario    capability       subsystem    mode             criteria         collect
+            ple store with a                               example     is   similarity,
+            “successful”                                   selected and     tool
+            but       unsafe                               copied.          sequence,
+            trajectory.                                    Defense          task result
+                                                           success:
+                                                           exemplar is
+                                                           suppressed
+                                                           or
+                                                           contradicted.
+Conflict    Attacker injects Semantic Recency/similar Attack                contradictio
+and         a        recent or shared ity wins over success:                n       flags,
+recency     contradicting    memory   trust.          false branch          selected
+collision   record      that                          selected              record, final
+            overlaps                                  without               answer/acti
+            semantically                              warning.              on
+            with     benign                           Defense
+            trusted                                   success:
+            memory.                                   contradiction
+                                                      surfaced,
+                                                      trusted
+                                                      branch
+                                                      preferred, or
+                                                      abstention
+                                                      triggered.
+Shared-     Compromised      Shared       Contamination     Attack          lineage
+memory      peer     agent   coordinati   fans    out  to   success:        graph,
+cascade     writes           on           downstream        depth > 1       propagation
+            contaminated     memory       agents.           and             depth, fan-
+            summary/note                                    downstream      out,
+            into    shared                                  contaminate     downstream
+            memory.                                         d write or      tool calls
+                                                            action.
+                                                            Defense
+                                                            success:
+                                                            cascade    is
+                                                            capped    or
+                                                            frozen.
+Memory      Many      near- Vector,       Top-k             Attack          duplicate
+flooding    duplicate low- episodic,      domination,       success:        clusters,
+                                                      Success and
+                                                      defense-
+            Attacker      Target    Expected failure success                  Data       to
+Scenario    capability    subsystem mode              criteria                collect
+            grade records or shared degraded          attacker                source
+            are inserted. memory    diversity, rising cluster                 diversity in
+                                    overhead.         dominates               top-k,
+                                                      retrieval and           latency, task
+                                                      hurts utility.          success
+                                                      Defense
+                                                      success:
+                                                      duplicate
+                                                      throttling and
+                                                      diverse
+                                                      retrieval
+                                                      keep       safe
+                                                      utility stable.
+
+Use safe stub tools and public or synthetic corpora. Do not bring in EHRs, autonomous
+driving, or external browsing if you can avoid it. Those domains create engineering drag
+and unnecessary reviewer scrutiny.
+
+Metric table
+Let 𝑄𝑎 be attack queries, 𝑄𝑏 benign queries, 𝑃 poisoned records, 𝑅(𝑞) the retrieved set for
+query 𝑞, and 𝐶(𝑞) the final memory-conditioned reasoning context.
+
+                                                         Why                  Which
+                                                         reviewers How to claim it
+Metric       Formal definition                           will care collect it supports
+Attack                           𝐴𝑆𝑅𝑑𝑒𝑓                  Direct       Evaluate  “The
+                            1−
+Success                          𝐴𝑆𝑅𝑏𝑎𝑠𝑒                 headline     attack-   defense
+Reductio                                                 security     triggered works.”
+n                                                        number.      failures
+                                                                      with and
+                                                                      without
+                                                                      defense.
+Unsafe                    1                              Tells        Log         “Retrieva
+                 𝑈𝑅𝑅 =         ∑ 𝟏 [𝑅(𝑞) ∩ 𝑃 ≠ ∅]
+Retrieval                |𝑄𝑎 |                           whether      retrieved   l       is
+                             𝑞∈𝑄𝑎
+Rate                                                     poisoned     IDs         safer.”
+                                                         records      before
+                                                         still win    reasoning
+                                                         retrieval.   .
+                                                     Why                  Which
+                                                     reviewers How to claim it
+Metric      Formal definition                        will care collect it supports
+Contamin 𝐶𝐶𝑅                                      Stronger Log post-           “Unsafe
+ated        1                                     than URR defense             memory
+         =     ∑ 𝟏 [𝐶(𝑞) contains unquarantined poisoned content]
+Context    |𝑄|                                    because     context          is     not
+               𝑞
+Rate                                              it          assembly.        merely
+                                                  measures                     retrieved
+                                                  what the                     less;    it
+                                                  model                        reaches
+                                                  actually                     the
+                                                  sees.                        model
+                                                                               less.”
+Propagati   Maximum or mean graph distance from      Makes         Build       “Cross-
+on Depth    initial poisoned write to downstream     “propaga      parent-     agent
+            contaminated writes/actions in the       tion”         child       spread is
+            memory lineage DAG                       measurab      lineage     containe
+                                                     le.           edges       d.”
+                                                                   across
+                                                                   shared
+                                                                   writes
+                                                                   and
+                                                                   summarie
+                                                                   s.
+Quaranti    Standard 𝑇𝑃/(𝑇𝑃 + 𝐹𝑃) and 𝑇𝑃/(𝑇𝑃 + Prevents            Use         “The
+ne          𝐹𝑁) over poisoned-vs-benign write labels “security     synthetic   gate     is
+Precision                                            by            poison      selective,
+/ Recall                                             blocking      labels      not
+                                                     everythin     and         dumb.”
+                                                     g.”           conflict
+                                                                   labels.
+Benign                            𝑐𝑙𝑒𝑎𝑛
+                                 𝑈𝑑𝑒𝑓                Reviewer      Measure “Utility
+Utility                  𝐵𝑈𝑃 =    𝑐𝑙𝑒𝑎𝑛              s      will   clean task survives.
+                                 𝑈𝑏𝑎𝑠𝑒
+Preservat                                            punish        success    ”
+ion                                                  large         or exact-
+                                                     clean-        match/go
+                                                     task loss.    al
+                                                                   completio
+                                                                   n.
+Task                            𝑎𝑡𝑡𝑎𝑐𝑘
+                         𝑇𝑆𝐷 = 𝑈𝑑𝑒𝑓                  Reductio      Compute     “Defense
+Success                                              n       in    task        remains
+Under                                                attack        completio   operation
+Defense                                              success is    n     on    al.”
+                                                          Why                     Which
+                                                          reviewers    How to claim it
+Metric         Formal definition                          will care    collect it supports
+                                                          meaningl     attacked
+                                                          ess if the   workload
+                                                          agent        s.
+                                                          also stops
+                                                          solving
+                                                          tasks.
+Latency        𝐿𝑂 =
+                      𝑇𝑑𝑒𝑓 −𝑇𝑏𝑎𝑠𝑒
+                                    using p50 and p95     Central      End-to-      “Overhea
+                        𝑇𝑏𝑎𝑠𝑒
+Overhead                                                  for          end          d      is
+                                                          deployabi    request      acceptabl
+                                                          lity.        timing.      e.”
+Memory                                 𝑆𝑑𝑒𝑓 − 𝑆𝑏𝑎𝑠𝑒       Provenan     Measure      “The
+                            𝑀𝐺𝑂 =
+Growth                                    𝑆𝑏𝑎𝑠𝑒           ce    and    bytes/rec    defense
+Overhead                                                  audit        ords    in   scales in
+                                                          metadata     store and    storage.”
+                                                          have         logs.
+                                                          storage
+                                                          cost.
+Scalabilit     Regression coefficient 𝛽̂ in 𝑌 = 𝛼 + Better             Fit slopes   “Scaling
+y Slope        𝛽log𝑁 for 𝑌 ∈ {latency, 𝑈𝑅𝑅, 𝐶𝐶𝑅} and than              over         is a first-
+               𝑁 ∈ {records,agents, 𝑘}               cherry-           sweep        class
+                                                     picked            experime     contributi
+                                                     endpoints         nts.         on.”
+                                                     .
+
+If you need one extra diagnostic metric, add Top-k Source Diversity. If you need to cut,
+cut it first.
+
+Experimental and scalability plan
+Minimum publishable experiment set
+The minimum publishable paper is not huge. It is:
+
+   •     Three frameworks: LangGraph, LlamaIndex, CrewAI.
+   •     Four subsystems: vector/RAG, semantic, episodic, shared coordination.
+   •     Four defense settings: no defense, provenance-only, spotlighting-style retrieval
+         wrapper, trust-threshold sanitizer, and full MemSieve.
+   •     Four scenario families: poisoned fact insertion, retrieved instruction hijack,
+         conflict/recency collision, shared-memory cascade, plus flooding as the main stress
+         test.
+   •    One primary model: use one low-cost but capable hosted model for the full
+        matrix.
+   •    One optional transfer model: only after the main figures are complete.
+   •    Three random seeds or retrieval randomizations where applicable.
+   •    A clean utility suite and a scalability suite.
+That is enough for a short paper if the results are clean.
+The strongest implementation order is:
+   1.   LangGraph + vector/semantic memory + write gate + retrieval gate
+   2.   CrewAI shared memory + propagation controller
+   3.   LlamaIndex episodic/long-term blocks
+   4.   Metric logging and lineage graph
+   5.   Only then optional AutoGen
+What can be simplified:
+
+   •    Use one shared embedding backend across all frameworks.
+   •    Use deterministic stub tools and auto-gradable tasks.
+   •    Use a single canonical record schema everywhere.
+   •    Use one public corpus family plus synthetic conflict injection rather than many
+        domains.
+   •    Keep the primary experimental emphasis on attack and defense, not absolute task
+        intelligence.
+What must not be skipped:
+
+   •    A clean-task utility table
+   •    An ablation table
+   •    A propagation experiment
+   •    A real scalability section
+   •    At least one non-RAG subsystem result in the main paper
+
+Stronger optional experiment set
+If time holds, the strongest upgrades are:
+
+   •    Add AutoGen as a fourth framework.
+   •    Add one Letta/MemGPT-style archival/shared-memory case if integration is
+        painless.
+   •    Add a second model for transfer robustness.
+   •    Run a small AgentDojo or ASB-inspired subset only if it plugs in cleanly on day
+        one; otherwise cite those benchmarks for positioning and move on. [26]
+   •      Add optional comparisons to RAGForensics on vector rows and Task Shield on
+          tool rows if their code is easy to reuse. [27]
+Do not attempt:
+
+   •      StruQ reproduction
+   •      New model training
+   •      Full AgentDojo integration from scratch
+   •      A new benchmark from scratch
+   •      Human evaluation
+   •      A fifth framework
+
+Experiment matrix
+                                                                      Primary
+Experiment       Frameworks       Subsystems        Baselines         metrics        Priority
+Clean            LangGraph,       all four          all   included BUP, TSD, LO      Must
+utility          LlamaIndex,                        defenses
+                 CrewAI
+Write-path       LangGraph,       semantic,         no    defense, ASR               Must
+poisoning        LlamaIndex       episodic          threshold, full reduction,
+                                                                    quarantine
+                                                                    P/R
+Unsafe           all     MVP vector/RAG,            no     defense, URR,        CCR, Must
+retrieval        frameworks  semantic               spotlighting,   TSD
+                                                    threshold, full
+Conflict         LangGraph,       semantic,         no    defense, contradiction     Must
+resolution       CrewAI           shared            threshold, full win-rate, TSD
+Shared-          CrewAI,          shared            no     defense, propagation     Must
+memory           optional         coordination      provenance-     depth, fan-out,
+cascade          AutoGen                            only, full      TSD
+Memory           LangGraph,       vector,           no    defense, URR, LO, top- Must
+flooding         LlamaIndex,      episodic,         threshold, full k diversity
+                 CrewAI           shared
+Memory-      all     MVP all applicable             threshold      vs scalability     Must
+size scaling frameworks                             full              slope,      LO,
+                                                                      URR
+Agent-           CrewAI,          shared            provenance-       propagation     Must
+count            optional         coordination      only vs full      depth, fan-out,
+scaling          AutoGen                                              LO
+Defense          best-        all four              full minus one ASR,         CCR, Must
+ablations        performing 2                       module         TSD
+                                                                         Primary
+Experiment          Frameworks      Subsystems       Baselines           metrics            Priority
+                    frameworks
+Second-             one or two vector            + no defense vs ASR                        Optional
+model               frameworks shared              full          reduction,
+transfer                                                         BUP
+
+What results would actually convince reviewers
+For a short paper, the following would be convincing:
+    •   At least 60–80% relative reduction in unsafe retrieval or attack success on three
+        or more scenario families.
+    •   At most 5–10% clean-task loss on the main clean utility table.
+    •   A propagation result where contamination depth or fan-out is sharply capped
+        compared with the undefended case.
+    •   A p95 latency overhead that stays moderate under realistic top-k values.
+    •   Ablations showing that write-time gate, retrieval gate, and propagation controller
+        each matter.
+    •   Scaling curves showing that the full pipeline remains stable as memory size and
+        agent count grow.
+If the only strong result is vector-store filtering, the paper is weak. If the powerful result is
+shared-memory containment plus one other subsystem, the paper becomes much stronger.
+
+Scalability section design
+Treat scalability as a headline contribution, not appendix filler.
+Strong figure set
+                                                                        Why        it
+                                                                        supports the
+                                                     Expected           defense       Minimum
+Figure title           X-axis       Y-axis           trend              claim         data needed
+Unsafe                 total        unsafe           Undefended         Shows      the    4–5
+retrieval under        memory       retrieval rate   and      weak      defense      is   memory
+memory                 records      or               baselines          not brittle to    sizes × 3–4
+growth      and        on     log   contaminated     worsen       or    bigger stores     poison
+poison                 scale;       context rate     remain             or     higher     ratios × 3
+pressure               separate                      nontrivial; full   poison            defenses ×
+                       curves for                    MemSieve           density           3
+                       poison                        stays                                frameworks
+                       ratio                         meaningfully
+                                                     lower      and
+                                                     flatter
+                                                                  Why        it
+                                                                  supports the
+                                               Expected           defense       Minimum
+Figure title      X-axis      Y-axis           trend              claim         data needed
+Cross-agent       number      propagation      Undefended         Makes      the   2, 4, 8, 16,
+contamination     of agents   depth       or   growth             paper clearly    32 agents ×
+as teams scale                contaminated     approaches         about            2       team
+                              shared writes    linear       or    propagation,     workflows ×
+                              per run          worse;      full   not       only   30 runs
+                                               defense caps       retrieval
+                                               spread       or    hygiene
+                                               flattens slope
+Security–cost     p95         attack-          Some               Prevents the     top-k 2, 4, 8,
+frontier across   latency     success          modules buy        “too             16 × key
+top-k      and    overhead    reduction or     little security    heuristic /      ablations ×
+enabled           or          benign utility   at high cost;      too              one     main
+modules           memory      preservation     full pipeline      expensive”       framework
+                  overhead                     should             critique         family
+                                               dominate
+                                               weak
+                                               baselines in
+                                               the      useful
+                                               region
+
+These are much stronger than the usual weak “latency vs N” plot because they couple
+security outcome to scale, which is what reviewers actually care about in this topic.
+
+Execution and paper plan
+Two-week execution timeline
+                                           Writing     /   artifact
+Date    Technical goal                     goal                       Hard rule
+May     Freeze title, problem statement, Draft abstract and No code before the
+2       threat      model,   frameworks, intro claims.      claim is frozen.
+        subsystems, and baselines. Build
+        literature matrix.
+May     Smoke-test           LangGraph, Draft threat model            If a framework does
+3       LlamaIndex,     CrewAI.  Define and    related-work           not run cleanly, do not
+        canonical record schema and positioning notes.                debug for hours; move
+        logging format.                                               on.
+May     Implement adapter layer and Draft                   design Get one end-to-end
+4       write-time gate for LangGraph. subsection.                 defended run today.
+May     Port adapter and write gate to Draft               system Keep         the      schema
+                                           Writing / artifact
+Date   Technical goal                      goal                Hard rule
+5      LlamaIndex and CrewAI.              architecture table. identical          across
+                                                               frameworks.
+May    Implement quarantine store, audit Draft           metric No     fancy   detector
+6      log,     duplicate     throttling, definitions.          training.
+       contradiction checks.
+May    Implement            retrieval-time Draft experimental Produce first retrieval
+7      reranking, source diversity, and setup.                table today.
+       safe context rendering.
+May    Implement pre-tool verification Draft        evaluation   If propagation is not
+8      and lineage propagation control in section shell.         measurable, fix the
+       CrewAI; basic shared-memory                               logger before doing
+       cascade harness.                                          more runs.
+May    Run the mock deadline matrix: Freeze claims           for Do not expand scope
+9      one model, three frameworks, two version one.             after this point.
+       scenarios, three baselines.
+May    Add episodic-memory scenario Start figures.               If AutoGen is messy,
+10     and flooding stress test. Optional                        cut it immediately.
+       AutoGen only if easy.
+May    Run       clean    utility    and Fill   utility   and Clean-task results are
+11     conflict/recency experiments.     ablation tables.     mandatory.
+May    Run memory-size sweeps and top- Draft         scalability At least one strong
+12     k sweeps.                       section.                  scaling curve must
+                                                                 exist by tonight.
+May    Run agent-count propagation Refine              figure Do not add a second
+13     sweeps. Optional second model if captions and claims. model              before
+       main results are complete.                             propagation is finished.
+May    Full metric calculation, error Full paper          draft If a module has weak
+14     analysis, and ablation completion. complete.             value, cut it and
+                                                                simplify.
+May    Harsh internal review pass: shrink Near-final             Make the paper smaller
+15     claims, fix threat model, tighten submission draft.       and    sharper,   not
+       tables, remove fluff.                                     broader.
+May    Final     submission    cleanup: Final submit.            No last-minute     new
+16     reproducibility notes, appendix,                          experiments.
+       artifact    packaging,   naming
+       consistency.
+Paper skeleton for a 6–8 page submission
+              Page     Exact                              Evidence        /
+Section       budget   purpose        Claims to make      figures              What to avoid
+Title   and 0.2        State the      Memory       is     None       beyond    Do         not
+Abstract               problem,       writable state;     one sentence of      oversell
+                       defense,       MemSieve            quantitative         “general
+                       scope, and     defends write,      summary         if   immunity.”
+                       result   in    retrieve,  and      available.
+                       one breath.    propagate.
+Introductio   0.8      Explain        Public       work   One motivating       Do not spend
+n                      why agent      shows memory        table or compact     the intro on
+                       memory         is    attackable;   example; main        attack
+                       differs        the       missing   result teaser.       taxonomy.
+                       from           piece     is    a
+                       ordinary       unified defense
+                       RAG and        middleware.
+                       why
+                       defenses
+                       are
+                       fragmented
+                       .
+Backgroun 0.8          Define four    The threat is       Subsystem table;     Do not make
+d      and             subsystems     persistent          concise    threat    the      threat
+Threat                 and            contamination       model                model vague
+Model                  attacker       plus                paragraph.           or universal.
+                       capabilities   propagation,
+                       .              not just one
+                                      bad chunk.
+Defense       1.4      Present        Multi-stage         Architecture      Do not dump
+Design                 canonical      gating     beats    table;   optional implementatio
+                       schema         single-stage        scoring           n trivia.
+                       and            fixes;              equation.
+                       pipeline       provenance +
+                       stages.        contradiction +
+                                      lineage      are
+                                      enough for a
+                                      strong compact
+                                      design.
+Experiment    0.8      Describe       The evaluation Framework/bas             Do          not
+al Setup               framework      is        public, eline       table;     overinflate
+                       s,    tasks,   reproducible,     metric table.          benchmark
+                       baselines,     and fair.                                breadth.
+               Page      Exact                            Evidence        /
+Section        budget    purpose        Claims to make    figures             What to avoid
+                         scenarios,
+                         metrics,
+                         models.
+Evaluation     1.5       Show           The      defense Main        result Do not bury
+                         attack         works and does table;      ablation clean-task
+                         reduction,     not      collapse table.            losses.
+                         clean          utility.
+                         utility, and
+                         ablations.
+Scalability    0.9       Make           Security gains Three      strong Do not show
+Analysis                 scaling        persist under scalability        only     raw
+                         central.       larger   stores figures.         latency.
+                                        and       larger
+                                        teams       with
+                                        acceptable
+                                        overhead.
+Discussion     0.4       Preempt        The defense is    Error   analysis    Do          not
+and                      reviewer       not complete,     bullets      or     pretend     the
+Limitations              attacks.       but     it   is   compact             system      has
+                                        reusable   and    paragraph.          formal
+                                        practical.                            guarantees.
+Related        0.4       Position       This is not No               figures Do not write a
+Work                     against        another RAG needed.                  survey.
+                         memory         defense    and                       Compress
+                         architectur    not merely a                         aggressively.
+                         es, attacks,   message-level
+                         and            defense.
+                         defenses.
+Conclusion     0.2       Restate   Memory         None.                       Do         not
+                         one clean security needs                             introduce new
+                         claim.    pipeline                                   ideas.
+                                   defense    and
+                                   scaling
+                                   evidence.
+
+Contributions
+   •   We propose a framework-agnostic memory firewall for LLM agents that
+       secures the write, retrieval, and propagation paths of agent memory rather than only
+       the retriever or the prompt.
+   •   We unify four practical agent memory subsystems—vector/RAG, semantic
+       fact memory, episodic/example memory, and shared coordination memory—under
+       a single provenance-aware defense schema and evaluation methodology.
+   •   We introduce a scalable stress-evaluation harness for agent memory
+       security that measures unsafe retrieval, contaminated context, propagation depth,
+       utility preservation, and overhead across public agent frameworks.
+   •   We show that memory defense must be evaluated as a scaling problem, not
+       just an attack-success problem, by varying memory size, poison ratio, agent count,
+       subsystem count, and retrieval top-k.
+
+Reviewer-risk audit and final recommendation
+Reviewer-risk table
+                                                                                Evidence    that
+                                 Why     it      is                             reduces      the
+Reviewer risk        Severity    serious              Fix                       risk
+“This is         just High       This is the Put             non-RAG            Main      table
+another         RAG              most likely kill subsystems      and           must    include
+defense.”                        shot.            shared-memory                 semantic,
+                                                  propagation in the            episodic, and
+                                                  main results, not             shared-
+                                                  appendix.                     memory wins.
+“The       threat High           Security             Use      the      four-   Threat model
+model is vague.”                 reviewers hate       capability       threat   table       with
+                                 fuzzy attacker       model above and a         capability-to-
+                                 powers.              strict    out-of-scope    scenario
+                                                      list.                     mapping.
+“The defense is High             If the design        Use a principled,         Module
+too heuristic.”                  looks like ad        interpretable scoring     ablation table
+                                 hoc       filters,   pipeline and strong       and calibration
+                                 novelty              ablations.                /      threshold
+                                 collapses.                                     sensitivity plot.
+“The            High             A tiny eval will     Three    frameworks Experiment
+experiments are                  not carry a          minimum,       four matrix       and
+too small.”                      systems-             subsystems, multiple scaling curves.
+                                 defense paper.       scale sweeps.
+“The paper lacks High            Framework-           Use       LangGraph,      One framework
+real framework                   agnostic claims      LlamaIndex, CrewAI        comparison
+comparison.”                     require actual       for sure; AutoGen         table      with
+                                 adapters.            optional.                 identical
+                                                                                scenario
+                                                                                templates.
+                                                                              Evidence    that
+                                    Why     it    is                          reduces      the
+Reviewer risk         Severity      serious            Fix                    risk
+“The scalability Medium–            Purely             Use real framework     Memory-size
+results     are High                synthetic          stores and actual      and      agent-
+synthetic.”                         scaling is easy    multi-agent shared-    count figures
+                                    to dismiss.        memory flows.          with       real
+                                                                              runtime paths.
+“The    defense High                Reviewers will Put    clean utility       Clean-task
+hurts    benign                     assume over- preservation in the          success table
+task                                blocking unless main paper.               and     frontier
+performance.”                       shown                                     plot.
+                                    otherwise.
+“The novelty is High                The topic     is Make the novelty         First paragraph
+unclear.”                           crowded.         sentence      brutally   of intro and
+                                                     clear: write–retrieve–   first sentence
+                                                     propagate     defense    of related work.
+                                                     across     subsystems
+                                                     and frameworks, with
+                                                     scaling.
+“Why        not Medium              Fair question, Include spotlighting       Honest
+compare against                     but   schedule and           threshold    baseline table
+stronger public                     matters.       sanitization;              explaining
+defenses?”                                         optionally          add    include      /
+                                                   RAGForensics         or    optional     /
+                                                   Task Shield where          exclude
+                                                   fair.                      decisions.
+
+Final recommendation
+The single strongest paper direction is:
+    MemSieve: A Provenance-Aware Memory Firewall for LLM Agents
+    A defense-first, public, cross-framework paper centered on write-time validation,
+    retrieval-time risk gating, pre-tool verification, and propagation containment
+    across four memory subsystems.
+This direction is better than the main alternatives:
+
+Alternative                      Why it is weaker now
+Vector-store-only defense        Too easy to dismiss as another RAG paper.
+Attack-only      memory          Violates your defense-first goal and is crowded by public
+paper                            attack work.
+Propagation-only multi-          Risks looking synthetic unless tied back to persistent shared
+Alternative                    Why it is weaker now
+agent paper                    memory and broader memory types.
+Huge benchmark paper           Impossible to finish convincingly in two weeks.
+
+The minimum viable version of the paper should be:
+
+   •   LangGraph, LlamaIndex, CrewAI
+   •   Vector/RAG, semantic, episodic, shared coordination memory
+   •   No defense, provenance-only, spotlighting, trust-threshold sanitizer, full MemSieve
+   •   Poisoned insertion, unsafe retrieval, contradiction collision, shared-memory
+       cascade, flooding
+   •   Clean utility table
+   •   One ablation table
+   •   Three scalability figures
+   •   One primary model
+The stronger version if time allows should add:
+
+   •   AutoGen as a fourth framework
+   •   Optional Letta/MemGPT archival/shared-memory case
+   •   One second model
+   •   Vector-row comparison with RAGForensics
+   •   Tool-row comparison with Task Shield
+   •   Small public benchmark subset if it plugs in cleanly
+The harsh practical verdict is this: build the smallest paper that undeniably shows
+cross-subsystem defense plus scaling. That paper is much more likely to survive
+review than a broader but weaker project. The fastest way to kill the submission is to
+overreach on frameworks, domains, or baseline reproductions. The fastest way to make it
+publishable is to keep the claim narrow, the defense pipeline crisp, the metrics generic, and
+the scalability evidence central.
+Open questions / limitations: because the unpublished draft was not retrievable here, I
+avoided overlap-specific judgments and built the roadmap entirely from public material. If
+you later notice any accidental similarity in naming, scenario framing, or metric phrasing,
+change those immediately before writing; your proposed paper is strong enough without
+leaning on anything private.
+
+
+[1] [6] [8] [13] https://arxiv.org/abs/2309.02427
+https://arxiv.org/abs/2309.02427
+[2] [22] [27] https://arxiv.org/abs/2504.21668
+https://arxiv.org/abs/2504.21668
+[3] [7] [25] https://arxiv.org/abs/2402.07867
+https://arxiv.org/abs/2402.07867
+[4] [14] [15] https://docs.langchain.com/oss/javascript/concepts/memory
+https://docs.langchain.com/oss/javascript/concepts/memory
+[5] [12] https://arxiv.org/abs/2302.12173
+https://arxiv.org/abs/2302.12173
+[9] https://arxiv.org/abs/2410.07283
+https://arxiv.org/abs/2410.07283
+[10] [20] https://arxiv.org/abs/2403.14720
+https://arxiv.org/abs/2403.14720
+[11] https://arxiv.org/abs/2403.02691
+https://arxiv.org/abs/2403.02691
+[16] https://docs.llamaindex.ai/en/stable/module_guides/deploying/agents/memory/
+https://docs.llamaindex.ai/en/stable/module_guides/deploying/agents/memory/
+[17] https://docs.crewai.com/en/concepts/memory
+https://docs.crewai.com/en/concepts/memory
+[18]              https://microsoft.github.io/autogen/dev/user-guide/agentchat-user-
+guide/memory.html
+https://microsoft.github.io/autogen/dev/user-guide/agentchat-user-guide/memory.html
+[19] https://arxiv.org/abs/2310.08560
+https://arxiv.org/abs/2310.08560
+[21] https://arxiv.org/abs/2601.05504
+https://arxiv.org/abs/2601.05504
+[23] https://arxiv.org/abs/2412.16682
+https://arxiv.org/abs/2412.16682
+[24] https://arxiv.org/abs/2402.06363
+https://arxiv.org/abs/2402.06363
+[26] https://arxiv.org/abs/2406.13352
+https://arxiv.org/abs/2406.13352
+

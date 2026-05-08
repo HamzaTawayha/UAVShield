@@ -1,0 +1,11 @@
+log_id,log_date,duration_s,mav_type,rating,airframe_name,airframe_type,vehicle_name,vehicle_uuid,source,ver_sw_release,download_url
+593d18c8-2d07-47e7-941b-6cf6af1c9213,2026-02-05,10,Quadrotor,good,Generic Quadcopter,Quadrotor x,,000600000000383937303133510c001b0039,QGroundControl,v1.14.3 0,https://cdn.logs.px4.io/593d18c8-2d07-47e7-941b-6cf6af1c9213.ulg
+03762a0f-e428-40e9-9483-a7d7f2036a4d,2025-12-19,27,Quadrotor,good,Generic Quadcopter,Quadrotor x,,00020000000033393536323251140039003b,QGroundControl,v1.16.0 255,https://cdn.logs.px4.io/03762a0f-e428-40e9-9483-a7d7f2036a4d.ulg
+75ed2911-e980-4b16-a99d-719319ac85ba,2025-10-31,14,Quadrotor,good,Generic 250 Racer,Quadrotor x,,0001000000003132343035335109003b001a,QGroundControl,v1.17.0 64,https://cdn.logs.px4.io/75ed2911-e980-4b16-a99d-719319ac85ba.ulg
+ba4ed394-eb7e-43e4-a0c2-1d7ae9918b35,2025-09-18,226,Quadrotor,good,Generic Quadcopter,Quadrotor x,,00060000000032373835333251160042002b,QGroundControl,v1.16.0 255,https://cdn.logs.px4.io/ba4ed394-eb7e-43e4-a0c2-1d7ae9918b35.ulg
+70f45d8b-a3d6-4d98-81fa-7452b8bc9e57,2025-08-21,52,Quadrotor,good,Generic Quadcopter,Quadrotor x,,00060000000036383236333251050022002b,QGroundControl,v1.16.0 255,https://cdn.logs.px4.io/70f45d8b-a3d6-4d98-81fa-7452b8bc9e57.ulg
+fd055a0b-e314-41f6-a7ec-bd8084f9e03b,2025-08-13,5,Quadrotor,good,Generic Quadcopter,Quadrotor x,,,QGroundControl,v1.16.0 192,https://cdn.logs.px4.io/fd055a0b-e314-41f6-a7ec-bd8084f9e03b.ulg
+32d12bcd-d7c0-4f32-a52f-adac614f83df,2025-06-16,148,Quadrotor,good,HIL Quadcopter X,Simulation,,000100000000323737373238510400310046,QGroundControl,v1.12.1 255,https://cdn.logs.px4.io/32d12bcd-d7c0-4f32-a52f-adac614f83df.ulg
+7dffda3e-9540-4883-932f-09c42ab9ab41,2025-06-14,19,Quadrotor,good,S500 Generic,Quadrotor x,,000600000000343739383031510a00400030,QGroundControl,v1.14.0 255,https://cdn.logs.px4.io/7dffda3e-9540-4883-932f-09c42ab9ab41.ulg
+08d55bb8-efdd-48d1-a6af-51a7e02d55fd,2024-07-17,19,Quadrotor,good,Generic Quadcopter,Quadrotor x,,000200000000393035353438510a0025001c,QGroundControl,v1.13.3 255,https://cdn.logs.px4.io/08d55bb8-efdd-48d1-a6af-51a7e02d55fd.ulg
+b55f7bda-a9cd-425a-9885-bc9e1eeff7ea,2023-11-14,32,Quadrotor,good,Holybro S500,Quadrotor x,Quadcopter f450 frame,000100000000313137313036510a004b002e,QGroundControl,v1.13.3 255,https://cdn.logs.px4.io/b55f7bda-a9cd-425a-9885-bc9e1eeff7ea.ulg

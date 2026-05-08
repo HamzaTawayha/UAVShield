@@ -1,0 +1,1745 @@
+{
+  "test": {
+    "accuracy": 0.660377358490566,
+    "precision": 0.9210526315789473,
+    "recall": 0.33653846153846156,
+    "f1": 0.49295774647887325,
+    "roc_auc": 0.7744836182336182,
+    "normal_threshold_quantile": 0.95,
+    "windows": 212
+  },
+  "by_label": {
+    "crash": {
+      "n": 42,
+      "mean_score": 0.7236815488907977,
+      "p95_score": 0.866169543289185,
+      "flagged_count": 3,
+      "flagged_rate": 0.07142857142857142
+    },
+    "normal_good": {
+      "n": 108,
+      "mean_score": 0.5984466151947951,
+      "p95_score": 0.8464839473137654,
+      "flagged_count": 3,
+      "flagged_rate": 0.027777777777777776
+    },
+    "unsatisfactory": {
+      "n": 62,
+      "mean_score": 0.84540055176129,
+      "p95_score": 0.973222030628866,
+      "flagged_count": 32,
+      "flagged_rate": 0.5161290322580645
+    }
+  },
+  "predictions": [
+    {
+      "label": "normal_good",
+      "y_true": 0,
+      "file": "0004dbb9-c57b-442c-be97-3d24d722d5fa.ulg",
+      "window_start_s": 0.0,
+      "anomaly_probability": 0.41345276842963835,
+      "flagged": 0
+    },
+    {
+      "label": "normal_good",
+      "y_true": 0,
+      "file": "0004dbb9-c57b-442c-be97-3d24d722d5fa.ulg",
+      "window_start_s": 16.0,
+      "anomaly_probability": 0.13840086365660167,
+      "flagged": 0
+    },
+    {
+      "label": "normal_good",
+      "y_true": 0,
+      "file": "0004dbb9-c57b-442c-be97-3d24d722d5fa.ulg",
+      "window_start_s": 32.0,
+      "anomaly_probability": 0.23683531143542877,
+      "flagged": 0
+    },
+    {
+      "label": "normal_good",
+      "y_true": 0,
+      "file": "0004dbb9-c57b-442c-be97-3d24d722d5fa.ulg",
+      "window_start_s": 48.0,
+      "anomaly_probability": 0.2220124378746207,
+      "flagged": 0
+    },
+    {
+      "label": "normal_good",
+      "y_true": 0,
+      "file": "0004dbb9-c57b-442c-be97-3d24d722d5fa.ulg",
+      "window_start_s": 64.0,
+      "anomaly_probability": 0.3002635992842798,
+      "flagged": 0
+    },
+    {
+      "label": "normal_good",
+      "y_true": 0,
+      "file": "0004dbb9-c57b-442c-be97-3d24d722d5fa.ulg",
+      "window_start_s": 80.0,
+      "anomaly_probability": 0.4932762021211205,
+      "flagged": 0
+    },
+    {
+      "label": "normal_good",
+      "y_true": 0,
+      "file": "0004dbb9-c57b-442c-be97-3d24d722d5fa.ulg",
+      "window_start_s": 96.0,
+      "anomaly_probability": 0.4683974377192854,
+      "flagged": 0
+    },
+    {
+      "label": "normal_good",
+      "y_true": 0,
+      "file": "0004dbb9-c57b-442c-be97-3d24d722d5fa.ulg",
+      "window_start_s": 112.0,
+      "anomaly_probability": 0.4014944021195106,
+      "flagged": 0
+    },
+    {
+      "label": "normal_good",
+      "y_true": 0,
+      "file": "01f55399-84d2-497a-8ed5-9a92abc9ac73.ulg",
+      "window_start_s": 0.0,
+      "anomaly_probability": 0.606746845827728,
+      "flagged": 0
+    },
+    {
+      "label": "normal_good",
+      "y_true": 0,
+      "file": "01f55399-84d2-497a-8ed5-9a92abc9ac73.ulg",
+      "window_start_s": 16.0,
+      "anomaly_probability": 0.7893469515942177,
+      "flagged": 0
+    },
+    {
+      "label": "normal_good",
+      "y_true": 0,
+      "file": "01f55399-84d2-497a-8ed5-9a92abc9ac73.ulg",
+      "window_start_s": 32.0,
+      "anomaly_probability": 0.6814242142086334,
+      "flagged": 0
+    },
+    {
+      "label": "normal_good",
+      "y_true": 0,
+      "file": "01f55399-84d2-497a-8ed5-9a92abc9ac73.ulg",
+      "window_start_s": 48.0,
+      "anomaly_probability": 0.6065445422923472,
+      "flagged": 0
+    },
+    {
+      "label": "normal_good",
+      "y_true": 0,
+      "file": "01f55399-84d2-497a-8ed5-9a92abc9ac73.ulg",
+      "window_start_s": 64.0,
+      "anomaly_probability": 0.689749104661231,
+      "flagged": 0
+    },
+    {
+      "label": "normal_good",
+      "y_true": 0,
+      "file": "01f55399-84d2-497a-8ed5-9a92abc9ac73.ulg",
+      "window_start_s": 80.0,
+      "anomaly_probability": 0.7865582555013526,
+      "flagged": 0
+    },
+    {
+      "label": "normal_good",
+      "y_true": 0,
+      "file": "01f55399-84d2-497a-8ed5-9a92abc9ac73.ulg",
+      "window_start_s": 96.0,
+      "anomaly_probability": 0.6134335047583103,
+      "flagged": 0
+    },
+    {
+      "label": "normal_good",
+      "y_true": 0,
+      "file": "01f55399-84d2-497a-8ed5-9a92abc9ac73.ulg",
+      "window_start_s": 112.0,
+      "anomaly_probability": 0.6692335715765775,
+      "flagged": 0
+    },
+    {
+      "label": "normal_good",
+      "y_true": 0,
+      "file": "03c7415d-6d6a-4bdf-82be-fa427cc6c250.ulg",
+      "window_start_s": 0.0,
+      "anomaly_probability": 0.681304985812659,
+      "flagged": 0
+    },
+    {
+      "label": "normal_good",
+      "y_true": 0,
+      "file": "03c7415d-6d6a-4bdf-82be-fa427cc6c250.ulg",
+      "window_start_s": 16.0,
+      "anomaly_probability": 0.8695786853083939,
+      "flagged": 1
+    },
+    {
+      "label": "normal_good",
+      "y_true": 0,
+      "file": "03c7415d-6d6a-4bdf-82be-fa427cc6c250.ulg",
+      "window_start_s": 32.0,
+      "anomaly_probability": 0.8257199223973024,
+      "flagged": 0
+    },
+    {
+      "label": "normal_good",
+      "y_true": 0,
+      "file": "03c7415d-6d6a-4bdf-82be-fa427cc6c250.ulg",
+      "window_start_s": 48.0,
+      "anomaly_probability": 0.7330732038926914,
+      "flagged": 0
+    },
+    {
+      "label": "normal_good",
+      "y_true": 0,
+      "file": "03c7415d-6d6a-4bdf-82be-fa427cc6c250.ulg",
+      "window_start_s": 64.0,
+      "anomaly_probability": 0.7429918225340164,
+      "flagged": 0
+    },
+    {
+      "label": "normal_good",
+      "y_true": 0,
+      "file": "05873753-2643-41c3-90da-4d8a5c4ec471.ulg",
+      "window_start_s": 0.0,
+      "anomaly_probability": 0.820485859156443,
+      "flagged": 0
+    },
+    {
+      "label": "normal_good",
+      "y_true": 0,
+      "file": "05873753-2643-41c3-90da-4d8a5c4ec471.ulg",
+      "window_start_s": 16.0,
+      "anomaly_probability": 0.7792089528762292,
+      "flagged": 0
+    },
+    {
+      "label": "normal_good",
+      "y_true": 0,
+      "file": "05873753-2643-41c3-90da-4d8a5c4ec471.ulg",
+      "window_start_s": 32.0,
+      "anomaly_probability": 0.8264469551068029,
+      "flagged": 0
+    },
+    {
+      "label": "normal_good",
+      "y_true": 0,
+      "file": "0b1a730d-147b-47e3-b25e-c56fe27dacf8.ulg",
+      "window_start_s": 0.0,
+      "anomaly_probability": 0.6545500209642583,
+      "flagged": 0
+    },
+    {
+      "label": "normal_good",
+      "y_true": 0,
+      "file": "0b1a730d-147b-47e3-b25e-c56fe27dacf8.ulg",
+      "window_start_s": 16.0,
+      "anomaly_probability": 0.7194874442189775,
+      "flagged": 0
+    },
+    {
+      "label": "normal_good",
+      "y_true": 0,
+      "file": "0b1a730d-147b-47e3-b25e-c56fe27dacf8.ulg",
+      "window_start_s": 32.0,
+      "anomaly_probability": 0.7805309471017894,
+      "flagged": 0
+    },
+    {
+      "label": "normal_good",
+      "y_true": 0,
+      "file": "0b1a730d-147b-47e3-b25e-c56fe27dacf8.ulg",
+      "window_start_s": 48.0,
+      "anomaly_probability": 0.8280440128727099,
+      "flagged": 0
+    },
+    {
+      "label": "normal_good",
+      "y_true": 0,
+      "file": "0b1a730d-147b-47e3-b25e-c56fe27dacf8.ulg",
+      "window_start_s": 64.0,
+      "anomaly_probability": 0.7513366332374543,
+      "flagged": 0
+    },
+    {
+      "label": "normal_good",
+      "y_true": 0,
+      "file": "0b7217d4-92e0-4479-bfb3-6b1b4422f249.ulg",
+      "window_start_s": 0.0,
+      "anomaly_probability": 0.6548452814288777,
+      "flagged": 0
+    },
+    {
+      "label": "normal_good",
+      "y_true": 0,
+      "file": "0b7217d4-92e0-4479-bfb3-6b1b4422f249.ulg",
+      "window_start_s": 16.0,
+      "anomaly_probability": 0.7110297138080103,
+      "flagged": 0
+    },
+    {
+      "label": "normal_good",
+      "y_true": 0,
+      "file": "0b7217d4-92e0-4479-bfb3-6b1b4422f249.ulg",
+      "window_start_s": 32.0,
+      "anomaly_probability": 0.7902371626242508,
+      "flagged": 0
+    },
+    {
+      "label": "normal_good",
+      "y_true": 0,
+      "file": "0b7217d4-92e0-4479-bfb3-6b1b4422f249.ulg",
+      "window_start_s": 48.0,
+      "anomaly_probability": 0.7424351781195597,
+      "flagged": 0
+    },
+    {
+      "label": "normal_good",
+      "y_true": 0,
+      "file": "0b7217d4-92e0-4479-bfb3-6b1b4422f249.ulg",
+      "window_start_s": 64.0,
+      "anomaly_probability": 0.766988341626638,
+      "flagged": 0
+    },
+    {
+      "label": "normal_good",
+      "y_true": 0,
+      "file": "0b7217d4-92e0-4479-bfb3-6b1b4422f249.ulg",
+      "window_start_s": 80.0,
+      "anomaly_probability": 0.7646181670835734,
+      "flagged": 0
+    },
+    {
+      "label": "normal_good",
+      "y_true": 0,
+      "file": "0b7217d4-92e0-4479-bfb3-6b1b4422f249.ulg",
+      "window_start_s": 96.0,
+      "anomaly_probability": 0.6752166138355041,
+      "flagged": 0
+    },
+    {
+      "label": "normal_good",
+      "y_true": 0,
+      "file": "0b7217d4-92e0-4479-bfb3-6b1b4422f249.ulg",
+      "window_start_s": 112.0,
+      "anomaly_probability": 0.7134951365062108,
+      "flagged": 0
+    },
+    {
+      "label": "normal_good",
+      "y_true": 0,
+      "file": "0b7217d4-92e0-4479-bfb3-6b1b4422f249.ulg",
+      "window_start_s": 128.0,
+      "anomaly_probability": 0.7044405050190121,
+      "flagged": 0
+    },
+    {
+      "label": "normal_good",
+      "y_true": 0,
+      "file": "0b7217d4-92e0-4479-bfb3-6b1b4422f249.ulg",
+      "window_start_s": 144.0,
+      "anomaly_probability": 0.7488540094549472,
+      "flagged": 0
+    },
+    {
+      "label": "normal_good",
+      "y_true": 0,
+      "file": "0b7217d4-92e0-4479-bfb3-6b1b4422f249.ulg",
+      "window_start_s": 160.0,
+      "anomaly_probability": 0.6662157828978225,
+      "flagged": 0
+    },
+    {
+      "label": "normal_good",
+      "y_true": 0,
+      "file": "0de32cb0-a86a-4a44-b8c4-4c1a6b7146a1.ulg",
+      "window_start_s": 0.0,
+      "anomaly_probability": 0.6143501940057394,
+      "flagged": 0
+    },
+    {
+      "label": "normal_good",
+      "y_true": 0,
+      "file": "0de32cb0-a86a-4a44-b8c4-4c1a6b7146a1.ulg",
+      "window_start_s": 16.0,
+      "anomaly_probability": 0.5736611459335914,
+      "flagged": 0
+    },
+    {
+      "label": "normal_good",
+      "y_true": 0,
+      "file": "0ec04a15-ed3d-48c1-942d-77411802d359.ulg",
+      "window_start_s": 0.0,
+      "anomaly_probability": 0.5103028109980319,
+      "flagged": 0
+    },
+    {
+      "label": "normal_good",
+      "y_true": 0,
+      "file": "0ec04a15-ed3d-48c1-942d-77411802d359.ulg",
+      "window_start_s": 16.0,
+      "anomaly_probability": 0.6226749984646986,
+      "flagged": 0
+    },
+    {
+      "label": "normal_good",
+      "y_true": 0,
+      "file": "108e5729-67b7-4d93-ae8e-ff0f5df5a63c.ulg",
+      "window_start_s": 0.0,
+      "anomaly_probability": 0.4746615432474365,
+      "flagged": 0
+    },
+    {
+      "label": "normal_good",
+      "y_true": 0,
+      "file": "108e5729-67b7-4d93-ae8e-ff0f5df5a63c.ulg",
+      "window_start_s": 16.0,
+      "anomaly_probability": 0.5723059379711883,
+      "flagged": 0
+    },
+    {
+      "label": "normal_good",
+      "y_true": 0,
+      "file": "108e5729-67b7-4d93-ae8e-ff0f5df5a63c.ulg",
+      "window_start_s": 32.0,
+      "anomaly_probability": 0.7909467204241503,
+      "flagged": 0
+    },
+    {
+      "label": "normal_good",
+      "y_true": 0,
+      "file": "108e5729-67b7-4d93-ae8e-ff0f5df5a63c.ulg",
+      "window_start_s": 48.0,
+      "anomaly_probability": 0.5390875394966245,
+      "flagged": 0
+    },
+    {
+      "label": "normal_good",
+      "y_true": 0,
+      "file": "108e5729-67b7-4d93-ae8e-ff0f5df5a63c.ulg",
+      "window_start_s": 64.0,
+      "anomaly_probability": 0.7608992612630875,
+      "flagged": 0
+    },
+    {
+      "label": "normal_good",
+      "y_true": 0,
+      "file": "108e5729-67b7-4d93-ae8e-ff0f5df5a63c.ulg",
+      "window_start_s": 80.0,
+      "anomaly_probability": 0.7419955803399705,
+      "flagged": 0
+    },
+    {
+      "label": "normal_good",
+      "y_true": 0,
+      "file": "108e5729-67b7-4d93-ae8e-ff0f5df5a63c.ulg",
+      "window_start_s": 96.0,
+      "anomaly_probability": 0.6718008644762373,
+      "flagged": 0
+    },
+    {
+      "label": "normal_good",
+      "y_true": 0,
+      "file": "108e5729-67b7-4d93-ae8e-ff0f5df5a63c.ulg",
+      "window_start_s": 112.0,
+      "anomaly_probability": 0.7460789365326919,
+      "flagged": 0
+    },
+    {
+      "label": "normal_good",
+      "y_true": 0,
+      "file": "108e5729-67b7-4d93-ae8e-ff0f5df5a63c.ulg",
+      "window_start_s": 128.0,
+      "anomaly_probability": 0.7233455423732893,
+      "flagged": 0
+    },
+    {
+      "label": "normal_good",
+      "y_true": 0,
+      "file": "108e5729-67b7-4d93-ae8e-ff0f5df5a63c.ulg",
+      "window_start_s": 144.0,
+      "anomaly_probability": 0.8054668256597749,
+      "flagged": 0
+    },
+    {
+      "label": "normal_good",
+      "y_true": 0,
+      "file": "108e5729-67b7-4d93-ae8e-ff0f5df5a63c.ulg",
+      "window_start_s": 160.0,
+      "anomaly_probability": 0.641538324558858,
+      "flagged": 0
+    },
+    {
+      "label": "normal_good",
+      "y_true": 0,
+      "file": "108e5729-67b7-4d93-ae8e-ff0f5df5a63c.ulg",
+      "window_start_s": 176.0,
+      "anomaly_probability": 0.631444571489403,
+      "flagged": 0
+    },
+    {
+      "label": "normal_good",
+      "y_true": 0,
+      "file": "108e5729-67b7-4d93-ae8e-ff0f5df5a63c.ulg",
+      "window_start_s": 192.0,
+      "anomaly_probability": 0.7287947867415058,
+      "flagged": 0
+    },
+    {
+      "label": "normal_good",
+      "y_true": 0,
+      "file": "13b49ba9-33a6-4354-b7f0-151ea12a8829.ulg",
+      "window_start_s": 0.0,
+      "anomaly_probability": 0.3976283439798853,
+      "flagged": 0
+    },
+    {
+      "label": "normal_good",
+      "y_true": 0,
+      "file": "13b49ba9-33a6-4354-b7f0-151ea12a8829.ulg",
+      "window_start_s": 16.0,
+      "anomaly_probability": 0.2498714531594456,
+      "flagged": 0
+    },
+    {
+      "label": "normal_good",
+      "y_true": 0,
+      "file": "13b49ba9-33a6-4354-b7f0-151ea12a8829.ulg",
+      "window_start_s": 32.0,
+      "anomaly_probability": 0.3388326686648455,
+      "flagged": 0
+    },
+    {
+      "label": "normal_good",
+      "y_true": 0,
+      "file": "13d1f0b9-85a4-41f2-a347-5ad8efe44088.ulg",
+      "window_start_s": 0.0,
+      "anomaly_probability": 0.6168644050936307,
+      "flagged": 0
+    },
+    {
+      "label": "normal_good",
+      "y_true": 0,
+      "file": "13d1f0b9-85a4-41f2-a347-5ad8efe44088.ulg",
+      "window_start_s": 16.0,
+      "anomaly_probability": 0.8822533182108697,
+      "flagged": 1
+    },
+    {
+      "label": "normal_good",
+      "y_true": 0,
+      "file": "13d1f0b9-85a4-41f2-a347-5ad8efe44088.ulg",
+      "window_start_s": 32.0,
+      "anomaly_probability": 0.84803348133781,
+      "flagged": 0
+    },
+    {
+      "label": "normal_good",
+      "y_true": 0,
+      "file": "13d1f0b9-85a4-41f2-a347-5ad8efe44088.ulg",
+      "window_start_s": 48.0,
+      "anomaly_probability": 0.8575707417469499,
+      "flagged": 0
+    },
+    {
+      "label": "normal_good",
+      "y_true": 0,
+      "file": "13d1f0b9-85a4-41f2-a347-5ad8efe44088.ulg",
+      "window_start_s": 64.0,
+      "anomaly_probability": 0.882507991278295,
+      "flagged": 1
+    },
+    {
+      "label": "normal_good",
+      "y_true": 0,
+      "file": "164765f1-28ff-460b-bc45-1e53a7154cce.ulg",
+      "window_start_s": 0.0,
+      "anomaly_probability": 0.48723706547266865,
+      "flagged": 0
+    },
+    {
+      "label": "normal_good",
+      "y_true": 0,
+      "file": "164765f1-28ff-460b-bc45-1e53a7154cce.ulg",
+      "window_start_s": 16.0,
+      "anomaly_probability": 0.17543957534480956,
+      "flagged": 0
+    },
+    {
+      "label": "normal_good",
+      "y_true": 0,
+      "file": "164765f1-28ff-460b-bc45-1e53a7154cce.ulg",
+      "window_start_s": 32.0,
+      "anomaly_probability": 0.3005958633554433,
+      "flagged": 0
+    },
+    {
+      "label": "normal_good",
+      "y_true": 0,
+      "file": "164765f1-28ff-460b-bc45-1e53a7154cce.ulg",
+      "window_start_s": 48.0,
+      "anomaly_probability": 0.2053907202684198,
+      "flagged": 0
+    },
+    {
+      "label": "normal_good",
+      "y_true": 0,
+      "file": "164765f1-28ff-460b-bc45-1e53a7154cce.ulg",
+      "window_start_s": 64.0,
+      "anomaly_probability": 0.3831567828874979,
+      "flagged": 0
+    },
+    {
+      "label": "normal_good",
+      "y_true": 0,
+      "file": "164765f1-28ff-460b-bc45-1e53a7154cce.ulg",
+      "window_start_s": 80.0,
+      "anomaly_probability": 0.4144183485622475,
+      "flagged": 0
+    },
+    {
+      "label": "normal_good",
+      "y_true": 0,
+      "file": "164765f1-28ff-460b-bc45-1e53a7154cce.ulg",
+      "window_start_s": 96.0,
+      "anomaly_probability": 0.39387865279688766,
+      "flagged": 0
+    },
+    {
+      "label": "normal_good",
+      "y_true": 0,
+      "file": "164765f1-28ff-460b-bc45-1e53a7154cce.ulg",
+      "window_start_s": 112.0,
+      "anomaly_probability": 0.49656791457659144,
+      "flagged": 0
+    },
+    {
+      "label": "normal_good",
+      "y_true": 0,
+      "file": "19960f9c-0917-4512-ac89-4c03f7f2fc47.ulg",
+      "window_start_s": 0.0,
+      "anomaly_probability": 0.3667130136685924,
+      "flagged": 0
+    },
+    {
+      "label": "normal_good",
+      "y_true": 0,
+      "file": "19960f9c-0917-4512-ac89-4c03f7f2fc47.ulg",
+      "window_start_s": 16.0,
+      "anomaly_probability": 0.20436879288575535,
+      "flagged": 0
+    },
+    {
+      "label": "normal_good",
+      "y_true": 0,
+      "file": "19960f9c-0917-4512-ac89-4c03f7f2fc47.ulg",
+      "window_start_s": 32.0,
+      "anomaly_probability": 0.20134206039407443,
+      "flagged": 0
+    },
+    {
+      "label": "normal_good",
+      "y_true": 0,
+      "file": "19960f9c-0917-4512-ac89-4c03f7f2fc47.ulg",
+      "window_start_s": 48.0,
+      "anomaly_probability": 0.1965233786948385,
+      "flagged": 0
+    },
+    {
+      "label": "normal_good",
+      "y_true": 0,
+      "file": "19960f9c-0917-4512-ac89-4c03f7f2fc47.ulg",
+      "window_start_s": 64.0,
+      "anomaly_probability": 0.23233159041410645,
+      "flagged": 0
+    },
+    {
+      "label": "normal_good",
+      "y_true": 0,
+      "file": "19960f9c-0917-4512-ac89-4c03f7f2fc47.ulg",
+      "window_start_s": 80.0,
+      "anomaly_probability": 0.44081106476426896,
+      "flagged": 0
+    },
+    {
+      "label": "normal_good",
+      "y_true": 0,
+      "file": "19960f9c-0917-4512-ac89-4c03f7f2fc47.ulg",
+      "window_start_s": 96.0,
+      "anomaly_probability": 0.44079793665491446,
+      "flagged": 0
+    },
+    {
+      "label": "normal_good",
+      "y_true": 0,
+      "file": "19960f9c-0917-4512-ac89-4c03f7f2fc47.ulg",
+      "window_start_s": 112.0,
+      "anomaly_probability": 0.3264740951110531,
+      "flagged": 0
+    },
+    {
+      "label": "normal_good",
+      "y_true": 0,
+      "file": "1d3a18d4-3c9f-4e49-9b96-2b330fe6a21b.ulg",
+      "window_start_s": 0.0,
+      "anomaly_probability": 0.36816423200317255,
+      "flagged": 0
+    },
+    {
+      "label": "normal_good",
+      "y_true": 0,
+      "file": "1d3a18d4-3c9f-4e49-9b96-2b330fe6a21b.ulg",
+      "window_start_s": 16.0,
+      "anomaly_probability": 0.15392140125769482,
+      "flagged": 0
+    },
+    {
+      "label": "normal_good",
+      "y_true": 0,
+      "file": "1d3a18d4-3c9f-4e49-9b96-2b330fe6a21b.ulg",
+      "window_start_s": 32.0,
+      "anomaly_probability": 0.6321195133934768,
+      "flagged": 0
+    },
+    {
+      "label": "normal_good",
+      "y_true": 0,
+      "file": "20467322-4006-4d9b-b6cd-463e2272fa3e.ulg",
+      "window_start_s": 0.0,
+      "anomaly_probability": 0.4017449084048823,
+      "flagged": 0
+    },
+    {
+      "label": "normal_good",
+      "y_true": 0,
+      "file": "21d72038-ba58-4299-a6d9-a7e543ace4d0.ulg",
+      "window_start_s": 0.0,
+      "anomaly_probability": 0.5629345688214985,
+      "flagged": 0
+    },
+    {
+      "label": "normal_good",
+      "y_true": 0,
+      "file": "21d72038-ba58-4299-a6d9-a7e543ace4d0.ulg",
+      "window_start_s": 16.0,
+      "anomaly_probability": 0.27702394642454775,
+      "flagged": 0
+    },
+    {
+      "label": "normal_good",
+      "y_true": 0,
+      "file": "21d72038-ba58-4299-a6d9-a7e543ace4d0.ulg",
+      "window_start_s": 32.0,
+      "anomaly_probability": 0.2494474419760866,
+      "flagged": 0
+    },
+    {
+      "label": "normal_good",
+      "y_true": 0,
+      "file": "21d72038-ba58-4299-a6d9-a7e543ace4d0.ulg",
+      "window_start_s": 48.0,
+      "anomaly_probability": 0.4548497444014349,
+      "flagged": 0
+    },
+    {
+      "label": "normal_good",
+      "y_true": 0,
+      "file": "2216828d-2fb5-40b0-afd7-d8cb8f536be9.ulg",
+      "window_start_s": 0.0,
+      "anomaly_probability": 0.5828089556256955,
+      "flagged": 0
+    },
+    {
+      "label": "normal_good",
+      "y_true": 0,
+      "file": "2216828d-2fb5-40b0-afd7-d8cb8f536be9.ulg",
+      "window_start_s": 16.0,
+      "anomaly_probability": 0.5254514384904619,
+      "flagged": 0
+    },
+    {
+      "label": "normal_good",
+      "y_true": 0,
+      "file": "2216828d-2fb5-40b0-afd7-d8cb8f536be9.ulg",
+      "window_start_s": 32.0,
+      "anomaly_probability": 0.5093247634876075,
+      "flagged": 0
+    },
+    {
+      "label": "normal_good",
+      "y_true": 0,
+      "file": "2216828d-2fb5-40b0-afd7-d8cb8f536be9.ulg",
+      "window_start_s": 48.0,
+      "anomaly_probability": 0.6737797084198104,
+      "flagged": 0
+    },
+    {
+      "label": "normal_good",
+      "y_true": 0,
+      "file": "2348c673-a441-48a0-ba48-40583c381c99.ulg",
+      "window_start_s": 0.0,
+      "anomaly_probability": 0.5207024261948374,
+      "flagged": 0
+    },
+    {
+      "label": "normal_good",
+      "y_true": 0,
+      "file": "2348c673-a441-48a0-ba48-40583c381c99.ulg",
+      "window_start_s": 16.0,
+      "anomaly_probability": 0.7214117136485659,
+      "flagged": 0
+    },
+    {
+      "label": "normal_good",
+      "y_true": 0,
+      "file": "2348c673-a441-48a0-ba48-40583c381c99.ulg",
+      "window_start_s": 32.0,
+      "anomaly_probability": 0.6832447549062362,
+      "flagged": 0
+    },
+    {
+      "label": "normal_good",
+      "y_true": 0,
+      "file": "2348c673-a441-48a0-ba48-40583c381c99.ulg",
+      "window_start_s": 48.0,
+      "anomaly_probability": 0.8184901143564693,
+      "flagged": 0
+    },
+    {
+      "label": "normal_good",
+      "y_true": 0,
+      "file": "2348c673-a441-48a0-ba48-40583c381c99.ulg",
+      "window_start_s": 64.0,
+      "anomaly_probability": 0.8031503924043427,
+      "flagged": 0
+    },
+    {
+      "label": "normal_good",
+      "y_true": 0,
+      "file": "2348c673-a441-48a0-ba48-40583c381c99.ulg",
+      "window_start_s": 80.0,
+      "anomaly_probability": 0.7813609360348575,
+      "flagged": 0
+    },
+    {
+      "label": "normal_good",
+      "y_true": 0,
+      "file": "2348c673-a441-48a0-ba48-40583c381c99.ulg",
+      "window_start_s": 96.0,
+      "anomaly_probability": 0.8107203857840068,
+      "flagged": 0
+    },
+    {
+      "label": "normal_good",
+      "y_true": 0,
+      "file": "2348c673-a441-48a0-ba48-40583c381c99.ulg",
+      "window_start_s": 112.0,
+      "anomaly_probability": 0.8140971403632817,
+      "flagged": 0
+    },
+    {
+      "label": "normal_good",
+      "y_true": 0,
+      "file": "2348c673-a441-48a0-ba48-40583c381c99.ulg",
+      "window_start_s": 128.0,
+      "anomaly_probability": 0.7616213228340746,
+      "flagged": 0
+    },
+    {
+      "label": "normal_good",
+      "y_true": 0,
+      "file": "2348c673-a441-48a0-ba48-40583c381c99.ulg",
+      "window_start_s": 144.0,
+      "anomaly_probability": 0.8243910374431429,
+      "flagged": 0
+    },
+    {
+      "label": "normal_good",
+      "y_true": 0,
+      "file": "2348c673-a441-48a0-ba48-40583c381c99.ulg",
+      "window_start_s": 160.0,
+      "anomaly_probability": 0.8436062412691114,
+      "flagged": 0
+    },
+    {
+      "label": "normal_good",
+      "y_true": 0,
+      "file": "2348c673-a441-48a0-ba48-40583c381c99.ulg",
+      "window_start_s": 176.0,
+      "anomaly_probability": 0.8014234988760265,
+      "flagged": 0
+    },
+    {
+      "label": "normal_good",
+      "y_true": 0,
+      "file": "2348c673-a441-48a0-ba48-40583c381c99.ulg",
+      "window_start_s": 192.0,
+      "anomaly_probability": 0.8556047406022499,
+      "flagged": 0
+    },
+    {
+      "label": "normal_good",
+      "y_true": 0,
+      "file": "2348c673-a441-48a0-ba48-40583c381c99.ulg",
+      "window_start_s": 208.0,
+      "anomaly_probability": 0.8410797154034002,
+      "flagged": 0
+    },
+    {
+      "label": "normal_good",
+      "y_true": 0,
+      "file": "2348c673-a441-48a0-ba48-40583c381c99.ulg",
+      "window_start_s": 224.0,
+      "anomaly_probability": 0.8024892039657014,
+      "flagged": 0
+    },
+    {
+      "label": "unsatisfactory",
+      "y_true": 1,
+      "file": "009441e0-ccf0-4682-8a71-37102de8d856.ulg",
+      "window_start_s": 0.0,
+      "anomaly_probability": 0.8149165524594614,
+      "flagged": 0
+    },
+    {
+      "label": "unsatisfactory",
+      "y_true": 1,
+      "file": "009441e0-ccf0-4682-8a71-37102de8d856.ulg",
+      "window_start_s": 16.0,
+      "anomaly_probability": 0.84715560827883,
+      "flagged": 0
+    },
+    {
+      "label": "unsatisfactory",
+      "y_true": 1,
+      "file": "009441e0-ccf0-4682-8a71-37102de8d856.ulg",
+      "window_start_s": 32.0,
+      "anomaly_probability": 0.6785846406142908,
+      "flagged": 0
+    },
+    {
+      "label": "unsatisfactory",
+      "y_true": 1,
+      "file": "009441e0-ccf0-4682-8a71-37102de8d856.ulg",
+      "window_start_s": 48.0,
+      "anomaly_probability": 0.7833812705243708,
+      "flagged": 0
+    },
+    {
+      "label": "unsatisfactory",
+      "y_true": 1,
+      "file": "009441e0-ccf0-4682-8a71-37102de8d856.ulg",
+      "window_start_s": 64.0,
+      "anomaly_probability": 0.5779959077509582,
+      "flagged": 0
+    },
+    {
+      "label": "unsatisfactory",
+      "y_true": 1,
+      "file": "0fb584d4-2b83-4738-9516-76c80ffb0800.ulg",
+      "window_start_s": 0.0,
+      "anomaly_probability": 0.9265875318387867,
+      "flagged": 1
+    },
+    {
+      "label": "unsatisfactory",
+      "y_true": 1,
+      "file": "0fb584d4-2b83-4738-9516-76c80ffb0800.ulg",
+      "window_start_s": 16.0,
+      "anomaly_probability": 0.9413709543161657,
+      "flagged": 1
+    },
+    {
+      "label": "unsatisfactory",
+      "y_true": 1,
+      "file": "0fb584d4-2b83-4738-9516-76c80ffb0800.ulg",
+      "window_start_s": 32.0,
+      "anomaly_probability": 0.9161200770125779,
+      "flagged": 1
+    },
+    {
+      "label": "unsatisfactory",
+      "y_true": 1,
+      "file": "0fb584d4-2b83-4738-9516-76c80ffb0800.ulg",
+      "window_start_s": 48.0,
+      "anomaly_probability": 0.9396586565395515,
+      "flagged": 1
+    },
+    {
+      "label": "unsatisfactory",
+      "y_true": 1,
+      "file": "0fb584d4-2b83-4738-9516-76c80ffb0800.ulg",
+      "window_start_s": 64.0,
+      "anomaly_probability": 0.9679558808323135,
+      "flagged": 1
+    },
+    {
+      "label": "unsatisfactory",
+      "y_true": 1,
+      "file": "0fb584d4-2b83-4738-9516-76c80ffb0800.ulg",
+      "window_start_s": 80.0,
+      "anomaly_probability": 0.9526242299808324,
+      "flagged": 1
+    },
+    {
+      "label": "unsatisfactory",
+      "y_true": 1,
+      "file": "0fb584d4-2b83-4738-9516-76c80ffb0800.ulg",
+      "window_start_s": 96.0,
+      "anomaly_probability": 0.9737036058657743,
+      "flagged": 1
+    },
+    {
+      "label": "unsatisfactory",
+      "y_true": 1,
+      "file": "0fb584d4-2b83-4738-9516-76c80ffb0800.ulg",
+      "window_start_s": 112.0,
+      "anomaly_probability": 0.949663075071635,
+      "flagged": 1
+    },
+    {
+      "label": "unsatisfactory",
+      "y_true": 1,
+      "file": "0fb584d4-2b83-4738-9516-76c80ffb0800.ulg",
+      "window_start_s": 128.0,
+      "anomaly_probability": 0.9569123584331333,
+      "flagged": 1
+    },
+    {
+      "label": "unsatisfactory",
+      "y_true": 1,
+      "file": "0fb584d4-2b83-4738-9516-76c80ffb0800.ulg",
+      "window_start_s": 144.0,
+      "anomaly_probability": 0.9411417395089191,
+      "flagged": 1
+    },
+    {
+      "label": "unsatisfactory",
+      "y_true": 1,
+      "file": "0fb584d4-2b83-4738-9516-76c80ffb0800.ulg",
+      "window_start_s": 160.0,
+      "anomaly_probability": 0.9153369034559335,
+      "flagged": 1
+    },
+    {
+      "label": "unsatisfactory",
+      "y_true": 1,
+      "file": "0fb584d4-2b83-4738-9516-76c80ffb0800.ulg",
+      "window_start_s": 176.0,
+      "anomaly_probability": 0.9394311086837519,
+      "flagged": 1
+    },
+    {
+      "label": "unsatisfactory",
+      "y_true": 1,
+      "file": "0fb584d4-2b83-4738-9516-76c80ffb0800.ulg",
+      "window_start_s": 192.0,
+      "anomaly_probability": 0.9586522834286726,
+      "flagged": 1
+    },
+    {
+      "label": "unsatisfactory",
+      "y_true": 1,
+      "file": "0fb584d4-2b83-4738-9516-76c80ffb0800.ulg",
+      "window_start_s": 208.0,
+      "anomaly_probability": 0.9827901966646734,
+      "flagged": 1
+    },
+    {
+      "label": "unsatisfactory",
+      "y_true": 1,
+      "file": "0fb584d4-2b83-4738-9516-76c80ffb0800.ulg",
+      "window_start_s": 224.0,
+      "anomaly_probability": 0.9650420627308022,
+      "flagged": 1
+    },
+    {
+      "label": "unsatisfactory",
+      "y_true": 1,
+      "file": "1d652f6e-e128-4a6b-a2a2-f4c4a74093b5.ulg",
+      "window_start_s": 0.0,
+      "anomaly_probability": 0.6587731342307482,
+      "flagged": 0
+    },
+    {
+      "label": "unsatisfactory",
+      "y_true": 1,
+      "file": "1d652f6e-e128-4a6b-a2a2-f4c4a74093b5.ulg",
+      "window_start_s": 16.0,
+      "anomaly_probability": 0.8445898738848031,
+      "flagged": 0
+    },
+    {
+      "label": "unsatisfactory",
+      "y_true": 1,
+      "file": "1d652f6e-e128-4a6b-a2a2-f4c4a74093b5.ulg",
+      "window_start_s": 32.0,
+      "anomaly_probability": 0.8166907830929392,
+      "flagged": 0
+    },
+    {
+      "label": "unsatisfactory",
+      "y_true": 1,
+      "file": "1d652f6e-e128-4a6b-a2a2-f4c4a74093b5.ulg",
+      "window_start_s": 48.0,
+      "anomaly_probability": 0.8809915552117983,
+      "flagged": 1
+    },
+    {
+      "label": "unsatisfactory",
+      "y_true": 1,
+      "file": "1d652f6e-e128-4a6b-a2a2-f4c4a74093b5.ulg",
+      "window_start_s": 64.0,
+      "anomaly_probability": 0.8400932197181303,
+      "flagged": 0
+    },
+    {
+      "label": "unsatisfactory",
+      "y_true": 1,
+      "file": "1d652f6e-e128-4a6b-a2a2-f4c4a74093b5.ulg",
+      "window_start_s": 80.0,
+      "anomaly_probability": 0.8091061378267923,
+      "flagged": 0
+    },
+    {
+      "label": "unsatisfactory",
+      "y_true": 1,
+      "file": "1d652f6e-e128-4a6b-a2a2-f4c4a74093b5.ulg",
+      "window_start_s": 96.0,
+      "anomaly_probability": 0.8194908037909869,
+      "flagged": 0
+    },
+    {
+      "label": "unsatisfactory",
+      "y_true": 1,
+      "file": "1d652f6e-e128-4a6b-a2a2-f4c4a74093b5.ulg",
+      "window_start_s": 112.0,
+      "anomaly_probability": 0.8564137374842162,
+      "flagged": 0
+    },
+    {
+      "label": "unsatisfactory",
+      "y_true": 1,
+      "file": "1d652f6e-e128-4a6b-a2a2-f4c4a74093b5.ulg",
+      "window_start_s": 128.0,
+      "anomaly_probability": 0.7997156080524107,
+      "flagged": 0
+    },
+    {
+      "label": "unsatisfactory",
+      "y_true": 1,
+      "file": "1d652f6e-e128-4a6b-a2a2-f4c4a74093b5.ulg",
+      "window_start_s": 144.0,
+      "anomaly_probability": 0.7155862175523527,
+      "flagged": 0
+    },
+    {
+      "label": "unsatisfactory",
+      "y_true": 1,
+      "file": "271df769-7d58-49a4-8ceb-a7e6736064f8.ulg",
+      "window_start_s": 0.0,
+      "anomaly_probability": 0.713631643996034,
+      "flagged": 0
+    },
+    {
+      "label": "unsatisfactory",
+      "y_true": 1,
+      "file": "271df769-7d58-49a4-8ceb-a7e6736064f8.ulg",
+      "window_start_s": 16.0,
+      "anomaly_probability": 0.46478329782431876,
+      "flagged": 0
+    },
+    {
+      "label": "unsatisfactory",
+      "y_true": 1,
+      "file": "271df769-7d58-49a4-8ceb-a7e6736064f8.ulg",
+      "window_start_s": 32.0,
+      "anomaly_probability": 0.6173185448497618,
+      "flagged": 0
+    },
+    {
+      "label": "unsatisfactory",
+      "y_true": 1,
+      "file": "271df769-7d58-49a4-8ceb-a7e6736064f8.ulg",
+      "window_start_s": 48.0,
+      "anomaly_probability": 0.8074818370882194,
+      "flagged": 0
+    },
+    {
+      "label": "unsatisfactory",
+      "y_true": 1,
+      "file": "271df769-7d58-49a4-8ceb-a7e6736064f8.ulg",
+      "window_start_s": 64.0,
+      "anomaly_probability": 0.6636600110465655,
+      "flagged": 0
+    },
+    {
+      "label": "unsatisfactory",
+      "y_true": 1,
+      "file": "2990cd6a-8d83-4683-8183-ac789d800f70.ulg",
+      "window_start_s": 0.0,
+      "anomaly_probability": 0.8552144262706278,
+      "flagged": 0
+    },
+    {
+      "label": "unsatisfactory",
+      "y_true": 1,
+      "file": "2990cd6a-8d83-4683-8183-ac789d800f70.ulg",
+      "window_start_s": 16.0,
+      "anomaly_probability": 0.9151961766297582,
+      "flagged": 1
+    },
+    {
+      "label": "unsatisfactory",
+      "y_true": 1,
+      "file": "2f74b9df-4d1c-4a88-b6bb-b65ad5cab486.ulg",
+      "window_start_s": 0.0,
+      "anomaly_probability": 0.6429654674103363,
+      "flagged": 0
+    },
+    {
+      "label": "unsatisfactory",
+      "y_true": 1,
+      "file": "2f74b9df-4d1c-4a88-b6bb-b65ad5cab486.ulg",
+      "window_start_s": 16.0,
+      "anomaly_probability": 0.7489596725291122,
+      "flagged": 0
+    },
+    {
+      "label": "unsatisfactory",
+      "y_true": 1,
+      "file": "3e0c4a83-ccc8-4d5d-82bb-50867a2f06fc.ulg",
+      "window_start_s": 0.0,
+      "anomaly_probability": 0.5975187875669912,
+      "flagged": 0
+    },
+    {
+      "label": "unsatisfactory",
+      "y_true": 1,
+      "file": "3fe4f6f2-3f2c-4876-9a76-acfc97896446.ulg",
+      "window_start_s": 0.0,
+      "anomaly_probability": 0.7992239998687295,
+      "flagged": 0
+    },
+    {
+      "label": "unsatisfactory",
+      "y_true": 1,
+      "file": "3fe4f6f2-3f2c-4876-9a76-acfc97896446.ulg",
+      "window_start_s": 16.0,
+      "anomaly_probability": 0.9256094403174067,
+      "flagged": 1
+    },
+    {
+      "label": "unsatisfactory",
+      "y_true": 1,
+      "file": "3fe4f6f2-3f2c-4876-9a76-acfc97896446.ulg",
+      "window_start_s": 32.0,
+      "anomaly_probability": 0.9734991964076319,
+      "flagged": 1
+    },
+    {
+      "label": "unsatisfactory",
+      "y_true": 1,
+      "file": "3fe4f6f2-3f2c-4876-9a76-acfc97896446.ulg",
+      "window_start_s": 48.0,
+      "anomaly_probability": 0.8772063381245354,
+      "flagged": 1
+    },
+    {
+      "label": "unsatisfactory",
+      "y_true": 1,
+      "file": "3fe4f6f2-3f2c-4876-9a76-acfc97896446.ulg",
+      "window_start_s": 64.0,
+      "anomaly_probability": 0.9374987614326272,
+      "flagged": 1
+    },
+    {
+      "label": "unsatisfactory",
+      "y_true": 1,
+      "file": "3fe4f6f2-3f2c-4876-9a76-acfc97896446.ulg",
+      "window_start_s": 80.0,
+      "anomaly_probability": 0.9346229201307752,
+      "flagged": 1
+    },
+    {
+      "label": "unsatisfactory",
+      "y_true": 1,
+      "file": "3fe4f6f2-3f2c-4876-9a76-acfc97896446.ulg",
+      "window_start_s": 96.0,
+      "anomaly_probability": 0.8638061469863193,
+      "flagged": 0
+    },
+    {
+      "label": "unsatisfactory",
+      "y_true": 1,
+      "file": "3fe4f6f2-3f2c-4876-9a76-acfc97896446.ulg",
+      "window_start_s": 112.0,
+      "anomaly_probability": 0.8250973555105727,
+      "flagged": 0
+    },
+    {
+      "label": "unsatisfactory",
+      "y_true": 1,
+      "file": "3fe4f6f2-3f2c-4876-9a76-acfc97896446.ulg",
+      "window_start_s": 128.0,
+      "anomaly_probability": 0.9473419690086052,
+      "flagged": 1
+    },
+    {
+      "label": "unsatisfactory",
+      "y_true": 1,
+      "file": "3fe4f6f2-3f2c-4876-9a76-acfc97896446.ulg",
+      "window_start_s": 144.0,
+      "anomaly_probability": 0.9576869784212775,
+      "flagged": 1
+    },
+    {
+      "label": "unsatisfactory",
+      "y_true": 1,
+      "file": "3fe4f6f2-3f2c-4876-9a76-acfc97896446.ulg",
+      "window_start_s": 160.0,
+      "anomaly_probability": 0.9586745434971128,
+      "flagged": 1
+    },
+    {
+      "label": "unsatisfactory",
+      "y_true": 1,
+      "file": "3fe4f6f2-3f2c-4876-9a76-acfc97896446.ulg",
+      "window_start_s": 176.0,
+      "anomaly_probability": 0.9746313525873518,
+      "flagged": 1
+    },
+    {
+      "label": "unsatisfactory",
+      "y_true": 1,
+      "file": "3fe4f6f2-3f2c-4876-9a76-acfc97896446.ulg",
+      "window_start_s": 192.0,
+      "anomaly_probability": 0.9562006883429243,
+      "flagged": 1
+    },
+    {
+      "label": "unsatisfactory",
+      "y_true": 1,
+      "file": "3fe4f6f2-3f2c-4876-9a76-acfc97896446.ulg",
+      "window_start_s": 208.0,
+      "anomaly_probability": 0.9197529097980924,
+      "flagged": 1
+    },
+    {
+      "label": "unsatisfactory",
+      "y_true": 1,
+      "file": "3fe4f6f2-3f2c-4876-9a76-acfc97896446.ulg",
+      "window_start_s": 224.0,
+      "anomaly_probability": 0.944812973341646,
+      "flagged": 1
+    },
+    {
+      "label": "unsatisfactory",
+      "y_true": 1,
+      "file": "4325afe2-cc70-4819-a521-5796cbbf4bae.ulg",
+      "window_start_s": 0.0,
+      "anomaly_probability": 0.7350389279409099,
+      "flagged": 0
+    },
+    {
+      "label": "unsatisfactory",
+      "y_true": 1,
+      "file": "4325afe2-cc70-4819-a521-5796cbbf4bae.ulg",
+      "window_start_s": 16.0,
+      "anomaly_probability": 0.8576477763850656,
+      "flagged": 0
+    },
+    {
+      "label": "unsatisfactory",
+      "y_true": 1,
+      "file": "447430c8-ecaa-4d6c-a6a1-7665bd5b2116.ulg",
+      "window_start_s": 0.0,
+      "anomaly_probability": 0.6107955165007389,
+      "flagged": 0
+    },
+    {
+      "label": "unsatisfactory",
+      "y_true": 1,
+      "file": "447430c8-ecaa-4d6c-a6a1-7665bd5b2116.ulg",
+      "window_start_s": 16.0,
+      "anomaly_probability": 0.586737109615419,
+      "flagged": 0
+    },
+    {
+      "label": "unsatisfactory",
+      "y_true": 1,
+      "file": "457680cb-4e1e-4605-aa41-7c1ee1354782.ulg",
+      "window_start_s": 0.0,
+      "anomaly_probability": 0.9478420368750281,
+      "flagged": 1
+    },
+    {
+      "label": "unsatisfactory",
+      "y_true": 1,
+      "file": "457680cb-4e1e-4605-aa41-7c1ee1354782.ulg",
+      "window_start_s": 16.0,
+      "anomaly_probability": 0.9434774447108025,
+      "flagged": 1
+    },
+    {
+      "label": "unsatisfactory",
+      "y_true": 1,
+      "file": "457680cb-4e1e-4605-aa41-7c1ee1354782.ulg",
+      "window_start_s": 32.0,
+      "anomaly_probability": 0.9404242433480745,
+      "flagged": 1
+    },
+    {
+      "label": "crash",
+      "y_true": 1,
+      "file": "05206c31-4fb4-4f27-b4a5-8334dcbd94c8.ulg",
+      "window_start_s": 0.0,
+      "anomaly_probability": 0.8570367049402242,
+      "flagged": 0
+    },
+    {
+      "label": "crash",
+      "y_true": 1,
+      "file": "05206c31-4fb4-4f27-b4a5-8334dcbd94c8.ulg",
+      "window_start_s": 16.0,
+      "anomaly_probability": 0.8461855658293939,
+      "flagged": 0
+    },
+    {
+      "label": "crash",
+      "y_true": 1,
+      "file": "20a4948a-4325-4e62-bb7c-d39d866fb569.ulg",
+      "window_start_s": 0.0,
+      "anomaly_probability": 0.7456726593578306,
+      "flagged": 0
+    },
+    {
+      "label": "crash",
+      "y_true": 1,
+      "file": "20a4948a-4325-4e62-bb7c-d39d866fb569.ulg",
+      "window_start_s": 16.0,
+      "anomaly_probability": 0.6389354944383845,
+      "flagged": 0
+    },
+    {
+      "label": "crash",
+      "y_true": 1,
+      "file": "20a4948a-4325-4e62-bb7c-d39d866fb569.ulg",
+      "window_start_s": 32.0,
+      "anomaly_probability": 0.7946402188933291,
+      "flagged": 0
+    },
+    {
+      "label": "crash",
+      "y_true": 1,
+      "file": "20a4948a-4325-4e62-bb7c-d39d866fb569.ulg",
+      "window_start_s": 48.0,
+      "anomaly_probability": 0.7321795982850327,
+      "flagged": 0
+    },
+    {
+      "label": "crash",
+      "y_true": 1,
+      "file": "20a4948a-4325-4e62-bb7c-d39d866fb569.ulg",
+      "window_start_s": 64.0,
+      "anomaly_probability": 0.5998831538128869,
+      "flagged": 0
+    },
+    {
+      "label": "crash",
+      "y_true": 1,
+      "file": "20a4948a-4325-4e62-bb7c-d39d866fb569.ulg",
+      "window_start_s": 80.0,
+      "anomaly_probability": 0.5701835102400313,
+      "flagged": 0
+    },
+    {
+      "label": "crash",
+      "y_true": 1,
+      "file": "20a4948a-4325-4e62-bb7c-d39d866fb569.ulg",
+      "window_start_s": 96.0,
+      "anomaly_probability": 0.5802438360957595,
+      "flagged": 0
+    },
+    {
+      "label": "crash",
+      "y_true": 1,
+      "file": "20a4948a-4325-4e62-bb7c-d39d866fb569.ulg",
+      "window_start_s": 112.0,
+      "anomaly_probability": 0.6715296789684986,
+      "flagged": 0
+    },
+    {
+      "label": "crash",
+      "y_true": 1,
+      "file": "20a4948a-4325-4e62-bb7c-d39d866fb569.ulg",
+      "window_start_s": 128.0,
+      "anomaly_probability": 0.7436710179902403,
+      "flagged": 0
+    },
+    {
+      "label": "crash",
+      "y_true": 1,
+      "file": "24f78bdf-c061-4f5c-8080-c53dd26f5df7.ulg",
+      "window_start_s": 0.0,
+      "anomaly_probability": 0.8145067711681022,
+      "flagged": 0
+    },
+    {
+      "label": "crash",
+      "y_true": 1,
+      "file": "24f78bdf-c061-4f5c-8080-c53dd26f5df7.ulg",
+      "window_start_s": 16.0,
+      "anomaly_probability": 0.8665613343604853,
+      "flagged": 1
+    },
+    {
+      "label": "crash",
+      "y_true": 1,
+      "file": "24f78bdf-c061-4f5c-8080-c53dd26f5df7.ulg",
+      "window_start_s": 32.0,
+      "anomaly_probability": 0.9034181697538088,
+      "flagged": 1
+    },
+    {
+      "label": "crash",
+      "y_true": 1,
+      "file": "33a47432-46c8-4cf5-ad8f-9ba3c1d05f03.ulg",
+      "window_start_s": 0.0,
+      "anomaly_probability": 0.7405696350932744,
+      "flagged": 0
+    },
+    {
+      "label": "crash",
+      "y_true": 1,
+      "file": "33a47432-46c8-4cf5-ad8f-9ba3c1d05f03.ulg",
+      "window_start_s": 16.0,
+      "anomaly_probability": 0.5993203250463722,
+      "flagged": 0
+    },
+    {
+      "label": "crash",
+      "y_true": 1,
+      "file": "33a47432-46c8-4cf5-ad8f-9ba3c1d05f03.ulg",
+      "window_start_s": 32.0,
+      "anomaly_probability": 0.6914575713258161,
+      "flagged": 0
+    },
+    {
+      "label": "crash",
+      "y_true": 1,
+      "file": "33a47432-46c8-4cf5-ad8f-9ba3c1d05f03.ulg",
+      "window_start_s": 48.0,
+      "anomaly_probability": 0.8305488461403492,
+      "flagged": 0
+    },
+    {
+      "label": "crash",
+      "y_true": 1,
+      "file": "33a47432-46c8-4cf5-ad8f-9ba3c1d05f03.ulg",
+      "window_start_s": 64.0,
+      "anomaly_probability": 0.7820817647834122,
+      "flagged": 0
+    },
+    {
+      "label": "crash",
+      "y_true": 1,
+      "file": "5b7f1df3-48b2-4e7b-9394-b5eacaa79d10.ulg",
+      "window_start_s": 0.0,
+      "anomaly_probability": 0.5592668346749693,
+      "flagged": 0
+    },
+    {
+      "label": "crash",
+      "y_true": 1,
+      "file": "5b7f1df3-48b2-4e7b-9394-b5eacaa79d10.ulg",
+      "window_start_s": 16.0,
+      "anomaly_probability": 0.5162072078488363,
+      "flagged": 0
+    },
+    {
+      "label": "crash",
+      "y_true": 1,
+      "file": "62e7654f-c1dc-4a40-b30e-7e5ac48d55dc.ulg",
+      "window_start_s": 0.0,
+      "anomaly_probability": 0.6225370954815018,
+      "flagged": 0
+    },
+    {
+      "label": "crash",
+      "y_true": 1,
+      "file": "62e7654f-c1dc-4a40-b30e-7e5ac48d55dc.ulg",
+      "window_start_s": 16.0,
+      "anomaly_probability": 0.7653407458119124,
+      "flagged": 0
+    },
+    {
+      "label": "crash",
+      "y_true": 1,
+      "file": "62e7654f-c1dc-4a40-b30e-7e5ac48d55dc.ulg",
+      "window_start_s": 32.0,
+      "anomaly_probability": 0.8587255129344803,
+      "flagged": 0
+    },
+    {
+      "label": "crash",
+      "y_true": 1,
+      "file": "62e7654f-c1dc-4a40-b30e-7e5ac48d55dc.ulg",
+      "window_start_s": 48.0,
+      "anomaly_probability": 0.8190756400336628,
+      "flagged": 0
+    },
+    {
+      "label": "crash",
+      "y_true": 1,
+      "file": "64eae2fa-c906-478b-a426-3eeb59de307b.ulg",
+      "window_start_s": 0.0,
+      "anomaly_probability": 0.7418734643455615,
+      "flagged": 0
+    },
+    {
+      "label": "crash",
+      "y_true": 1,
+      "file": "64eae2fa-c906-478b-a426-3eeb59de307b.ulg",
+      "window_start_s": 16.0,
+      "anomaly_probability": 0.9322738144814992,
+      "flagged": 1
+    },
+    {
+      "label": "crash",
+      "y_true": 1,
+      "file": "763359a0-d310-4c94-ac3d-3db16ac8652b.ulg",
+      "window_start_s": 0.0,
+      "anomaly_probability": 0.7346436654956809,
+      "flagged": 0
+    },
+    {
+      "label": "crash",
+      "y_true": 1,
+      "file": "763359a0-d310-4c94-ac3d-3db16ac8652b.ulg",
+      "window_start_s": 16.0,
+      "anomaly_probability": 0.7565122175151562,
+      "flagged": 0
+    },
+    {
+      "label": "crash",
+      "y_true": 1,
+      "file": "763359a0-d310-4c94-ac3d-3db16ac8652b.ulg",
+      "window_start_s": 32.0,
+      "anomaly_probability": 0.6925873422627312,
+      "flagged": 0
+    },
+    {
+      "label": "crash",
+      "y_true": 1,
+      "file": "763359a0-d310-4c94-ac3d-3db16ac8652b.ulg",
+      "window_start_s": 48.0,
+      "anomaly_probability": 0.708277121274575,
+      "flagged": 0
+    },
+    {
+      "label": "crash",
+      "y_true": 1,
+      "file": "763359a0-d310-4c94-ac3d-3db16ac8652b.ulg",
+      "window_start_s": 64.0,
+      "anomaly_probability": 0.7407398034904902,
+      "flagged": 0
+    },
+    {
+      "label": "crash",
+      "y_true": 1,
+      "file": "763359a0-d310-4c94-ac3d-3db16ac8652b.ulg",
+      "window_start_s": 80.0,
+      "anomaly_probability": 0.6666944444646984,
+      "flagged": 0
+    },
+    {
+      "label": "crash",
+      "y_true": 1,
+      "file": "763359a0-d310-4c94-ac3d-3db16ac8652b.ulg",
+      "window_start_s": 96.0,
+      "anomaly_probability": 0.6577563893183168,
+      "flagged": 0
+    },
+    {
+      "label": "crash",
+      "y_true": 1,
+      "file": "763359a0-d310-4c94-ac3d-3db16ac8652b.ulg",
+      "window_start_s": 112.0,
+      "anomaly_probability": 0.7113045812353462,
+      "flagged": 0
+    },
+    {
+      "label": "crash",
+      "y_true": 1,
+      "file": "763359a0-d310-4c94-ac3d-3db16ac8652b.ulg",
+      "window_start_s": 128.0,
+      "anomaly_probability": 0.7201190766389456,
+      "flagged": 0
+    },
+    {
+      "label": "crash",
+      "y_true": 1,
+      "file": "763359a0-d310-4c94-ac3d-3db16ac8652b.ulg",
+      "window_start_s": 144.0,
+      "anomaly_probability": 0.7319380367876667,
+      "flagged": 0
+    },
+    {
+      "label": "crash",
+      "y_true": 1,
+      "file": "763359a0-d310-4c94-ac3d-3db16ac8652b.ulg",
+      "window_start_s": 160.0,
+      "anomaly_probability": 0.6175704014284983,
+      "flagged": 0
+    },
+    {
+      "label": "crash",
+      "y_true": 1,
+      "file": "763359a0-d310-4c94-ac3d-3db16ac8652b.ulg",
+      "window_start_s": 176.0,
+      "anomaly_probability": 0.6660839230750483,
+      "flagged": 0
+    },
+    {
+      "label": "crash",
+      "y_true": 1,
+      "file": "763359a0-d310-4c94-ac3d-3db16ac8652b.ulg",
+      "window_start_s": 192.0,
+      "anomaly_probability": 0.7164221736096478,
+      "flagged": 0
+    },
+    {
+      "label": "crash",
+      "y_true": 1,
+      "file": "763359a0-d310-4c94-ac3d-3db16ac8652b.ulg",
+      "window_start_s": 208.0,
+      "anomaly_probability": 0.7084819679547616,
+      "flagged": 0
+    },
+    {
+      "label": "crash",
+      "y_true": 1,
+      "file": "763359a0-d310-4c94-ac3d-3db16ac8652b.ulg",
+      "window_start_s": 224.0,
+      "anomaly_probability": 0.7415677367262882,
+      "flagged": 0
+    }
+  ],
+  "train": {
+    "windows": 346,
+    "normal_windows": 99,
+    "anomaly_windows": 247
+  },
+  "calibration": {
+    "windows": 117,
+    "normal_windows": 33,
+    "anomaly_windows": 84
+  },
+  "model": "AutonLab/MOMENT-1-large embeddings + random_forest head",
+  "threshold": 0.8640216642605866,
+  "interpretation": "anomaly_probability > threshold is anomalous"
+}

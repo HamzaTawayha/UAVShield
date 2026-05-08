@@ -1,0 +1,45 @@
+# Conservative defaults for PX4 SITL/lab UAV sanity checks.
+max_ground_speed_mps: 35.0
+max_vertical_speed_mps: 8.0
+max_acceleration_mps2: 20.0
+max_imu_velocity_residual_mps2: 8.0
+velocity_position_tolerance_mps: 8.0
+
+# Battery sanity. Keep this conservative unless you collect real discharge logs.
+max_battery_drop_pct_per_min: 5.0
+max_battery_rise_pct_per_min: 20.0
+low_current_threshold_a: 1.0
+max_low_current_battery_drop_pct_per_min: 1.0
+
+# Attitude sanity.
+max_roll_pitch_rate_deg_s: 180.0
+max_yaw_rate_deg_s: 240.0
+min_heading_check_speed_mps: 2.0
+heading_velocity_tolerance_deg: 75.0
+
+# Cross-layer consistency.
+perception_depth_tolerance_m: 2.0
+waypoint_radius_m: 3.0
+command_progress_window_s: 5.0
+command_min_progress_m: 0.5
+max_command_distance_m: 1000.0
+
+# Data freshness and replay detection.
+max_sensor_age_s: 2.0
+max_clock_skew_s: 0.25
+
+# Altitude/rangefinder consistency.
+terrain_alt_m: 0.0
+max_ground_altitude_residual_m: 3.0
+
+# Optional geofence. Uncomment or override these for a real mission box.
+# geofence_min_lat: 42.3300
+# geofence_max_lat: 42.3330
+# geofence_min_lon: -83.0470
+# geofence_max_lon: -83.0440
+# geofence_min_alt_m: 0.0
+# geofence_max_alt_m: 120.0
+
+# Multi-drone consistency.
+max_peer_state_age_s: 2.0
+min_peer_separation_m: 1.0

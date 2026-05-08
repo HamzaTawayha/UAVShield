@@ -1,0 +1,1906 @@
+\documentclass[11pt,oneside]{report}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[margin=1in]{geometry}
+\usepackage{array}
+\usepackage{longtable}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{hyperref}
+
+\hypersetup{
+  colorlinks=true,
+  linkcolor=black,
+  citecolor=black,
+  urlcolor=blue
+}
+
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{6pt}
+\sloppy
+\emergencystretch=3em
+\renewcommand{\arraystretch}{1.2}
+\newcolumntype{L}[1]{>{\raggedright\arraybackslash}p{#1}}
+\newcommand{\project}{MemSieve}
+\newcommand{\missing}{\textbf{Missing / Must Decide: }}
+\newcommand{\evidence}{\textbf{Evidence required: }}
+\newcommand{\risk}{\textbf{Risk: }}
+\newcommand{\fix}{\textbf{Required fix: }}
+
+\title{\textbf{\project: Implementation and Paper Roadmap}\\
+\large A Harsh Research Audit, System Blueprint, Experimental Plan, and Submission Manual}
+\author{Prepared from \texttt{paper\_roadmap.pdf}}
+\date{May 2, 2026}
+
+\begin{document}
+\maketitle
+\tableofcontents
+
+\chapter*{Source Discipline and Audit Position}
+\addcontentsline{toc}{chapter}{Source Discipline and Audit Position}
+
+This document is a standalone implementation-and-paper manual derived from the repository file
+\texttt{paper\_roadmap.pdf}. The repository also contains \texttt{AeroMind Paper.pdf}, but this
+manual does not use it because the task explicitly names \texttt{paper\_roadmap.pdf} as the source
+report. Any later use of other private or unpublished material must be declared and reviewed for
+overlap risk before submission.
+
+The source report is strong in its research framing: it correctly identifies that the publishable
+unit is not ``memory can be attacked,'' but a defense-first runtime architecture for mutable LLM
+agent memory. It also makes the right strategic call: the paper should focus on a compact,
+cross-framework, cross-subsystem memory firewall with scalability evidence, not a broad benchmark,
+new attack taxonomy, or heavyweight formal system.
+
+The source report is weak as an implementation document. It does not specify exact APIs,
+thresholds, task schemas, framework integration contracts, datasets, statistical tests,
+reproducibility artifacts, or acceptance criteria for individual modules. It cites many public
+threads of work but does not provide verified bibliographic metadata. It proposes a two-week
+execution schedule, which is plausible only for a disciplined MVP and implausible for a broad
+main-conference paper with full baseline reproduction.
+
+\textbf{Operating rule for this manual:} when the report does not specify something, this document
+marks it as \missing{} rather than pretending the detail exists. Implementation decisions below are
+derived from the report's thesis and converted into concrete contracts so a developer can begin
+coding immediately.
+
+\chapter{Research Vision and Paper Thesis}
+
+\section{Executive Research Vision}
+
+\textbf{Core research idea.} \project{} is a provenance-aware memory firewall for LLM agents. It sits
+between agent frameworks and their memory APIs, forcing every memory write, retrieval, context
+assembly, tool action, and cross-agent memory propagation event through a common defensive pipeline.
+The core architectural insight is to treat agent memory as a mutable write--retrieve--propagate
+system rather than as a passive vector index or prompt suffix.
+
+\textbf{Problem solved.} Modern LLM agents increasingly store durable state: user facts, project
+preferences, retrieved passages, prior trajectories, shared team notes, tool outputs, summaries, and
+coordination artifacts. These memory records can be contaminated by poisoned corpora, indirect
+prompt injection, low-trust user content, compromised peer agents, or self-reinforcing summaries.
+Current defenses are fragmented: they usually protect one stage, one substrate, or one framework.
+\project{} aims to reduce contaminated writes, unsafe retrieval, contradiction-induced failures,
+tool-use abuse conditioned on memory, and cross-agent propagation.
+
+\textbf{Why the problem matters now.} The report argues that public agent frameworks now expose
+durable memory as a first-class runtime feature. This changes the security problem from prompt
+safety at one interaction to persistent state safety across sessions and agents. The important
+shift is persistence: a contaminated memory record can keep influencing future reasoning after the
+original attacker interaction has disappeared.
+
+\textbf{Expected paper-level contribution.} The expected contribution is a compact systems/security
+paper that demonstrates a reusable runtime layer over public memory APIs. The paper should show that
+one canonical schema plus multi-stage gates can materially lower unsafe retrieval and propagation
+across vector/RAG memory, semantic fact memory, episodic/example memory, and shared coordination
+memory, while preserving clean utility and keeping overhead bounded as memory size and agent count
+grow.
+
+\textbf{Why this is publishable rather than merely engineering.} The publishable claim is not that a
+developer can wrap memory APIs. The publishable claim is that memory defense needs a new evaluation
+object: the full write--retrieve--propagate lifecycle across heterogeneous memory subsystems. A
+paper becomes credible if it shows claim-evidence alignment: generic metrics, real framework
+adapters, cross-subsystem scenarios, ablations, and scalability curves. Without that evidence,
+\project{} is only a well-named middleware prototype.
+
+\section{Paper Thesis}
+
+The strongest thesis is:
+
+\begin{quote}
+LLM agent memory should be defended as a stateful runtime subsystem. A framework-agnostic middleware
+that normalizes memory records into a provenance- and lineage-aware schema, gates writes, reranks
+retrievals under risk, renders retrieved content as typed evidence, verifies memory-conditioned tool
+actions, and controls cross-agent propagation can substantially reduce memory contamination while
+preserving clean utility and scaling acceptably.
+\end{quote}
+
+The paper must not claim general immunity. It should claim measurable reduction under a bounded
+threat model.
+
+\section{Non-Negotiable Scope}
+
+\begin{itemize}
+  \item MVP frameworks: LangGraph, LlamaIndex, and CrewAI.
+  \item Optional framework: AutoGen only if integration is low-friction.
+  \item Stretch framework: Letta/MemGPT only if it is practically zero-friction.
+  \item MVP memory subsystems: vector/RAG, semantic fact, episodic/example, shared coordination.
+  \item MVP defense stages: adapter, write gate, quarantine/audit, retrieval gate, context shaping,
+        pre-tool verification, propagation controller.
+  \item MVP evidence: clean utility table, attack reduction table, ablation table, propagation
+        result, scalability curves, reproducibility package.
+\end{itemize}
+
+\chapter{Novelty, Gaps, and Contributions}
+
+\section{Strongest Novelty Claims Extracted from the Report}
+
+\begin{longtable}{|L{0.25\textwidth}|L{0.35\textwidth}|L{0.30\textwidth}|}
+\hline
+\textbf{Claim} & \textbf{Why it is potentially strong} & \textbf{Evidence needed} \\
+\hline
+Cross-lifecycle memory defense & Most defenses target retrieval, prompts, or tools separately.
+The report's strongest move is to defend writes, retrievals, context assembly, tool actions, and
+propagation as one lifecycle. & Ablations showing that no single stage explains all gains. \\
+\hline
+Cross-subsystem coverage & Vector-only defenses are easy to dismiss. Covering semantic,
+episodic, and shared coordination memory makes the paper meaningfully about agent memory. & Main
+results table must include non-RAG rows, not appendix-only evidence. \\
+\hline
+Framework-agnostic runtime layer & A common schema plus adapters can make the architecture
+portable across public frameworks. & Working adapters for at least three frameworks with identical
+scenario templates and logging. \\
+\hline
+Propagation-aware memory security & Shared memory and peer-agent summaries make contamination
+spread measurable. & Lineage graph, propagation depth, fan-out, and agent-count scaling. \\
+\hline
+Scalability-first evaluation & Security that only works on tiny stores is not deployable. & Curves
+over memory size, poison ratio, top-k, and agent count. \\
+\hline
+\end{longtable}
+
+\section{Weak, Risky, or Already Covered Claims}
+
+\begin{longtable}{|L{0.23\textwidth}|L{0.34\textwidth}|L{0.33\textwidth}|}
+\hline
+\textbf{Risky claim} & \textbf{Why it is weak} & \textbf{Rewrite or remove} \\
+\hline
+``We introduce memory attacks.'' & The report itself says public work already covers indirect
+prompt injection, RAG poisoning, memory injection, and propagation. & Remove. Position attacks as
+evaluation scenarios grounded in public threat categories. \\
+\hline
+``Framework-agnostic defense.'' & This is only true if adapters actually run. Otherwise reviewers
+will treat it as architecture rhetoric. & Claim ``portable across three public frameworks via thin
+adapters'' after demonstrating LangGraph, LlamaIndex, and CrewAI. \\
+\hline
+``Defends all memory.'' & The report explicitly recommends four stable subsystems and says
+procedural/scratchpad memory is an extension. & Claim coverage of four practical memory subsystems;
+mark procedural memory as future work. \\
+\hline
+``Novel detector.'' & The report warns against a monolithic learned detector. A detector-focused
+claim would be a schedule and review trap. & Claim interpretable, calibratable gates and optional
+LLM checks, not a new classifier. \\
+\hline
+``Strong conference main-track readiness in two weeks.'' & The report is blunt that this is
+unlikely unless most code already exists. & Target a compact systems/security paper or workshop
+submission first; build a main-track version only after stronger evaluation. \\
+\hline
+\end{longtable}
+
+\section{Publishable Novelty Statement}
+
+\project{} is a framework-portable memory firewall that defends LLM agent memory across the
+write, retrieve, reason, act, and propagate lifecycle. It normalizes heterogeneous memory records
+into a common schema carrying provenance, trust priors, contradiction signals, and lineage edges;
+quarantines or down-trusts suspicious writes; reranks retrieved candidates with risk-aware scoring
+and source diversity; renders memory as typed evidence rather than executable instruction; verifies
+memory-conditioned tool actions; and limits cross-agent spread through lineage-aware propagation
+control. The novelty is the combination of lifecycle coverage, cross-subsystem evaluation, public
+framework adapters, generic memory-security metrics, and scalability evidence.
+
+\section{Concrete Paper Contributions}
+
+\begin{longtable}{|L{0.06\textwidth}|L{0.29\textwidth}|L{0.29\textwidth}|L{0.26\textwidth}|}
+\hline
+\textbf{\#} & \textbf{Contribution} & \textbf{What the paper must prove} & \textbf{Primary evidence} \\
+\hline
+1 & A lifecycle defense architecture for mutable agent memory. & Multi-stage defense reduces
+contaminated writes, unsafe retrieval, unsafe context, unsafe tool action, and propagation more than
+single-stage baselines. & Main attack table plus ablation table. \\
+\hline
+2 & A canonical provenance and lineage schema for heterogeneous agent memory. & One schema can
+represent vector/RAG, semantic, episodic, and shared coordination records across three frameworks. &
+Schema definition, adapter tests, cross-framework logs. \\
+\hline
+3 & A cross-subsystem memory-security evaluation harness. & The same scenarios and metrics run
+across multiple frameworks and memory types without bespoke hand-tuning per row. & Experiment runner,
+scenario manifests, reproducibility artifacts. \\
+\hline
+4 & New evaluation metrics for memory contamination and propagation. & Unsafe retrieval alone is
+insufficient; contaminated context and propagation depth capture stronger failure modes. & Metric
+definitions, examples, and plots linking metrics to downstream outcomes. \\
+\hline
+5 & Scalability evidence for security under memory growth and team growth. & Security gains remain
+meaningful as memory size, poison ratio, top-k, and agent count increase, with acceptable overhead. &
+Scalability curves and security-cost frontier. \\
+\hline
+\end{longtable}
+
+\section{Gaps That Must Be Filled Before Coding}
+
+\begin{itemize}
+  \item \missing{} Exact model provider, model version, embedding model, and cost budget.
+  \item \missing{} Exact framework versions and whether adapters target Python or JavaScript APIs.
+  \item \missing{} Threshold values for write admission, retrieval risk, quarantine, trust decay, and
+        confirmation.
+  \item \missing{} Public corpus choice or synthetic corpus generator parameters.
+  \item \missing{} Tool-action risk taxonomy and which stub tools count as high impact.
+  \item \missing{} Statistical test policy: confidence intervals, paired tests, bootstrap, or only
+        descriptive statistics.
+  \item \missing{} Submission venue, page limit, artifact expectations, and anonymity policy.
+\end{itemize}
+
+\chapter{System Architecture}
+
+\section{Architecture Overview}
+
+\project{} sits between an agent runtime and its native memory implementation. The framework should
+believe it is calling a normal memory API; \project{} intercepts and records every memory event.
+
+\begin{figure}[h]
+\centering
+\fbox{\begin{minipage}{0.92\textwidth}
+\textbf{Figure 1 textual architecture placeholder.}
+
+Untrusted sources, user turns, tools, external documents, and peer-agent messages enter the
+\project{} adapter layer. The adapter converts each event into a canonical memory record. Write-time
+admission either commits, down-trusts, or quarantines the record. The audit logger records every
+decision. Retrieval calls fetch native candidates, then risk-aware reranking applies trust,
+corroboration, contradiction, lineage, duplicate, and diversity logic. The context shaper renders
+selected records as typed evidence blocks. The agent reasons over this shaped context. Before tools
+run, pre-tool verification checks user authorization and trusted support. For multi-agent systems,
+the propagation controller attaches lineage edges, decays trust across summaries, and freezes rapid
+low-trust fan-out.
+\end{minipage}}
+\caption{Architecture placeholder. The final paper should replace or refine this with a clean
+pipeline diagram showing trust boundaries and audit side channels.}
+\end{figure}
+
+\section{Components, Inputs, Outputs, and Dependencies}
+
+\begin{longtable}{|L{0.18\textwidth}|L{0.22\textwidth}|L{0.22\textwidth}|L{0.28\textwidth}|}
+\hline
+\textbf{Component} & \textbf{Input} & \textbf{Output} & \textbf{Dependencies and notes} \\
+\hline
+Framework adapters & Native framework write, query, retrieve, add, and shared-memory calls. &
+Canonical \texttt{MemoryRecord} and \texttt{MemoryEvent}. & One adapter each for LangGraph,
+LlamaIndex, CrewAI. AutoGen optional. \\
+\hline
+Canonical schema & Raw content plus metadata. & Validated record with subsystem, source type,
+actor, lineage, trust, labels, and timestamps. & Must remain identical across frameworks. \\
+\hline
+Provenance engine & Source type, actor, parent IDs, framework namespace, record labels. & Trust
+prior and lineage features. & Uses configured trust priors and decay rules. \\
+\hline
+Write-time admission gate & Candidate write record. & Decision: commit, commit-low-trust,
+quarantine, reject. & Uses instructionality, contradiction, sensitivity, duplicate, and source-risk
+features. \\
+\hline
+Quarantine store & Suspicious record and decision rationale. & Non-retrievable or restricted
+quarantine record. & Must be isolated from normal retrieval. \\
+\hline
+Audit logger & Every write, retrieve, rerank, context, tool, and propagation event. & Append-only
+JSONL logs. & Required for reproducibility, metrics, forensics, and paper figures. \\
+\hline
+Retrieval reranker & Native top-k candidates, query, task context. & Risk-adjusted candidate set. &
+Score combines relevance, trust, corroboration, contradiction, lineage risk, duplicate penalty, and
+diversity. \\
+\hline
+Context shaper & Selected records and risk labels. & Typed evidence blocks. & Must prevent raw
+retrieved text from being rendered as instruction. \\
+\hline
+Pre-tool verifier & Proposed tool call, user instruction, supporting memory records. & Allow,
+ask-confirmation, read-only degrade, or block. & Uses support threshold and tool risk classes. \\
+\hline
+Propagation controller & Shared-memory writes, summaries, peer messages. & Lineage edges, trust
+decay, freeze/quarantine decisions. & Needed for shared-memory cascade experiments. \\
+\hline
+Experiment runner & Scenario manifests, framework config, baseline config, seeds. & Run logs,
+metrics, result tables, plots. & Must isolate runs and preserve raw logs. \\
+\hline
+\end{longtable}
+
+\section{Canonical Record Schema}
+
+The schema below is an implementation contract. The report gives the core fields; this manual adds
+fields required for experiments, reproducibility, and lineage.
+
+\begin{verbatim}
+MemoryRecord:
+  record_id: string
+  run_id: string
+  framework: enum[langgraph, llamaindex, crewai, autogen, letta]
+  subsystem: enum[vector_rag, semantic, episodic, shared_coordination,
+                  procedural_extension]
+  content: string
+  content_hash: string
+  source_type: enum[system_seed, curated_corpus, user_text, external_doc,
+                    tool_output, peer_agent, summary, synthetic_attack]
+  source_id: string
+  actor_id: string
+  timestamp: iso8601
+  parent_ids: list[string]
+  lineage_depth: integer
+  trust_prior: float
+  trust_score: float
+  relevance_score: float|null
+  risk_score: float
+  contradiction_score: float
+  instructionality_score: float
+  duplicate_cluster_id: string|null
+  sensitivity_label: enum[none, private, credential_like, policy_like]
+  poison_label: enum[benign, poisoned, unknown]
+  decision: enum[commit, commit_low_trust, quarantine, reject]
+  decision_reasons: list[string]
+  quarantine_id: string|null
+  tags: list[string]
+\end{verbatim}
+
+\missing{} The final implementation must decide whether records are persisted in SQLite, DuckDB,
+JSONL plus vector index, or framework-native stores plus a sidecar metadata database. The quickest
+MVP is JSONL audit logs plus SQLite metadata plus framework-native memory stores.
+
+\section{Core API Contracts}
+
+\begin{verbatim}
+class MemoryFirewall:
+    def admit_write(self, record: MemoryRecord) -> AdmissionDecision: ...
+    def retrieve(self, query: MemoryQuery) -> RetrievalDecision: ...
+    def shape_context(self, decision: RetrievalDecision) -> EvidenceBundle: ...
+    def verify_tool_call(self, call: ToolCall,
+                         evidence: EvidenceBundle) -> ToolDecision: ...
+    def propagate(self, event: PropagationEvent) -> PropagationDecision: ...
+
+class FrameworkAdapter:
+    def wrap_memory(self, native_memory: object) -> object: ...
+    def to_record(self, event: NativeMemoryEvent) -> MemoryRecord: ...
+    def native_commit(self, record: MemoryRecord) -> None: ...
+    def native_query(self, query: MemoryQuery) -> list[MemoryRecord]: ...
+\end{verbatim}
+
+The API should be synchronous first. Async support can be added behind the same interface only after
+the synchronous MVP is stable.
+
+\section{Scoring Logic}
+
+The retrieval utility score should be explicit and logged:
+
+\[
+\begin{aligned}
+S(r, q) ={}&
+\lambda_{\mathrm{rel}}\mathrm{Rel}(r,q)
++ \lambda_{\mathrm{trust}}\mathrm{Trust}(r)
++ \lambda_{\mathrm{cor}}\mathrm{Corrob}(r)\\
+&- \lambda_{\mathrm{contr}}\mathrm{Contradict}(r,q)
+- \lambda_{\mathrm{lineage}}\mathrm{LineageRisk}(r)
+- \lambda_{\mathrm{dup}}\mathrm{DuplicatePenalty}(r).
+\end{aligned}
+\]
+
+The final implementation must log each term separately. If only the aggregate score is logged,
+ablation and reviewer debugging become weak.
+
+\missing{} Initial weights are not specified in the report. Start with fixed configuration values,
+then run a threshold sensitivity sweep. Do not train a detector unless the MVP is already complete.
+
+\section{Data Flow}
+
+\begin{enumerate}
+  \item A user turn, tool output, external document, or peer-agent message attempts to enter memory.
+  \item The framework adapter converts the native event into a \texttt{MemoryRecord}.
+  \item The provenance engine assigns a trust prior from source type and lineage depth.
+  \item The write gate computes instructionality, contradiction, duplicate, sensitivity, and source
+        risk features.
+  \item The gate commits, down-trusts, quarantines, or rejects the record.
+  \item The audit logger writes the raw event, normalized record, scores, and decision.
+  \item During task execution, the native framework retrieves candidates.
+  \item The retrieval gate reranks candidates and enforces source and lineage diversity.
+  \item The context shaper renders memory as typed evidence blocks.
+  \item The agent proposes an answer or tool call.
+  \item The pre-tool verifier checks whether high-impact tool arguments are supported by explicit
+        user intent or corroborated trusted memory.
+  \item In multi-agent runs, shared-memory writes carry parent IDs and trust decay; rapid low-trust
+        fan-out is frozen or quarantined.
+\end{enumerate}
+
+\section{Trust Boundaries and Attacker Interaction Points}
+
+\begin{longtable}{|L{0.22\textwidth}|L{0.27\textwidth}|L{0.41\textwidth}|}
+\hline
+\textbf{Boundary} & \textbf{Attacker interaction point} & \textbf{Required control} \\
+\hline
+External content to memory & Poisoned documents, retrieved passages, tool-returned text. &
+Source trust priors, instructionality scan, quarantine, context shaping. \\
+\hline
+User text to memory & Query-only write inducement and false fact insertion. & Write admission,
+contradiction checks against high-trust memory, audit labels. \\
+\hline
+Memory to prompt context & Unsafe retrieved chunks entering the model as raw instructions. &
+Risk-aware reranking and typed evidence rendering. \\
+\hline
+Memory to tool execution & Memory-conditioned tool argument or policy change. & Pre-tool
+verification, support threshold, read-only degrade. \\
+\hline
+Agent to shared memory & Compromised peer-agent output, infected summaries, team notes. &
+Lineage edges, trust decay, fan-out freeze. \\
+\hline
+Quarantine to normal memory & Accidental retrieval of suspicious records. & Physical namespace
+separation and explicit quarantine policy. \\
+\hline
+\end{longtable}
+
+\section{Implementation Order}
+
+The first components to implement are the canonical schema, audit logger, LangGraph adapter,
+write gate, retrieval gate, and metric calculation. Propagation should be implemented before any
+optional fourth framework because propagation is one of the paper's differentiators.
+
+\section{Required Paper Figures}
+
+\begin{longtable}{|L{0.22\textwidth}|L{0.36\textwidth}|L{0.32\textwidth}|}
+\hline
+\textbf{Figure} & \textbf{What it should show} & \textbf{Why it matters} \\
+\hline
+System architecture & Pipeline from untrusted sources through gates to agent, tools, and shared
+memory, with audit side channel and trust boundaries. & Establishes that the system is lifecycle
+defense, not only retrieval filtering. \\
+\hline
+Canonical memory schema & Four memory subsystem examples normalized into one schema. & Supports
+framework/subsystem portability. \\
+\hline
+Lineage graph & Poison source, summary hops, shared writes, and downstream actions. & Makes
+propagation measurable and concrete. \\
+\hline
+Security-cost frontier & Attack reduction or contaminated context reduction versus p95 latency or
+memory overhead. & Preempts ``too expensive'' reviewer objections. \\
+\hline
+Scalability curves & Memory size, poison ratio, top-k, and agent count sweeps. & Makes scaling a
+central contribution rather than appendix filler. \\
+\hline
+\end{longtable}
+
+\chapter{Threat Model}
+
+\section{Attacker Capabilities}
+
+The attacker has bounded but realistic capabilities:
+
+\begin{itemize}
+  \item \textbf{Query-only write inducement:} the attacker can interact with the agent through normal
+        user or task channels and attempt to cause persistent malicious or misleading memory writes.
+  \item \textbf{Corpus or passage poisoning:} the attacker can insert or influence documents likely
+        to be retrieved by vector/RAG memory.
+  \item \textbf{Indirect prompt injection:} the attacker can place instructions inside retrieved or
+        tool-returned content.
+  \item \textbf{Compromised peer-agent output:} the attacker can control or contaminate one peer
+        agent's output that is written into shared coordination memory.
+\end{itemize}
+
+The attacker does not control the model weights, host operating system, memory firewall code, or
+experiment harness.
+
+\section{Attacker Goals}
+
+\begin{itemize}
+  \item Cause poisoned records to be committed to durable memory.
+  \item Cause poisoned or low-trust records to dominate retrieval.
+  \item Cause retrieved content to enter reasoning as instruction rather than evidence.
+  \item Cause contradiction collisions where recent or semantically similar false records override
+        high-trust records.
+  \item Cause memory-conditioned unsafe tool calls.
+  \item Cause contamination to propagate across agents through shared memory, summaries, or notes.
+\end{itemize}
+
+\section{Defender Assumptions}
+
+\begin{itemize}
+  \item The defender can wrap or intercept framework memory APIs.
+  \item The defender can maintain sidecar metadata, audit logs, and quarantine namespaces.
+  \item The defender can assign source trust priors based on source type and framework context.
+  \item The defender can run lightweight deterministic checks and optional LLM checks.
+  \item The defender can enforce tool-call confirmation or read-only degradation for high-risk calls.
+\end{itemize}
+
+\missing{} The implementation must decide whether optional LLM checks use the same model as the
+agent, a cheaper verifier model, or no model at all.
+
+\section{In Scope}
+
+\begin{itemize}
+  \item Persistent memory contamination through normal interaction paths.
+  \item Vector/RAG poisoning that affects retrieval.
+  \item Semantic false fact insertion and contradiction.
+  \item Episodic poisoned exemplar replay.
+  \item Shared coordination memory cascades.
+  \item Memory flooding and duplicate domination.
+  \item Utility and latency impact of defensive gates.
+\end{itemize}
+
+\section{Out of Scope}
+
+\begin{itemize}
+  \item Model-weight poisoning or fine-tuning attacks.
+  \item Host compromise, file-system compromise, or arbitrary code execution.
+  \item Embedding-model attacks and vector-index implementation vulnerabilities.
+  \item Vendor prompt leakage or hidden system prompt extraction.
+  \item Covert channels.
+  \item Human-in-the-loop social engineering outside the agent interface.
+  \item Formal proof of complete memory integrity.
+\end{itemize}
+
+\section{Victim System and Environment}
+
+The victim is an LLM-agent application built on a public framework with durable memory enabled. The
+MVP victim systems are:
+
+\begin{itemize}
+  \item LangGraph agent with vector/RAG and semantic memory.
+  \item LlamaIndex agent with memory blocks or long-term memory abstractions.
+  \item CrewAI team with shared coordination memory.
+\end{itemize}
+
+All tasks should use safe stub tools and synthetic or public non-sensitive corpora. The paper should
+avoid regulated domains unless there is a clear reason and proper ethics review.
+
+\section{Credibility of the Threat Model}
+
+The threat model is credible because it matches the direction of public agent systems: persistent
+memory, retrieval, summarization, and multi-agent coordination are exposed as normal features. It is
+not exaggerated because it excludes host compromise, model compromise, hidden vendor internals, and
+unbounded attacker control. The attacker interacts through plausible content and memory paths.
+
+\chapter{Implementation Blueprint}
+
+\section{Repository Structure}
+
+Create the following repository structure:
+
+\begin{verbatim}
+memsieve/
+  pyproject.toml
+  README.md
+  LICENSE
+  configs/
+    default.yaml
+    frameworks.yaml
+    thresholds.yaml
+    models.yaml
+  memsieve/
+    __init__.py
+    core/
+      record.py
+      events.py
+      decisions.py
+      scoring.py
+      config.py
+      clock.py
+    stores/
+      metadata_store.py
+      quarantine_store.py
+      audit_log.py
+      vector_store.py
+    gates/
+      write_gate.py
+      retrieval_gate.py
+      context_shaper.py
+      tool_verifier.py
+      propagation_controller.py
+    adapters/
+      base.py
+      langgraph_adapter.py
+      llamaindex_adapter.py
+      crewai_adapter.py
+      autogen_adapter.py
+    baselines/
+      no_defense.py
+      provenance_only.py
+      spotlighting_wrapper.py
+      trust_threshold.py
+      random_quarantine.py
+    scenarios/
+      poisoned_fact.py
+      retrieved_instruction.py
+      experience_graft.py
+      conflict_recency.py
+      shared_cascade.py
+      flooding.py
+    experiments/
+      runner.py
+      manifests.py
+      seed.py
+      graders.py
+      metrics.py
+      aggregate.py
+    plotting/
+      tables.py
+      figures.py
+      latex_export.py
+  manifests/
+    scenarios/
+    experiment_matrix.yaml
+  data/
+    raw/
+    synthetic/
+    curated/
+  runs/
+    .gitkeep
+  scripts/
+    run_smoke_tests.ps1
+    run_main_matrix.ps1
+    aggregate_results.ps1
+    make_figures.ps1
+  tests/
+    unit/
+    integration/
+    regression/
+  paper/
+    memsieve_paper.tex
+    figures/
+    tables/
+\end{verbatim}
+
+\section{Core Modules and Classes}
+
+\begin{longtable}{|L{0.25\textwidth}|L{0.30\textwidth}|L{0.35\textwidth}|}
+\hline
+\textbf{Module} & \textbf{Core classes} & \textbf{Responsibility} \\
+\hline
+\texttt{core.record} & \texttt{MemoryRecord}, \texttt{MemoryQuery} & Canonical schema,
+validation, serialization. \\
+\hline
+\texttt{core.decisions} & \texttt{AdmissionDecision}, \texttt{RetrievalDecision},
+\texttt{ToolDecision}, \texttt{PropagationDecision} & Typed decision objects with scores and
+reasons. \\
+\hline
+\texttt{stores.audit\_log} & \texttt{AuditLogger} & Append-only JSONL event logging. \\
+\hline
+\texttt{stores.quarantine\_store} & \texttt{QuarantineStore} & Isolated suspicious record store. \\
+\hline
+\texttt{gates.write\_gate} & \texttt{WriteGate} & Write scoring, contradiction checks, duplicate
+throttling, quarantine decisions. \\
+\hline
+\texttt{gates.retrieval\_gate} & \texttt{RetrievalGate} & Risk-aware reranking and diversity
+constraints. \\
+\hline
+\texttt{gates.context\_shaper} & \texttt{ContextShaper} & Converts raw records into typed evidence
+blocks. \\
+\hline
+\texttt{gates.tool\_verifier} & \texttt{ToolVerifier} & Blocks, confirms, or degrades risky
+memory-conditioned tool calls. \\
+\hline
+\texttt{gates.propagation\_controller} & \texttt{PropagationController} & Adds lineage, decays
+trust, detects fan-out cascades. \\
+\hline
+\texttt{adapters.*} & \texttt{FrameworkAdapter} subclasses & Wrap native memory APIs. \\
+\hline
+\texttt{experiments.runner} & \texttt{ExperimentRunner} & Runs scenario matrix and writes
+structured artifacts. \\
+\hline
+\texttt{experiments.metrics} & \texttt{MetricComputer} & Computes ASR, URR, CCR, BUP, TSD,
+propagation, latency, and scaling metrics. \\
+\hline
+\end{longtable}
+
+\section{Configuration Files}
+
+\begin{verbatim}
+# configs/default.yaml
+run:
+  seed: 0
+  output_dir: runs
+  log_level: INFO
+
+models:
+  agent_model: MISSING_MUST_DECIDE
+  verifier_model: none
+  embedding_model: MISSING_MUST_DECIDE
+
+thresholds:
+  quarantine_risk: 0.75
+  low_trust_risk: 0.45
+  contradiction_high: 0.70
+  instructionality_high: 0.65
+  propagation_freeze_fanout: 3
+  trust_decay_per_hop: 0.15
+
+retrieval:
+  top_k_native: 16
+  top_k_final: 4
+  require_source_diversity: true
+  max_same_lineage: 1
+
+tool_verification:
+  high_impact_tools: [write_file, send_message, external_post, purchase]
+  require_user_or_trusted_support: true
+\end{verbatim}
+
+The threshold values above are starting defaults, not scientific facts. The evaluation must include a
+sensitivity sweep.
+
+\section{Logging Design}
+
+Every run must write:
+
+\begin{itemize}
+  \item \texttt{run\_manifest.yaml}: framework, model, seed, scenario, baseline, thresholds, git hash
+        if available, and environment.
+  \item \texttt{events.jsonl}: every normalized memory event.
+  \item \texttt{records.jsonl}: canonical records and labels.
+  \item \texttt{decisions.jsonl}: gate scores and decisions.
+  \item \texttt{retrievals.jsonl}: native candidates, reranked candidates, selected context.
+  \item \texttt{tool\_calls.jsonl}: proposed and final tool decisions.
+  \item \texttt{lineage.jsonl}: parent-child edges for propagation.
+  \item \texttt{grader.jsonl}: task success, attack success, and grading rationale.
+  \item \texttt{timing.jsonl}: p50, p95, and per-stage latencies.
+\end{itemize}
+
+\textbf{Hard rule:} paper metrics must be computed from logs, not from ad hoc notebook state.
+
+\section{Experiment Runner Design}
+
+The runner should execute a matrix:
+
+\begin{verbatim}
+for framework in frameworks:
+  for subsystem in subsystems:
+    for scenario in scenarios:
+      for defense in defenses:
+        for seed in seeds:
+          prepare_clean_environment()
+          seed_memory()
+          inject_attack_if_needed()
+          run_task()
+          grade_outputs()
+          save_logs()
+\end{verbatim}
+
+Each run directory must be immutable after completion. Re-running should create a new run ID.
+
+\section{Reproducibility Design}
+
+\begin{itemize}
+  \item Pin Python version and all framework versions in \texttt{pyproject.toml} or a lock file.
+  \item Save all scenario manifests and generated synthetic records.
+  \item Save model names, API parameters, temperature, top-p, max tokens, and embedding model.
+  \item Use deterministic stub tools for all side-effectful actions.
+  \item Use fixed seeds for synthetic generation, retrieval tie-breaking, and scenario ordering.
+  \item Export paper tables directly from result JSON or CSV.
+  \item Keep raw logs for every table row.
+\end{itemize}
+
+\missing{} Exact reproducibility policy for hosted models: the paper must disclose that hosted LLMs
+can change unless a pinned snapshot or local model is used.
+
+\section{Implementation Phases}
+
+\subsection{Phase 0: Scaffold and Reproducibility}
+
+\textbf{Goal.} Create the repository, configuration, logging, and test skeleton.
+
+\textbf{Required modules.} \texttt{core.config}, \texttt{stores.audit\_log},
+\texttt{experiments.runner}.
+
+\textbf{Exact tasks.}
+\begin{itemize}
+  \item Create package structure and dependency file.
+  \item Implement config loading and schema validation.
+  \item Implement immutable run directory creation.
+  \item Implement append-only JSONL writer.
+  \item Add unit tests for config and logging.
+\end{itemize}
+
+\textbf{Expected outputs.} A smoke run creates a run directory with manifest and empty logs.
+
+\textbf{Correctness checks.} Tests pass; invalid config fails loudly; logs are valid JSONL.
+
+\textbf{Common failure points.} Silent overwrites, unpinned configs, invalid JSON due to raw model
+text.
+
+\textbf{Evidence to save.} Smoke-test logs and configuration snapshot.
+
+\subsection{Phase 1: Canonical Schema and Core Decisions}
+
+\textbf{Goal.} Implement canonical records and typed decisions.
+
+\textbf{Required modules.} \texttt{core.record}, \texttt{core.events},
+\texttt{core.decisions}.
+
+\textbf{Exact tasks.}
+\begin{itemize}
+  \item Implement \texttt{MemoryRecord} validation.
+  \item Implement content hashing and deterministic record IDs.
+  \item Implement admission, retrieval, tool, and propagation decision classes.
+  \item Add serialization round-trip tests.
+\end{itemize}
+
+\textbf{Expected outputs.} Any framework event can be represented as a stable record.
+
+\textbf{Correctness checks.} Round-trip tests preserve all fields; missing required fields fail.
+
+\textbf{Common failure points.} Framework-specific fields leak into generic schema; IDs are
+non-deterministic.
+
+\textbf{Evidence to save.} Schema examples for all four subsystems.
+
+\subsection{Phase 2: Framework Adapter Smoke Tests}
+
+\textbf{Goal.} Wrap LangGraph, LlamaIndex, and CrewAI enough to intercept memory writes and
+retrievals.
+
+\textbf{Required modules.} \texttt{adapters.base}, \texttt{adapters.langgraph\_adapter},
+\texttt{adapters.llamaindex\_adapter}, \texttt{adapters.crewai\_adapter}.
+
+\textbf{Exact tasks.}
+\begin{itemize}
+  \item Identify native memory write and retrieval calls.
+  \item Implement adapter methods for write, query, and commit.
+  \item Build one clean task per framework.
+  \item Verify identical event logs across framework-specific runs.
+\end{itemize}
+
+\textbf{Expected outputs.} Three clean smoke runs with memory event logs.
+
+\textbf{Correctness checks.} Each adapter captures writes and retrievals without changing clean
+answers.
+
+\textbf{Common failure points.} Framework version drift, async behavior, hidden memory writes, and
+agent code bypassing the adapter.
+
+\textbf{Evidence to save.} Adapter smoke logs and minimal working examples.
+
+\subsection{Phase 3: Write Gate, Quarantine, and Audit}
+
+\textbf{Goal.} Stop or label contaminated writes before they enter normal memory.
+
+\textbf{Required modules.} \texttt{gates.write\_gate}, \texttt{stores.quarantine\_store},
+\texttt{stores.metadata\_store}.
+
+\textbf{Exact tasks.}
+\begin{itemize}
+  \item Implement trust priors by source type.
+  \item Implement heuristic instructionality features.
+  \item Implement contradiction checks against high-trust semantic memory.
+  \item Implement near-duplicate clustering or hashing.
+  \item Implement quarantine namespace and audit reasons.
+\end{itemize}
+
+\textbf{Expected outputs.} Poisoned writes are committed, down-trusted, quarantined, or rejected with
+logged reasons.
+
+\textbf{Correctness checks.} Unit tests for benign writes, obvious poisoned writes, contradictions,
+and duplicate floods.
+
+\textbf{Common failure points.} Over-blocking benign user preferences; quarantined records leaking
+into retrieval.
+
+\textbf{Evidence to save.} Quarantine precision/recall logs and example decision rationales.
+
+\subsection{Phase 4: Retrieval Gate and Context Shaping}
+
+\textbf{Goal.} Make retrieval optimize task utility under risk, not raw similarity alone.
+
+\textbf{Required modules.} \texttt{gates.retrieval\_gate}, \texttt{gates.context\_shaper}.
+
+\textbf{Exact tasks.}
+\begin{itemize}
+  \item Retrieve a larger native candidate pool.
+  \item Compute risk-aware score terms.
+  \item Enforce source and lineage diversity.
+  \item Render records as trusted facts, examples, shared notes, contradictions, or quarantined
+        excerpts.
+  \item Log native rank, defended rank, selected context, and dropped candidates.
+\end{itemize}
+
+\textbf{Expected outputs.} The model sees typed evidence blocks and fewer contaminated records.
+
+\textbf{Correctness checks.} Retrieval tests where poisoned top-1 native result is demoted;
+context output contains no untyped raw injected instruction.
+
+\textbf{Common failure points.} Excessive relevance loss; context shaper accidentally quotes
+malicious content as command-like text.
+
+\textbf{Evidence to save.} Unsafe Retrieval Rate and Contaminated Context Rate examples.
+
+\subsection{Phase 5: Pre-Tool Verification and Propagation Control}
+
+\textbf{Goal.} Prevent memory-conditioned unsafe actions and shared-memory cascades.
+
+\textbf{Required modules.} \texttt{gates.tool\_verifier}, \texttt{gates.propagation\_controller}.
+
+\textbf{Exact tasks.}
+\begin{itemize}
+  \item Define high-impact stub tools.
+  \item Require explicit user instruction or trusted corroborating memory for high-impact actions.
+  \item Attach parent IDs to shared-memory writes.
+  \item Decay trust across summaries and peer-agent hops.
+  \item Freeze rapid low-trust fan-out.
+\end{itemize}
+
+\textbf{Expected outputs.} Tool calls and shared writes have support evidence and lineage.
+
+\textbf{Correctness checks.} A compromised peer cannot contaminate all downstream agents in the
+shared-memory cascade scenario.
+
+\textbf{Common failure points.} Tool verifier blocks too many legitimate actions; lineage is missing
+for summaries.
+
+\textbf{Evidence to save.} Lineage graph, propagation depth, fan-out, and blocked-call logs.
+
+\subsection{Phase 6: Baselines, Scenarios, and Graders}
+
+\textbf{Goal.} Implement fair comparisons and auto-gradable scenarios.
+
+\textbf{Required modules.} \texttt{baselines.*}, \texttt{scenarios.*}, \texttt{experiments.graders}.
+
+\textbf{Exact tasks.}
+\begin{itemize}
+  \item Implement no defense, provenance-only, spotlighting-style wrapper, trust-threshold sanitizer,
+        and random quarantine baseline.
+  \item Implement six scenario families.
+  \item Implement deterministic graders for task success and attack success.
+  \item Add scenario manifests with seed, memory subsystem, attack records, and expected labels.
+\end{itemize}
+
+\textbf{Expected outputs.} A small matrix can run end to end and produce metrics.
+
+\textbf{Correctness checks.} Baselines use the same tasks, models, memory sizes, and seeds as
+\project{}.
+
+\textbf{Common failure points.} Baselines accidentally get weaker retrieval settings; graders rely
+on brittle string matching only.
+
+\textbf{Evidence to save.} Scenario manifests and grader validation examples.
+
+\subsection{Phase 7: Full Evaluation Pipeline}
+
+\textbf{Goal.} Run the MVP experiment matrix and produce paper-ready CSV, LaTeX tables, and plots.
+
+\textbf{Required modules.} \texttt{experiments.metrics}, \texttt{experiments.aggregate},
+\texttt{plotting.tables}, \texttt{plotting.figures}.
+
+\textbf{Exact tasks.}
+\begin{itemize}
+  \item Run main attack matrix.
+  \item Run clean utility matrix.
+  \item Run ablations.
+  \item Run memory-size, poison-ratio, top-k, and agent-count sweeps.
+  \item Aggregate metrics with confidence intervals.
+  \item Export plots and tables.
+\end{itemize}
+
+\textbf{Expected outputs.} Paper tables and figures are generated from raw logs.
+
+\textbf{Correctness checks.} Re-running aggregation from raw logs reproduces table values.
+
+\textbf{Common failure points.} Missing run metadata, inconsistent seeds, incomplete failed-run
+handling.
+
+\textbf{Evidence to save.} Raw logs, aggregate CSVs, plotting scripts, figure source files.
+
+\chapter{Scenario Design}
+
+\section{Scenario Requirements}
+
+Every scenario must define: name, purpose, initial system state, attacker action, defender behavior,
+expected failure or success mode, metrics, logs, table/figure output, and supported claim.
+
+\section{Scenario Matrix}
+
+\begin{longtable}{|L{0.14\textwidth}|L{0.18\textwidth}|L{0.18\textwidth}|L{0.20\textwidth}|L{0.20\textwidth}|}
+\hline
+\textbf{Scenario} & \textbf{Purpose} & \textbf{Attacker action} & \textbf{Defender behavior} &
+\textbf{Claim supported} \\
+\hline
+Poisoned fact insertion & Test persistent false semantic memory. & Induce storage of a false
+project or user fact through low-trust content. & Quarantine, down-trust, or mark contradiction
+against high-trust fact. & Write-path defense reduces poisoned persistent memory. \\
+\hline
+Retrieved instruction hijack & Test RAG chunks that contain hidden instructions. & Insert a
+retrievable document that tells the agent to change behavior. & Demote, quarantine, or render as
+untrusted evidence. & Retrieval and context shaping reduce unsafe retrieved instruction. \\
+\hline
+Experience graft & Test poisoned episodic examples. & Seed an apparently successful but unsafe
+trajectory. & Suppress or label the exemplar; prefer trusted examples. & Episodic memory needs
+defense, not only RAG. \\
+\hline
+Conflict and recency collision & Test recent false record versus older trusted record. & Add recent
+semantically overlapping contradiction. & Surface contradiction and prefer high-trust record or
+abstain. & Trust and contradiction beat naive recency/similarity. \\
+\hline
+Shared-memory cascade & Test peer-agent contamination. & Compromised peer writes contaminated
+summary or shared note. & Attach lineage, decay trust, freeze low-trust fan-out. & Propagation
+controller caps cross-agent spread. \\
+\hline
+Memory flooding & Test duplicate and top-k domination. & Insert many near-duplicate low-quality or
+poisoned records. & Cluster duplicates, throttle writes, enforce diversity. & Defense remains stable
+under memory pressure. \\
+\hline
+\end{longtable}
+
+\section{Detailed Test Cases}
+
+\subsection{Poisoned Fact Insertion}
+
+\textbf{System state before experiment.} Semantic memory contains high-trust seeded facts and benign
+project/user facts. The agent has a task requiring later recall of one fact.
+
+\textbf{Attacker action.} The attacker submits low-trust content that implies a false persistent fact
+should be saved.
+
+\textbf{Defender behavior.} The write gate computes source risk, contradiction score, and
+instructionality. It commits benign facts, down-trusts uncertain facts, and quarantines high-risk
+false records.
+
+\textbf{Expected failure mode without defense.} The false fact is written, retrieved later, and used
+in an answer or plan.
+
+\textbf{Metrics.} Attack Success Rate, Quarantine Precision/Recall, Contaminated Context Rate, Task
+Success Under Defense.
+
+\textbf{Logs needed.} Write event, scores, decision reasons, retrieval event, final answer, grader.
+
+\textbf{Output.} Main attack table and write-gate ablation row.
+
+\textbf{Claim supported.} \project{} reduces persistent poisoned writes while preserving clean
+semantic memory utility.
+
+\subsection{Retrieved Instruction Hijack}
+
+\textbf{System state before experiment.} Vector/RAG memory contains benign documents relevant to a
+question. Attack document is semantically relevant and likely to appear in native top-k.
+
+\textbf{Attacker action.} The attacker inserts a poisoned document with hidden or explicit
+instructions embedded in content.
+
+\textbf{Defender behavior.} Retrieval gate scores lineage and instructionality risk, applies source
+diversity, and context shaper renders the chunk as untrusted evidence rather than instruction.
+
+\textbf{Expected failure mode without defense.} The model follows the retrieved instruction or
+changes the answer/tool plan.
+
+\textbf{Metrics.} Unsafe Retrieval Rate, Contaminated Context Rate, Attack Success Reduction, BUP,
+latency overhead.
+
+\textbf{Logs needed.} Native top-k, defended top-k, context bundle, final output, stage timings.
+
+\textbf{Output.} Unsafe retrieval table and memory-size scaling curve.
+
+\textbf{Claim supported.} The system improves over raw vector retrieval and spotlighting-style
+context wrapping.
+
+\subsection{Experience Graft}
+
+\textbf{System state before experiment.} Episodic memory contains prior successful trajectories. A
+task requires selecting or imitating a prior example.
+
+\textbf{Attacker action.} The attacker seeds a poisoned trajectory marked as successful but containing
+an unsafe step.
+
+\textbf{Defender behavior.} The write gate marks low trust or quarantines the trajectory; retrieval
+gate penalizes unsupported low-trust exemplars; context shaper labels examples as examples, not
+rules.
+
+\textbf{Expected failure mode without defense.} The agent imitates the poisoned plan.
+
+\textbf{Metrics.} Attack Success Rate, selected exemplar poison rate, TSD, BUP.
+
+\textbf{Logs needed.} Episodic write labels, selected exemplars, generated plan, tool sequence.
+
+\textbf{Output.} Non-RAG subsystem row in main table and ablation table.
+
+\textbf{Claim supported.} Memory defense generalizes beyond vector/RAG corpora.
+
+\subsection{Conflict and Recency Collision}
+
+\textbf{System state before experiment.} Semantic or shared memory contains an older high-trust
+record. A later low-trust contradictory record overlaps semantically.
+
+\textbf{Attacker action.} Insert a recent contradiction likely to win naive recency or similarity
+ranking.
+
+\textbf{Defender behavior.} Contradiction detector flags conflict; retrieval gate prefers high-trust
+record or surfaces both with a warning; tool verifier blocks actions relying only on the low-trust
+branch.
+
+\textbf{Expected failure mode without defense.} The recent false record silently overrides trusted
+memory.
+
+\textbf{Metrics.} Contradiction win rate, TSD, CCR, abstention/confirmation rate.
+
+\textbf{Logs needed.} Contradiction pairs, ranking, context, final answer/action.
+
+\textbf{Output.} Conflict-resolution table.
+
+\textbf{Claim supported.} Provenance and contradiction signals improve over similarity/recency.
+
+\subsection{Shared-Memory Cascade}
+
+\textbf{System state before experiment.} CrewAI team has shared coordination memory and multiple
+agents. One peer is contaminated.
+
+\textbf{Attacker action.} The compromised peer writes a contaminated summary or shared note.
+
+\textbf{Defender behavior.} Propagation controller records lineage, decays trust, freezes rapid
+low-trust fan-out, and quarantines suspicious shared writes.
+
+\textbf{Expected failure mode without defense.} Contamination spreads to downstream agents and
+affects their writes or tool actions.
+
+\textbf{Metrics.} Propagation depth, fan-out, contaminated shared writes, TSD, latency overhead.
+
+\textbf{Logs needed.} Lineage graph, shared writes, downstream retrievals, tool calls.
+
+\textbf{Output.} Agent-count scaling figure and lineage graph.
+
+\textbf{Claim supported.} \project{} contains memory-mediated cross-agent spread.
+
+\subsection{Memory Flooding}
+
+\textbf{System state before experiment.} Memory store contains benign records. Attack condition
+inserts many near-duplicate records with low trust or poison labels.
+
+\textbf{Attacker action.} Flood vector, episodic, or shared memory with semantically similar records.
+
+\textbf{Defender behavior.} Duplicate throttling, source diversity, and max-same-lineage constraints
+prevent domination.
+
+\textbf{Expected failure mode without defense.} Top-k dominated by attacker cluster; utility drops;
+latency rises.
+
+\textbf{Metrics.} Top-k Source Diversity, URR, CCR, BUP, latency overhead, memory growth overhead.
+
+\textbf{Logs needed.} Duplicate cluster IDs, retrieval source distribution, timings, task outcomes.
+
+\textbf{Output.} Flooding stress table and security-cost frontier.
+
+\textbf{Claim supported.} Defense remains stable under adversarial memory pressure.
+
+\chapter{Experimental Methodology}
+
+\section{Experimental Setup}
+
+The MVP setup uses three public frameworks, four memory subsystems, six scenarios, five defense
+settings, three seeds, one primary model, and one shared embedding backend.
+
+\begin{itemize}
+  \item Frameworks: LangGraph, LlamaIndex, CrewAI.
+  \item Optional: AutoGen after MVP results are complete.
+  \item Memory subsystems: vector/RAG, semantic, episodic, shared coordination.
+  \item Defense settings: no defense, provenance-only, spotlighting-style retrieval wrapper,
+        trust-threshold sanitizer, full \project{}.
+  \item Seeds: at least 3 for scenario generation and retrieval tie-breaking.
+  \item Model temperature: low or zero for reproducibility.
+\end{itemize}
+
+\missing{} Exact hosted/local model, model version, embedding backend, and API parameters.
+
+\section{Datasets and Simulated Environment}
+
+Use synthetic and public non-sensitive corpora. The safest MVP is a synthetic project-assistant
+environment with:
+
+\begin{itemize}
+  \item project documents for vector/RAG memory;
+  \item user and project facts for semantic memory;
+  \item prior task trajectories for episodic memory;
+  \item team notes and summaries for shared coordination memory;
+  \item deterministic stub tools for high-impact actions.
+\end{itemize}
+
+This avoids domain-specific ethics drag while still exercising real memory paths.
+
+\missing{} The report does not specify a public corpus. Choose one public, permissively licensed
+corpus only if it adds realism without slowing the MVP.
+
+\section{Baselines}
+
+Run every applicable scenario under:
+
+\begin{itemize}
+  \item No defense.
+  \item Provenance-only filter.
+  \item Spotlighting-style context wrapper.
+  \item Trust-threshold sanitizer.
+  \item Random quarantine baseline.
+  \item Full \project{}.
+\end{itemize}
+
+Optional comparisons:
+
+\begin{itemize}
+  \item RAGForensics for vector/RAG rows if code is easy to reuse.
+  \item Task Shield for tool-action rows if integration is moderate.
+\end{itemize}
+
+\section{Ablations}
+
+\begin{itemize}
+  \item Full \project{} minus write gate.
+  \item Full \project{} minus retrieval risk scoring.
+  \item Full \project{} minus context shaping.
+  \item Full \project{} minus contradiction checks.
+  \item Full \project{} minus source diversity.
+  \item Full \project{} minus pre-tool verification.
+  \item Full \project{} minus propagation controller.
+  \item Full \project{} with no trust decay.
+\end{itemize}
+
+\section{Main Experiment Matrix}
+
+\begin{longtable}{|L{0.17\textwidth}|L{0.22\textwidth}|L{0.19\textwidth}|L{0.22\textwidth}|L{0.10\textwidth}|}
+\hline
+\textbf{Experiment} & \textbf{Frameworks} & \textbf{Subsystems} & \textbf{Primary metrics} &
+\textbf{Priority} \\
+\hline
+Clean utility & LangGraph, LlamaIndex, CrewAI & All four & BUP, TSD, latency & Must \\
+\hline
+Write-path poisoning & LangGraph, LlamaIndex & Semantic, episodic & ASR reduction, quarantine P/R
+& Must \\
+\hline
+Unsafe retrieval & All MVP frameworks & Vector/RAG, semantic & URR, CCR, TSD & Must \\
+\hline
+Conflict resolution & LangGraph, CrewAI & Semantic, shared & Contradiction win rate, TSD & Must \\
+\hline
+Shared cascade & CrewAI, optional AutoGen & Shared coordination & Propagation depth, fan-out, TSD
+& Must \\
+\hline
+Flooding stress & All MVP frameworks & Vector, episodic, shared & Top-k diversity, URR, latency &
+Must \\
+\hline
+Memory-size scaling & All MVP frameworks & Applicable subsystems & Scalability slope, URR, CCR,
+latency & Must \\
+\hline
+Agent-count scaling & CrewAI, optional AutoGen & Shared coordination & Propagation depth, fan-out,
+latency & Must \\
+\hline
+Second-model transfer & One or two frameworks & Vector plus shared & ASR reduction, BUP & Optional
+\\
+\hline
+\end{longtable}
+
+\section{Repeated Trials and Seeds}
+
+Use at least three seeds. For stochastic hosted models, run more if budget allows. Report confidence
+intervals for aggregate rates. If only three seeds are feasible, do not overstate statistical
+significance.
+
+\section{Clean, Attacked, and Defended Conditions}
+
+\begin{itemize}
+  \item \textbf{Clean:} no poisoned records; measure utility, latency, memory overhead.
+  \item \textbf{Attacked/no-defense:} poisoned records or compromised peer present; no gates.
+  \item \textbf{Attacked/baseline:} same attack under each baseline.
+  \item \textbf{Attacked/full defense:} same attack under full \project{}.
+  \item \textbf{Attacked/ablation:} same attack with one module removed.
+\end{itemize}
+
+All comparisons must use identical tasks, seeds, framework versions, memory sizes, top-k values, and
+model parameters.
+
+\section{Tables and Figures to Produce}
+
+\begin{itemize}
+  \item Table 1: Frameworks, memory subsystems, adapter coverage.
+  \item Table 2: Scenario matrix and threat capability mapping.
+  \item Table 3: Main attack reduction results.
+  \item Table 4: Clean utility preservation.
+  \item Table 5: Ablation results.
+  \item Table 6: Baseline comparison by subsystem.
+  \item Figure 1: System architecture.
+  \item Figure 2: Unsafe retrieval and contaminated context versus memory size.
+  \item Figure 3: Cross-agent propagation depth versus agent count.
+  \item Figure 4: Security-cost frontier.
+  \item Figure 5: Threshold sensitivity or top-k source diversity.
+\end{itemize}
+
+\chapter{Metrics and Evaluation Logic}
+
+\section{Notation}
+
+Let $Q_a$ be attack queries, $Q_b$ be benign queries, $P$ be poisoned records, $R(q)$ be the final
+retrieved set for query $q$, and $C(q)$ be the final memory-conditioned context shown to the model.
+Let $U$ be task utility and $T$ be end-to-end latency.
+
+\section{Metric Definitions}
+
+\begin{longtable}{|L{0.16\textwidth}|L{0.24\textwidth}|L{0.20\textwidth}|L{0.20\textwidth}|L{0.10\textwidth}|}
+\hline
+\textbf{Metric} & \textbf{Formal definition} & \textbf{Intuition and computation} &
+\textbf{Supports / weakens claim} & \textbf{Range} \\
+\hline
+Attack Success Rate (ASR) & $\frac{1}{|Q_a|}\sum_{q\in Q_a}\mathbb{1}[\mathrm{attack\ succeeds}]$
+& Fraction of attacked tasks where the attacker achieves the scenario goal. Compute from grader
+logs. & Lower ASR supports security; unchanged ASR weakens the paper. & $[0,1]$ \\
+\hline
+Attack Success Reduction & $1-\frac{\mathrm{ASR}_{def}}{\mathrm{ASR}_{base}}$ & Relative reduction
+against no-defense or baseline. & Large positive reduction supports headline claim; negative values
+mean defense is harmful. & $(-\infty,1]$ \\
+\hline
+Unsafe Retrieval Rate (URR) & $\frac{1}{|Q_a|}\sum_{q\in Q_a}\mathbb{1}[R(q)\cap P\neq\emptyset]$
+& Measures whether poisoned records remain in final retrieval. Requires retrieved IDs and poison
+labels. & Supports retrieval safety but is insufficient alone. & $[0,1]$ \\
+\hline
+Contaminated Context Rate (CCR) &
+$\frac{1}{|Q|}\sum_q\mathbb{1}[\mathrm{contaminated}(C(q))]$ &
+Measures what the model actually sees after context shaping. & Stronger than URR; high CCR weakens
+context-shaping claims. & $[0,1]$ \\
+\hline
+Propagation Depth & Maximum or mean graph distance from initial poisoned write to downstream
+contaminated writes/actions. & Build from parent-child lineage edges. & Lower depth supports
+containment; depth growing with agent count weakens claim. & $\geq 0$ \\
+\hline
+Propagation Fan-out & Count of downstream contaminated records/actions reachable from initial
+poison. & Compute from lineage DAG. & Lower fan-out supports shared-memory defense. & $\geq 0$ \\
+\hline
+Quarantine Precision & $\frac{TP}{TP+FP}$ & Fraction of quarantined records that were truly poisoned.
+Requires poison labels. & Low precision means over-blocking. & $[0,1]$ \\
+\hline
+Quarantine Recall & $\frac{TP}{TP+FN}$ & Fraction of poisoned writes caught by quarantine or
+down-trust policy. & Low recall means poisoned writes pass through. & $[0,1]$ \\
+\hline
+Benign Utility Preservation (BUP) & $\frac{U^{clean}_{def}}{U^{clean}_{base}}$ & Clean-task success
+ratio under defense versus baseline. & Values near 1 support deployability; large drops are fatal. &
+$[0,\infty)$ \\
+\hline
+Task Success Under Defense (TSD) & $U^{attack}_{def}$ & Utility on attacked tasks while defense is
+enabled. & Security is less meaningful if the agent stops solving tasks. & Task-specific \\
+\hline
+Latency Overhead & $\frac{T_{def}-T_{base}}{T_{base}}$ at p50 and p95 & End-to-end and per-stage
+timing. & Moderate overhead supports practicality; high p95 weakens systems claim. & $\geq -1$ \\
+\hline
+Memory Growth Overhead & $\frac{S_{def}-S_{base}}{S_{base}}$ & Extra records/bytes from metadata,
+logs, quarantine, and lineage. & Supports storage scalability if bounded. & $\geq -1$ \\
+\hline
+Scalability Slope & $\hat{\beta}$ in $Y=\alpha+\beta\log N$ for $Y\in\{\mathrm{latency}, URR, CCR\}$
+& Fit slopes over memory records, agents, or top-k. & Flatter security degradation supports scaling.
+& Real-valued \\
+\hline
+Top-k Source Diversity & $\frac{|\mathrm{unique\ sources\ in\ }R(q)|}{|R(q)|}$ averaged over queries
+& Measures whether retrieval is dominated by one source or lineage. & Higher diversity supports
+flooding resistance. & $[0,1]$ \\
+\hline
+Contradiction Handling Rate & Fraction of conflict trials where the trusted branch is selected,
+both branches are surfaced, or the agent abstains. & Requires labeled contradiction pairs. & High
+rate supports semantic-memory safety. & $[0,1]$ \\
+\hline
+\end{longtable}
+
+\section{Are New Metrics Needed?}
+
+Yes. Existing attack success and utility metrics are necessary but not enough. Unsafe Retrieval Rate
+is common-sense and easy to compute, but it misses context shaping: a poisoned record can be
+retrieved and safely rendered as untrusted evidence. Contaminated Context Rate is therefore needed.
+Propagation Depth and Fan-out are also needed because the report's distinctive claim involves
+shared-memory containment. Scalability Slope is needed because the paper's thesis says security must
+survive memory growth and team growth.
+
+\chapter{Baselines and Ablations}
+
+\section{Baseline Definitions}
+
+\begin{longtable}{|L{0.20\textwidth}|L{0.34\textwidth}|L{0.26\textwidth}|}
+\hline
+\textbf{Baseline} & \textbf{Definition} & \textbf{Why fair} \\
+\hline
+No defense & Native framework memory with no additional filtering, reranking, context shaping, or
+propagation control. & Necessary lower bound and deployment default. \\
+\hline
+Provenance-only & Attach source labels and trust priors but do not quarantine, rerank by risk, or
+block tools. & Tests whether metadata alone explains results. \\
+\hline
+Spotlighting-style wrapper & Separate retrieved content from instructions and mark provenance in
+prompt context. & Fair retrieval-context baseline named by the report. \\
+\hline
+Trust-threshold sanitizer & Drop or sanitize records below a trust threshold. & Strong lightweight
+baseline close to practical defenses. \\
+\hline
+Random quarantine & Quarantine the same number of records as \project{} at random. & Detects whether
+improvement comes merely from blocking volume. \\
+\hline
+RAGForensics optional & Vector/RAG-specific traceback defense if easy to integrate. & Fair only for
+vector/RAG rows. Do not use for semantic/shared claims. \\
+\hline
+Task Shield optional & Tool-time task-alignment defense if easy to integrate. & Fair only for
+tool-action rows. Do not use for write-path claims. \\
+\hline
+\end{longtable}
+
+\section{Comparative Evaluation Logic}
+
+A convincing comparison is not ``\project{} beats no defense.'' The paper must show:
+
+\begin{itemize}
+  \item \project{} beats no defense on ASR, URR, CCR, and propagation.
+  \item \project{} beats provenance-only, proving labels alone are insufficient.
+  \item \project{} beats spotlighting-style context wrapping on write-path and propagation rows.
+  \item \project{} beats trust-threshold sanitizer on clean utility or attack reduction because it is
+        more selective.
+  \item \project{} remains competitive on latency and memory overhead.
+  \item Non-RAG subsystems show real gains.
+\end{itemize}
+
+\section{Comparison Tables to Include}
+
+\begin{longtable}{|L{0.20\textwidth}|L{0.70\textwidth}|}
+\hline
+\textbf{Table} & \textbf{Purpose} \\
+\hline
+Framework/subsystem coverage table & Show LangGraph, LlamaIndex, and CrewAI support for each memory
+subsystem and whether adapter coverage is full, partial, or missing. \\
+\hline
+Defense comparison table & Rows: defense settings. Columns: ASR reduction, URR, CCR, BUP, p95
+latency, memory overhead. Split by subsystem if space allows. \\
+\hline
+Prior-defense comparison table & Rows: \project{}, spotlighting, trust threshold, optional
+RAGForensics, optional Task Shield. Columns: supported lifecycle stages, memory subsystems, framework
+coverage, metrics improved. \\
+\hline
+Ablation table & Rows: full system and one-module-removed variants. Columns: ASR, CCR, propagation
+depth, BUP, p95 latency. \\
+\hline
+Scalability table & Rows: memory size, poison ratio, top-k, agent count. Columns: slope, confidence
+interval, dominant failure mode. \\
+\hline
+\end{longtable}
+
+\section{Ablation Interpretation}
+
+\begin{itemize}
+  \item If removing the write gate barely changes results, the write-path contribution is weak.
+  \item If removing context shaping barely changes CCR, the context-shaping contribution is weak.
+  \item If removing propagation control barely changes fan-out, the distinctive multi-agent claim is
+        weak.
+  \item If full \project{} is only marginally better than trust-threshold sanitizer, simplify claims
+        and emphasize portability and logging rather than defense quality.
+  \item If clean utility drops more than 10 percent on core tasks, the paper becomes difficult to
+        defend.
+\end{itemize}
+
+\chapter{Paper Skeleton}
+
+\section{Title Candidates}
+
+\begin{itemize}
+  \item \project: A Provenance-Aware Memory Firewall for LLM Agents
+  \item Defending Mutable Memory in LLM Agents with Provenance and Lineage
+  \item Memory Firewalls for Stateful LLM Agents
+  \item Write, Retrieve, Propagate: Securing Agent Memory Across Frameworks
+\end{itemize}
+
+\section{Abstract Draft Structure}
+
+\begin{enumerate}
+  \item State the problem: LLM agents increasingly rely on writable, persistent memory.
+  \item State the gap: existing defenses are fragmented across retrieval, prompts, or tools.
+  \item State the system: \project{} is a provenance-aware memory firewall for write, retrieval,
+        context, tool, and propagation paths.
+  \item State the method: common schema, quarantine, risk-aware retrieval, typed evidence, tool
+        verification, lineage control.
+  \item State the evidence: three frameworks, four memory subsystems, six scenarios, baselines,
+        ablations, scalability sweeps.
+  \item State the result: fill in quantitative reductions only after experiments are complete.
+\end{enumerate}
+
+\missing{} Do not write numeric claims in the abstract until final results are generated.
+
+\section{Paper Sections}
+
+\begin{longtable}{|L{0.15\textwidth}|L{0.25\textwidth}|L{0.25\textwidth}|L{0.25\textwidth}|}
+\hline
+\textbf{Section} & \textbf{What to write} & \textbf{Evidence/figures} & \textbf{Reviewer objection to
+preempt} \\
+\hline
+Introduction & Writable memory changes agent security from one-turn prompt defense to persistent
+state defense. State contributions crisply. & Motivating example and contribution list. & ``This is
+just another RAG defense.'' \\
+\hline
+Background & Define vector/RAG, semantic, episodic, shared coordination memory. Explain public
+framework support. & Subsystem table. & ``The memory taxonomy is arbitrary.'' \\
+\hline
+Threat Model & Define attacker capabilities, goals, assumptions, in/out scope. & Capability-to-
+scenario table. & ``The attacker is too strong or vague.'' \\
+\hline
+System Design & Present schema, gates, scoring, context shaping, tool verification, propagation. &
+Architecture figure, schema snippet, scoring equation. & ``The defense is ad hoc.'' \\
+\hline
+Implementation & Explain adapters and logging at high level. & Framework coverage table. &
+``Framework-agnostic is not implemented.'' \\
+\hline
+Methodology & Describe tasks, scenarios, baselines, metrics, seeds, model parameters. & Scenario
+matrix, metric table. & ``The evaluation is not reproducible.'' \\
+\hline
+Evaluation & Report attack reduction, contaminated context, clean utility, ablations. & Main tables
+and ablation table. & ``Security comes from over-blocking.'' \\
+\hline
+Scalability & Show memory-size, poison-ratio, top-k, and agent-count sweeps. & Three scalability
+figures. & ``It only works on toy stores.'' \\
+\hline
+Discussion & Analyze failures, tradeoffs, and deployment constraints. & Error analysis examples. &
+``The paper hides limitations.'' \\
+\hline
+Related Work & Map memory architectures, memory attacks, RAG defenses, prompt injection defenses,
+tool defenses, multi-agent propagation. & No figure required. & ``Novelty is unclear.'' \\
+\hline
+Limitations and Ethics & State synthetic setting, hosted model reproducibility, no formal guarantee,
+safe stub tools. & Artifact statement. & ``The evaluation is unsafe or overclaimed.'' \\
+\hline
+Conclusion & Restate bounded result and why lifecycle memory defense matters. & None. & ``Conclusion
+introduces new claims.'' \\
+\hline
+Appendix & Thresholds, prompts, scenario manifests, extra plots, adapter details. & Full artifact
+details. & ``Key details omitted.'' \\
+\hline
+\end{longtable}
+
+\section{Related Work Map}
+
+\begin{itemize}
+  \item Agent memory architectures: modular memory taxonomies, long-term memory, semantic/episodic
+        framing, shared memory.
+  \item Memory and RAG attacks: indirect prompt injection, PoisonedRAG, AgentPoison, MINJA, Zombie
+        Agents, memory injection.
+  \item Agent security benchmarks: InjecAgent, AgentDojo, Agent Security Bench.
+  \item Prompt and retrieval defenses: spotlighting, structured queries, provenance cueing,
+        trust-aware sanitization, RAGForensics.
+  \item Tool and task defenses: Task Shield and task-alignment gating.
+  \item Multi-agent propagation: prompt infection and remediation-style work.
+\end{itemize}
+
+\missing{} Bibliographic metadata must be verified from primary sources before paper submission.
+The source report provides URLs and names, not complete citations.
+
+\chapter{Timeline and Execution Checklist}
+
+\section{Two-Week Timeline}
+
+Assume work starts on May 2, 2026 and the goal is a submission-quality compact paper by May 16,
+2026. This timeline is aggressive and only realistic if the MVP stays narrow.
+
+\begin{longtable}{|L{0.11\textwidth}|L{0.32\textwidth}|L{0.27\textwidth}|L{0.20\textwidth}|}
+\hline
+\textbf{Date} & \textbf{Coding milestone} & \textbf{Writing/figure milestone} & \textbf{Hard rule} \\
+\hline
+May 2 & Freeze title, thesis, threat model, frameworks, subsystems, baselines. & Draft abstract
+slots and intro claims. & No code before claims are bounded. \\
+\hline
+May 3 & Smoke-test LangGraph, LlamaIndex, CrewAI; define schema and logs. & Draft threat model and
+related-work map. & Cut any framework that does not run cleanly after a short attempt. \\
+\hline
+May 4 & Implement core schema, audit logger, LangGraph adapter, write gate. & Draft architecture
+subsection. & Get one defended end-to-end run. \\
+\hline
+May 5 & Port write path to LlamaIndex and CrewAI. & Draft framework coverage table. & Keep schema
+identical across frameworks. \\
+\hline
+May 6 & Implement quarantine, duplicate throttling, contradiction checks. & Draft metric
+definitions. & No model training. \\
+\hline
+May 7 & Implement retrieval reranking, source diversity, context shaping. & Draft methodology. &
+Produce first retrieval table. \\
+\hline
+May 8 & Implement tool verifier and CrewAI propagation controller. & Draft evaluation section shell.
+& Fix lineage logging before running more propagation. \\
+\hline
+May 9 & Run mock matrix: one model, three frameworks, two scenarios, three baselines. & Freeze
+version-one claims. & Do not expand scope after this point. \\
+\hline
+May 10 & Add episodic scenario and flooding stress; optional AutoGen only if easy. & Start figures. &
+Cut AutoGen immediately if messy. \\
+\hline
+May 11 & Run clean utility and conflict/recency experiments. & Fill utility and ablation tables. &
+Clean utility is mandatory. \\
+\hline
+May 12 & Run memory-size and top-k sweeps. & Draft scalability section. & At least one scaling curve
+must exist. \\
+\hline
+May 13 & Run agent-count propagation sweeps; optional second model if done. & Refine captions and
+claims. & Do not add second model before propagation. \\
+\hline
+May 14 & Compute final metrics, error analysis, ablations. & Complete full paper draft. & Cut weak
+modules rather than hide them. \\
+\hline
+May 15 & Harsh internal review, threat-model tightening, table cleanup. & Near-final submission
+draft. & Make claims smaller and sharper. \\
+\hline
+May 16 & Reproducibility package, appendix, final compile, artifact naming. & Final submit. & No
+last-minute new experiments. \\
+\hline
+\end{longtable}
+
+\section{Minimum Viable Paper Path}
+
+\begin{itemize}
+  \item Three frameworks: LangGraph, LlamaIndex, CrewAI.
+  \item Four subsystems: vector/RAG, semantic, episodic, shared coordination.
+  \item Five defense settings: no defense, provenance-only, spotlighting, trust threshold, full
+        \project{}.
+  \item Six scenarios: poisoned fact, retrieved instruction, experience graft, conflict/recency,
+        shared cascade, flooding.
+  \item One primary model and one embedding backend.
+  \item Clean utility table, main attack table, ablation table, scalability figures.
+\end{itemize}
+
+\section{Strong Version Path}
+
+Add only after the MVP tables are complete:
+
+\begin{itemize}
+  \item AutoGen as a fourth framework.
+  \item Second model transfer.
+  \item RAGForensics on vector rows.
+  \item Task Shield on tool rows.
+  \item Letta/MemGPT archival/shared-memory case if integration is trivial.
+  \item Public benchmark subset only if it plugs in cleanly on day one.
+\end{itemize}
+
+\section{Phase Checklist}
+
+\begin{itemize}
+  \item Code scaffold complete.
+  \item Three framework adapters smoke-tested.
+  \item Canonical schema stable.
+  \item Audit logging complete.
+  \item Quarantine isolation tested.
+  \item Retrieval reranking logged term-by-term.
+  \item Context shaping prevents raw instruction rendering.
+  \item Tool verifier tested with high-impact stub tools.
+  \item Propagation lineage graph generated.
+  \item Baselines implemented fairly.
+  \item Scenarios auto-gradable.
+  \item Aggregation reproduces tables from logs.
+  \item Figures generated from scripts.
+\end{itemize}
+
+\chapter{Risks, Reviewer Objections, and Mitigations}
+
+\section{Reviewer 1: Security and System Design Reviewer}
+
+\textbf{Major concerns.}
+\begin{itemize}
+  \item Threat model may be too broad if write, retrieval, tool, and propagation attacks are all
+        claimed without tight boundaries.
+  \item Defense may look heuristic unless each score has a clear purpose and ablations.
+  \item Quarantine and trust scoring may create a false sense of security without strong audit and
+        isolation guarantees.
+  \item Framework adapters may be shallow wrappers that do not capture real memory flows.
+\end{itemize}
+
+\textbf{Minor concerns.}
+\begin{itemize}
+  \item Naming ``firewall'' may imply stronger guarantees than delivered.
+  \item Tool verifier scope may be underspecified.
+  \item Procedural memory is mentioned but not defended in the MVP.
+\end{itemize}
+
+\textbf{Missing evidence.}
+\begin{itemize}
+  \item Quarantine precision/recall.
+  \item Proof that quarantined records cannot enter normal retrieval.
+  \item Per-stage ablation results.
+  \item Adapter coverage table.
+\end{itemize}
+
+\textbf{Weak claims.} ``Framework-agnostic,'' ``general defense,'' and ``memory firewall'' are weak
+unless bounded by implementation evidence.
+
+\textbf{Required fixes.} Freeze the threat model, show exact trust boundaries, log every decision,
+and include ablations for write gate, retrieval gate, context shaping, tool verifier, and propagation.
+
+\textbf{Borderline outcome.} The paper has a nice architecture and some vector/RAG results, but
+shared-memory propagation is toy-like and clean utility is weak.
+
+\textbf{Strong accept outcome.} The paper demonstrates real adapters, strong non-RAG results, capped
+propagation under agent-count scaling, bounded overhead, and honest limitations.
+
+\section{Reviewer 2: Machine Learning and LLM Evaluation Reviewer}
+
+\textbf{Major concerns.}
+\begin{itemize}
+  \item Evaluation may rely on one model and synthetic tasks, limiting generality.
+  \item Auto-graders may be brittle or biased toward the defense.
+  \item Results may be sensitive to thresholds.
+  \item Hosted model nondeterminism may weaken reproducibility.
+\end{itemize}
+
+\textbf{Minor concerns.}
+\begin{itemize}
+  \item The report does not specify model, temperature, embedding backend, or prompt templates.
+  \item Three seeds may be thin if variance is high.
+  \item Utility metrics may be task-specific and not comparable across frameworks.
+\end{itemize}
+
+\textbf{Missing evidence.}
+\begin{itemize}
+  \item Threshold sensitivity plot.
+  \item Confidence intervals.
+  \item Clean utility table.
+  \item Second-model transfer if time allows.
+  \item Grader validation examples.
+\end{itemize}
+
+\textbf{Weak claims.} Any claim that \project{} is model-general is weak without at least a second
+model or a careful limitation.
+
+\textbf{Required fixes.} Pin model parameters, log prompts and outputs, keep graders deterministic,
+run threshold sweeps, and report variance.
+
+\textbf{Borderline outcome.} The system reduces attack success but only with aggressive thresholds
+that harm benign tasks.
+
+\textbf{Strong accept outcome.} The system preserves clean utility, improvements are stable across
+threshold ranges, and a second model shows the main trend persists.
+
+\section{Reviewer 3: Conference Acceptance Reviewer}
+
+\textbf{Major concerns.}
+\begin{itemize}
+  \item Novelty may be unclear in a crowded prompt-injection and RAG-defense space.
+  \item The paper may be too broad for its evidence.
+  \item Baseline comparison may be incomplete or unfair.
+  \item The work may read as engineering middleware rather than research.
+\end{itemize}
+
+\textbf{Minor concerns.}
+\begin{itemize}
+  \item Related work may be under-verified because the source report gives URLs, not full citations.
+  \item The title may overpromise if results are modest.
+  \item Page budget may be tight for architecture, methodology, and evaluation.
+\end{itemize}
+
+\textbf{Missing evidence.}
+\begin{itemize}
+  \item A single table showing cross-framework and cross-subsystem results.
+  \item A clear comparison with simple and strong baselines.
+  \item Scalability curves that tie security outcome to scale.
+  \item Error analysis explaining failure cases.
+\end{itemize}
+
+\textbf{Weak claims.} ``First,'' ``comprehensive,'' and ``general'' should be avoided unless verified
+against prior work.
+
+\textbf{Required fixes.} Make the contribution sentence brutally precise: lifecycle memory defense
+across four memory subsystems and three public frameworks, evaluated under scaling pressure.
+
+\textbf{Borderline outcome.} The paper is coherent but looks like a collection of wrappers with
+small synthetic experiments.
+
+\textbf{Strong accept outcome.} The paper changes how reviewers think about agent memory security by
+showing that write, retrieve, and propagate paths must be evaluated together.
+
+\section{Global Risk Table}
+
+\begin{longtable}{|L{0.25\textwidth}|L{0.12\textwidth}|L{0.28\textwidth}|L{0.25\textwidth}|}
+\hline
+\textbf{Risk} & \textbf{Severity} & \textbf{Why serious} & \textbf{Mitigation} \\
+\hline
+Looks like another RAG defense & High & Most public defenses already target retrieval. & Put
+semantic, episodic, and shared-memory results in the main table. \\
+\hline
+Threat model vague & High & Security reviewers punish undefined attacker powers. & Capability-to-
+scenario table and strict out-of-scope list. \\
+\hline
+Defense too heuristic & High & Ad hoc filters are weak novelty. & Interpretable feature terms,
+threshold sweeps, and ablations. \\
+\hline
+Experiments too small & High & Cross-framework claim needs real breadth. & Three frameworks, four
+subsystems, multiple seeds, scaling sweeps. \\
+\hline
+Clean utility loss & High & Over-blocking is not a useful defense. & BUP table and security-cost
+frontier. \\
+\hline
+Framework integration failure & Medium to high & Adapter claim collapses. & Cut optional frameworks
+early; keep MVP adapters simple. \\
+\hline
+Scalability synthetic only & Medium to high & Reviewers may dismiss toy scaling. & Use real runtime
+paths and real framework stores where possible. \\
+\hline
+Baseline reproduction sinkhole & Medium & Reproducing too many defenses wastes time. & Include
+three clean baselines; optional prior defenses only when easy and fair. \\
+\hline
+\end{longtable}
+
+\section{Final Deliverable Checklist}
+
+Before submission, every item below must be true:
+
+\begin{itemize}
+  \item Code complete for core schema, gates, stores, adapters, baselines, scenarios, runner, metrics,
+        aggregation, and plotting.
+  \item LangGraph, LlamaIndex, and CrewAI adapters smoke-tested and used in main results.
+  \item Experiments complete for clean, attacked, defended, and ablation conditions.
+  \item Tables generated from raw logs: framework coverage, scenario matrix, main attack results,
+        clean utility, ablations, baseline comparison, scalability summary.
+  \item Figures generated from scripts: architecture, lineage graph, memory-size scaling,
+        agent-count propagation, security-cost frontier, threshold sensitivity if space allows.
+  \item Logs saved for every run: manifests, records, decisions, retrievals, contexts, tool calls,
+        lineage, grader outputs, timings.
+  \item Claims validated against evidence; no abstract numeric claim appears without a table or
+        figure.
+  \item Related work checked from primary sources and full citations completed.
+  \item Threat model bounded and out-of-scope list included.
+  \item Clean utility loss reported honestly.
+  \item Reviewer objections addressed in introduction, methodology, evaluation, and limitations.
+  \item Paper compiles from a clean checkout.
+  \item Artifact README explains how to reproduce every table and figure.
+  \item Comparison table included to show whether \project{} outperforms no defense, provenance-only,
+        spotlighting-style wrapper, trust-threshold sanitizer, random quarantine, and optional prior
+        defenses where applicable.
+\end{itemize}
+
+\section{Harsh Final Verdict}
+
+The best version of this project is narrow, disciplined, and empirical. Build the smallest system
+that undeniably shows cross-subsystem memory defense plus scaling. The fastest way to weaken the
+paper is to overreach on frameworks, domains, baseline reproductions, or claims of generality. The
+fastest way to make it publishable is to keep the claim bounded, the runtime pipeline crisp, the
+logs complete, the baselines fair, and the scalability evidence central.
+
+\begin{thebibliography}{99}
+
+\bibitem{source-report}
+\texttt{paper\_roadmap.pdf}, repository source report, extracted May 2, 2026.
+
+\bibitem{coala}
+Source report cited CoALA-style modular agent memory taxonomies:
+\url{https://arxiv.org/abs/2309.02427}.
+
+\bibitem{ragforensics}
+Source report cited RAGForensics:
+\url{https://arxiv.org/abs/2504.21668}.
+
+\bibitem{agentpoison}
+Source report cited public memory poisoning work:
+\url{https://arxiv.org/abs/2402.07867}.
+
+\bibitem{langgraph-memory}
+Source report cited LangGraph/LangChain memory documentation:
+\url{https://docs.langchain.com/oss/javascript/concepts/memory}.
+
+\bibitem{indirect-prompt-injection}
+Source report cited indirect prompt injection:
+\url{https://arxiv.org/abs/2302.12173}.
+
+\bibitem{prompt-infection}
+Source report cited prompt infection / multi-agent propagation:
+\url{https://arxiv.org/abs/2410.07283}.
+
+\bibitem{spotlighting}
+Source report cited spotlighting:
+\url{https://arxiv.org/abs/2403.14720}.
+
+\bibitem{agent-security-bench}
+Source report cited agent security benchmarks:
+\url{https://arxiv.org/abs/2403.02691}.
+
+\bibitem{llamaindex-memory}
+Source report cited LlamaIndex memory documentation:
+\url{https://docs.llamaindex.ai/en/stable/module_guides/deploying/agents/memory/}.
+
+\bibitem{crewai-memory}
+Source report cited CrewAI memory documentation:
+\url{https://docs.crewai.com/en/concepts/memory}.
+
+\bibitem{autogen-memory}
+Source report cited AutoGen memory documentation:
+\url{https://microsoft.github.io/autogen/dev/user-guide/agentchat-user-guide/memory.html}.
+
+\bibitem{memgpt}
+Source report cited MemGPT/Letta memory hierarchy:
+\url{https://arxiv.org/abs/2310.08560}.
+
+\bibitem{trust-sanitizer}
+Source report cited trust-aware sanitization:
+\url{https://arxiv.org/abs/2601.05504}.
+
+\end{thebibliography}
+
+\end{document}

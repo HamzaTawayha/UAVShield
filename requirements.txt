@@ -1,0 +1,12 @@
+streamlit>=1.34
+pyulog>=1.2.2
+scikit-learn>=1.4
+joblib>=1.3
+torch>=2.2
+transformers<5
+huggingface-hub>=0.23
+einops>=0.7
+
+# MOMENT note for Python 3.12:
+# install the package itself with:
+#   python -m pip install momentfm --no-deps
