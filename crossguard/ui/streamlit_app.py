@@ -196,6 +196,7 @@ CHECK_EXPLANATIONS = {
     "imu.velocity_mismatch": "IMU acceleration does not match the change in reported velocity.",
     "compass.heading_velocity_mismatch": "The drone's heading does not match its direction of travel.",
     "peer.false_waypoint_reached": "A peer drone claims mission progress that its own position does not support.",
+    "ml.state_anomaly": "The learned rolling state model says this full UAV state sequence does not look like real flight behavior.",
 }
 
 

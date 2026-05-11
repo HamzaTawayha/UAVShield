@@ -16,6 +16,32 @@ The current implementation is deterministic and testable without ROS2. The ROS2
 adapter in `defense/ros2_node.py` is optional and only runs on a machine with
 `rclpy` installed.
 
+## Learned State Sanity Layer
+
+CrossGuard now also supports an optional learned sanity checker. The intent is
+to move beyond hand-picked thresholds: UAV-SEAD logs are converted into broad
+state windows covering position, speed, acceleration, battery, sensors,
+estimator health, actuator outputs, mission state, setpoints, and telemetry
+link quality. A MOMENT embedding model plus a lightweight head can then score
+whether the whole rolling state sequence looks like real UAV behavior.
+
+The runtime hook is optional:
+
+```python
+from crossguard.defense.harness import CrossGuardHarness
+from crossguard.ml.moment_checker import MomentStateSanityChecker
+
+ml_checker = MomentStateSanityChecker(
+    normalization_path="data/uav_sead/moment_windows/uav_sead_state_windows.normalization.json",
+    head_path="data/uav_sead/moment_windows/moment_binary_head/moment_binary_head.joblib",
+    threshold_path="data/uav_sead/moment_windows/moment_binary_head/evaluation.json",
+)
+harness = CrossGuardHarness(ml_checker=ml_checker)
+```
+
+When the learned checker flags a window, CrossGuard emits
+`ml.state_anomaly` alongside the deterministic invariant violations.
+
 ## Implemented Checks
 
 - Battery percentage range and impossible discharge/recharge rates.
@@ -49,6 +75,27 @@ Run tests:
 
 ```powershell
 python -m unittest discover -s crossguard/tests
+```
+
+Build a small UAV-SEAD window sample:
+
+```powershell
+python scripts/uav_sead_build_moment_windows.py --limit 20 --max-normal-windows-per-log 1 --max-anomaly-windows-per-log 2
+```
+
+Build the full UAV-SEAD window dataset:
+
+```powershell
+python scripts/uav_sead_build_moment_windows.py --include-log-level-anomalies
+```
+
+Train the MOMENT head on those windows:
+
+```powershell
+python -m pip install momentfm --no-deps
+python scripts/train_moment_binary_head.py `
+  --windows data/uav_sead/moment_windows/uav_sead_state_windows.npz `
+  --output-dir data/uav_sead/moment_windows/moment_binary_head
 ```
 
 ## Streamlit UI

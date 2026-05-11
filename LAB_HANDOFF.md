@@ -8,6 +8,7 @@ This repository contains the CrossGuard/UAVShield prototype:
 - Streamlit demo UI for testing injected vs previous drone states.
 - PX4 Flight Review data pipeline.
 - MOMENT-based time-series anomaly pipeline.
+- UAV-SEAD wide-state window builder for dynamic ML sanity checking.
 - Small saved MOMENT-derived artifacts from the local PX4 experiment.
 
 Raw `.ulg` datasets are intentionally not committed because they are too large
@@ -52,11 +53,18 @@ streamlit run streamlit_app.py
 
 Main files:
 
+- `scripts/uav_sead_build_moment_windows.py`
 - `scripts/px4_build_moment_windows.py`
 - `scripts/moment_crossguard_adapter.py`
 - `scripts/calibrate_px4_anomaly_threshold.py`
 - `scripts/train_moment_binary_head.py`
 - `data/px4_flight_review/MOMENT_PIPELINE.md`
+
+The UAV-SEAD builder is now the preferred path for the professor's requested
+dynamic sanity checker. It extracts broad state windows from real UAV logs:
+position, velocity, acceleration, battery, distance/range sensor, barometer,
+gyroscope, magnetometer, estimator health, actuator outputs, mission state,
+setpoints, and telemetry-link health.
 
 Current local result:
 
@@ -146,6 +154,21 @@ python scripts/calibrate_px4_anomaly_threshold.py --scores data/px4_flight_revie
 python scripts/train_moment_binary_head.py
 ```
 
+## Build UAV-SEAD Dynamic State Windows
+
+After downloading UAV-SEAD into `data/uav_sead`:
+
+```bash
+python scripts/uav_sead_build_moment_windows.py --include-log-level-anomalies
+python scripts/train_moment_binary_head.py \
+  --windows data/uav_sead/moment_windows/uav_sead_state_windows.npz \
+  --output-dir data/uav_sead/moment_windows/moment_binary_head
+```
+
+Runtime integration uses `MomentStateSanityChecker` and adds an
+`ml.state_anomaly` violation when the learned whole-state model flags the
+rolling state window.
+
 ## What To Tell The PhD Student
 
 The ROS2 side mainly needs adapters:
@@ -170,9 +193,7 @@ patterns.
 ## Immediate Next Steps
 
 1. Download the newly approved restricted dataset on the lab server.
-2. Write a converter from those `.ulg` files into the same 12-channel window
-   format.
-3. Retrain the MOMENT head using the restricted dataset labels.
-4. Improve crash labeling by extracting windows near anomaly/crash events rather
-   than labeling every window in a crash log as anomalous.
+2. Run the UAV-SEAD wide-state converter and inspect the class/window counts.
+3. Retrain the MOMENT head using the UAV-SEAD labels and precise anomaly ranges.
+4. Compare learned dynamic detection against the fixed rule-only harness.
 5. Run final evaluation tables for the paper.

@@ -108,6 +108,7 @@ class DroneState:
     sensor_timestamps: dict[str, float] = field(default_factory=dict)
     perception_objects: tuple[PerceptionObject, ...] = ()
     peer_states: tuple[PeerDroneState, ...] = ()
+    extra_features: dict[str, float] = field(default_factory=dict)
     last_command: Command | None = None
     current_waypoint: GeoPoint | None = None
     reported_waypoint_reached: bool = False
