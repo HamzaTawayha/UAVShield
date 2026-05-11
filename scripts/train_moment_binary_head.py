@@ -20,6 +20,7 @@ from sklearn.preprocessing import StandardScaler
 
 
 def main() -> None:
+    run_start = time.time()
     parser = argparse.ArgumentParser(
         description="Train a lightweight anomaly head on top of pretrained MOMENT embeddings."
     )
@@ -40,6 +41,12 @@ def main() -> None:
     parser.add_argument("--batch-size", type=int, default=16)
     parser.add_argument("--head", choices=["logistic", "random_forest"], default="random_forest")
     parser.add_argument(
+        "--sklearn-verbose",
+        type=int,
+        default=1,
+        help="Verbosity passed into the sklearn head. Use 0 for quiet sklearn fitting.",
+    )
+    parser.add_argument(
         "--device",
         choices=["auto", "cuda", "cpu"],
         default="auto",
@@ -47,6 +54,11 @@ def main() -> None:
     )
     args = parser.parse_args()
 
+    checkpoint("parsed arguments", run_start)
+    hyperparameters = build_hyperparameters(args)
+    print_hyperparameters(hyperparameters)
+
+    checkpoint(f"loading windows from {args.windows}", run_start)
     data = np.load(args.windows, allow_pickle=True)
     x = data["x"]
     y_multiclass = data["y"]
@@ -54,14 +66,29 @@ def main() -> None:
     files = data["files"]
     starts = data["window_start_s"]
     y = (y_multiclass != 0).astype(np.int64)
+    print(
+        "Dataset summary: "
+        f"windows={x.shape[0]}, channels={x.shape[1]}, seq_len={x.shape[2]}, "
+        f"normal={int((y == 0).sum())}, anomaly={int((y == 1).sum())}",
+        flush=True,
+    )
 
     args.output_dir.mkdir(parents=True, exist_ok=True)
+    (args.output_dir / "run_config.json").write_text(
+        json.dumps(hyperparameters, indent=2),
+        encoding="utf-8",
+    )
+    checkpoint(f"wrote run config to {args.output_dir / 'run_config.json'}", run_start)
+
     embeddings_path = args.output_dir / "moment_embeddings.npz"
     if embeddings_path.exists():
+        checkpoint(f"loading cached MOMENT embeddings from {embeddings_path}", run_start)
         embeddings = np.load(embeddings_path, allow_pickle=True)["embeddings"]
-        print(f"Loaded cached embeddings from {embeddings_path}")
+        print(f"Loaded cached embeddings from {embeddings_path}: shape={embeddings.shape}", flush=True)
     else:
+        checkpoint("building MOMENT embeddings", run_start)
         embeddings = build_moment_embeddings(x, batch_size=args.batch_size, device_request=args.device)
+        checkpoint(f"saving MOMENT embeddings to {embeddings_path}", run_start)
         np.savez_compressed(
             embeddings_path,
             embeddings=embeddings.astype(np.float32),
@@ -71,6 +98,7 @@ def main() -> None:
             window_start_s=starts,
         )
 
+    checkpoint("creating grouped train/calibration/test split", run_start)
     splitter = GroupShuffleSplit(n_splits=1, test_size=args.test_size, random_state=11)
     train_cal_idx, test_idx = next(splitter.split(embeddings, y, groups=files))
     cal_splitter = GroupShuffleSplit(n_splits=1, test_size=args.calibration_size, random_state=13)
@@ -83,17 +111,30 @@ def main() -> None:
     )
     train_idx = train_cal_idx[train_rel_idx]
     cal_idx = train_cal_idx[cal_rel_idx]
+    print_split_summary("train", y[train_idx])
+    print_split_summary("calibration", y[cal_idx])
+    print_split_summary("test", y[test_idx])
 
-    clf = build_head(args.head)
+    clf = build_head(args.head, verbose=args.sklearn_verbose)
+    checkpoint(f"fitting {args.head} head on {len(train_idx)} windows", run_start)
     clf.fit(embeddings[train_idx], y[train_idx])
+    checkpoint("head fit complete", run_start)
 
+    checkpoint("scoring calibration split", run_start)
     cal_scores = clf.predict_proba(embeddings[cal_idx])[:, 1]
+    checkpoint("scoring test split", run_start)
     test_scores = clf.predict_proba(embeddings[test_idx])[:, 1]
     if args.threshold_strategy == "f1_calibration":
+        checkpoint("choosing threshold by calibration F1", run_start)
         threshold = f1_optimal_threshold(cal_scores, y[cal_idx])
     else:
+        checkpoint(
+            f"choosing threshold from normal calibration q={args.threshold_quantile}",
+            run_start,
+        )
         threshold = normal_quantile_threshold(cal_scores, y[cal_idx], args.threshold_quantile)
 
+    checkpoint("evaluating test split", run_start)
     eval_payload = evaluate(
         y_true=y[test_idx],
         scores=test_scores,
@@ -118,7 +159,9 @@ def main() -> None:
     eval_payload["threshold"] = threshold
     eval_payload["threshold_strategy"] = args.threshold_strategy
     eval_payload["interpretation"] = "anomaly_probability > threshold is anomalous"
+    eval_payload["hyperparameters"] = hyperparameters
 
+    checkpoint(f"saving model and evaluation artifacts to {args.output_dir}", run_start)
     joblib.dump(clf, args.output_dir / "moment_binary_head.joblib")
     (args.output_dir / "evaluation.json").write_text(json.dumps(eval_payload, indent=2), encoding="utf-8")
     write_predictions(args.output_dir / "predictions.csv", eval_payload["predictions"])
@@ -134,9 +177,10 @@ def main() -> None:
     print(f"Test anomaly flag rate: {eval_payload['test']['anomaly_flag_rate']:.2%}")
     for label, stats in eval_payload["by_label"].items():
         print(f"  {label}: n={stats['n']}, flagged={stats['flagged_rate']:.2%}, mean_score={stats['mean_score']:.4f}")
+    checkpoint("run complete", run_start)
 
 
-def build_head(name: str):
+def build_head(name: str, verbose: int = 0):
     if name == "random_forest":
         return Pipeline(
             steps=[
@@ -149,6 +193,7 @@ def build_head(name: str):
                         min_samples_leaf=2,
                         random_state=11,
                         n_jobs=-1,
+                        verbose=verbose,
                     ),
                 ),
             ]
@@ -163,9 +208,76 @@ def build_head(name: str):
                     max_iter=2000,
                     solver="liblinear",
                     random_state=11,
+                    verbose=verbose,
                 ),
             ),
         ]
+    )
+
+
+def build_hyperparameters(args: argparse.Namespace) -> dict:
+    return {
+        "windows": str(args.windows),
+        "output_dir": str(args.output_dir),
+        "moment": {
+            "model": "AutonLab/MOMENT-1-large",
+            "task_name": "embedding",
+            "batch_size": args.batch_size,
+            "device": args.device,
+        },
+        "split": {
+            "test_size": args.test_size,
+            "calibration_size": args.calibration_size,
+            "test_random_state": 11,
+            "calibration_random_state": 13,
+            "grouped_by": "files",
+        },
+        "threshold": {
+            "strategy": args.threshold_strategy,
+            "normal_quantile": args.threshold_quantile,
+        },
+        "head": head_hyperparameters(args.head, args.sklearn_verbose),
+    }
+
+
+def head_hyperparameters(name: str, verbose: int) -> dict:
+    if name == "random_forest":
+        return {
+            "name": "random_forest",
+            "scaler": "StandardScaler",
+            "n_estimators": 400,
+            "class_weight": "balanced_subsample",
+            "min_samples_leaf": 2,
+            "random_state": 11,
+            "n_jobs": -1,
+            "verbose": verbose,
+        }
+    return {
+        "name": "logistic",
+        "scaler": "StandardScaler",
+        "class_weight": "balanced",
+        "max_iter": 2000,
+        "solver": "liblinear",
+        "random_state": 11,
+        "verbose": verbose,
+    }
+
+
+def print_hyperparameters(hyperparameters: dict) -> None:
+    print("\nMOMENT training hyperparameters:", flush=True)
+    print(json.dumps(hyperparameters, indent=2), flush=True)
+
+
+def checkpoint(message: str, start_time: float) -> None:
+    elapsed = time.time() - start_time
+    print(f"[checkpoint +{elapsed:.1f}s] {message}", flush=True)
+
+
+def print_split_summary(name: str, y: np.ndarray) -> None:
+    print(
+        f"{name.capitalize()} split: windows={int(y.size)}, "
+        f"normal={int((y == 0).sum())}, anomaly={int((y == 1).sum())}",
+        flush=True,
     )
 
 
