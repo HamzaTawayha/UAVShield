@@ -22,6 +22,7 @@ from torch.utils.data import DataLoader, Dataset
 class ModelConfig:
     n_channels: int
     seq_len: int
+    n_outputs: int
     hidden_size: int
     n_heads: int
     n_layers: int
@@ -34,7 +35,7 @@ class ModelConfig:
 class WindowClassificationDataset(Dataset[tuple[torch.Tensor, torch.Tensor]]):
     def __init__(self, x: np.ndarray, y: np.ndarray, indices: np.ndarray) -> None:
         self.x = x
-        self.y = y.astype(np.float32)
+        self.y = y
         self.indices = indices.astype(np.int64)
 
     def __len__(self) -> int:
@@ -42,7 +43,7 @@ class WindowClassificationDataset(Dataset[tuple[torch.Tensor, torch.Tensor]]):
 
     def __getitem__(self, item: int) -> tuple[torch.Tensor, torch.Tensor]:
         index = self.indices[item]
-        return torch.from_numpy(self.x[index]), torch.tensor(self.y[index], dtype=torch.float32)
+        return torch.from_numpy(self.x[index]), torch.tensor(self.y[index])
 
 
 class InvertedTransformerClassifier(nn.Module):
@@ -71,7 +72,7 @@ class InvertedTransformerClassifier(nn.Module):
             nn.Linear(config.hidden_size, config.hidden_size),
             nn.GELU(),
             nn.Dropout(config.dropout),
-            nn.Linear(config.hidden_size, 1),
+            nn.Linear(config.hidden_size, config.n_outputs),
         )
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
@@ -87,7 +88,10 @@ class InvertedTransformerClassifier(nn.Module):
             pooled = encoded[:, 1:, :].mean(dim=1)
         else:
             pooled = encoded[:, 0, :]
-        return self.classifier(self.norm(pooled)).squeeze(-1)
+        logits = self.classifier(self.norm(pooled))
+        if self.config.n_outputs == 1:
+            return logits.squeeze(-1)
+        return logits
 
 
 def main() -> None:
@@ -112,6 +116,15 @@ def main() -> None:
         "--threshold-strategy",
         choices=["normal_quantile", "f1_calibration"],
         default="f1_calibration",
+    )
+    parser.add_argument(
+        "--task",
+        choices=["binary", "multiclass"],
+        default="binary",
+        help=(
+            "binary trains normal-vs-anomaly; multiclass trains each UAV-SEAD class "
+            "and scores anomaly as 1 - P(Normal)."
+        ),
     )
     parser.add_argument("--hidden-size", type=int, default=128)
     parser.add_argument("--n-heads", type=int, default=8)
@@ -156,12 +169,14 @@ def main() -> None:
     files = data["files"]
     starts = data["window_start_s"]
     feature_names = data["feature_names"] if "feature_names" in data.files else np.arange(x.shape[1])
+    class_names = data["class_names"] if "class_names" in data.files else np.asarray(["Normal", "Anomaly"])
     y = (y_multiclass != 0).astype(np.int64)
 
     if args.limit_windows > 0:
         limit = min(args.limit_windows, x.shape[0])
         x = x[:limit]
         y = y[:limit]
+        y_multiclass = y_multiclass[:limit]
         labels = labels[:limit]
         files = files[:limit]
         starts = starts[:limit]
@@ -188,6 +203,7 @@ def main() -> None:
     config = ModelConfig(
         n_channels=int(x.shape[1]),
         seq_len=int(x.shape[2]),
+        n_outputs=1 if args.task == "binary" else int(y_multiclass.max()) + 1,
         hidden_size=args.hidden_size,
         n_heads=args.n_heads,
         n_layers=args.n_layers,
@@ -196,7 +212,8 @@ def main() -> None:
         instance_norm=args.instance_norm,
         pooling=args.pooling,
     )
-    hyperparameters = build_hyperparameters(args, config, y[train_idx])
+    train_targets = training_targets(args.task, y, y_multiclass)
+    hyperparameters = build_hyperparameters(args, config, y[train_idx], y_multiclass[train_idx], class_names)
     args.output_dir.mkdir(parents=True, exist_ok=True)
     (args.output_dir / "run_config.json").write_text(
         json.dumps(hyperparameters, indent=2),
@@ -205,11 +222,25 @@ def main() -> None:
     print("\niTransformer classifier hyperparameters:")
     print(json.dumps(hyperparameters, indent=2), flush=True)
 
-    train_loader = make_loader(x, y, train_idx, args.batch_size, shuffle=True, num_workers=args.num_workers)
-    cal_loader = make_loader(x, y, cal_idx, args.batch_size, shuffle=False, num_workers=args.num_workers)
+    train_loader = make_loader(
+        x,
+        train_targets,
+        train_idx,
+        args.batch_size,
+        shuffle=True,
+        num_workers=args.num_workers,
+    )
+    cal_loader = make_loader(
+        x,
+        train_targets,
+        cal_idx,
+        args.batch_size,
+        shuffle=False,
+        num_workers=args.num_workers,
+    )
 
     model = InvertedTransformerClassifier(config).to(device)
-    criterion = build_loss(args.class_weight, y[train_idx], device)
+    criterion = build_loss(args.task, args.class_weight, y[train_idx], y_multiclass[train_idx], device)
     optimizer = torch.optim.AdamW(model.parameters(), lr=args.lr, weight_decay=args.weight_decay)
     scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=max(args.epochs, 1))
 
@@ -225,14 +256,15 @@ def main() -> None:
         epochs=args.epochs,
         patience=args.patience,
         early_stop_metric=args.early_stop_metric,
+        task=args.task,
     )
     if best_state is not None:
         model.load_state_dict(best_state)
 
     checkpoint("scoring calibration split", run_start)
-    cal_scores = score_indices(model, x, cal_idx, args.batch_size, device)
+    cal_scores = score_indices(model, x, cal_idx, args.batch_size, device, args.task)
     checkpoint("scoring test split", run_start)
-    test_scores = score_indices(model, x, test_idx, args.batch_size, device)
+    test_scores = score_indices(model, x, test_idx, args.batch_size, device, args.task)
 
     if args.threshold_strategy == "f1_calibration":
         threshold = f1_optimal_threshold(cal_scores, y[cal_idx])
@@ -265,10 +297,11 @@ def main() -> None:
     checkpoint("saving model and evaluation artifacts", run_start)
     torch.save(
         {
-            "model_state_dict": model.state_dict(),
-            "config": asdict(config),
-            "feature_names": [str(item) for item in feature_names.tolist()],
-            "args": vars(args),
+        "model_state_dict": model.state_dict(),
+        "config": asdict(config),
+        "feature_names": [str(item) for item in feature_names.tolist()],
+        "class_names": [str(item) for item in class_names.tolist()],
+        "args": vars(args),
         },
         args.output_dir / "itransformer_classifier.pt",
     )
@@ -317,13 +350,26 @@ def choose_device(requested: str) -> torch.device:
     return torch.device("cpu")
 
 
-def build_hyperparameters(args: argparse.Namespace, config: ModelConfig, train_y: np.ndarray) -> dict[str, Any]:
+def training_targets(task: str, y_binary: np.ndarray, y_multiclass: np.ndarray) -> np.ndarray:
+    if task == "multiclass":
+        return y_multiclass.astype(np.int64)
+    return y_binary.astype(np.float32)
+
+
+def build_hyperparameters(
+    args: argparse.Namespace,
+    config: ModelConfig,
+    train_y: np.ndarray,
+    train_y_multiclass: np.ndarray,
+    class_names: np.ndarray,
+) -> dict[str, Any]:
     pos = int((train_y == 1).sum())
     neg = int((train_y == 0).sum())
     pos_weight = float(neg / max(pos, 1)) if args.class_weight == "balanced" else 1.0
     return {
         "windows": str(args.windows),
         "output_dir": str(args.output_dir),
+        "task": args.task,
         "architecture": asdict(config),
         "optimization": {
             "epochs": args.epochs,
@@ -334,6 +380,13 @@ def build_hyperparameters(args: argparse.Namespace, config: ModelConfig, train_y
             "class_weight": args.class_weight,
             "pos_weight": pos_weight,
             "early_stop_metric": args.early_stop_metric,
+        },
+        "classes": {
+            str(index): {
+                "name": str(class_names[index]) if index < len(class_names) else str(index),
+                "train_windows": int((train_y_multiclass == index).sum()),
+            }
+            for index in range(config.n_outputs if args.task == "multiclass" else len(class_names))
         },
         "split": {
             "test_size": args.test_size,
@@ -367,7 +420,23 @@ def make_loader(
     )
 
 
-def build_loss(class_weight: str, train_y: np.ndarray, device: torch.device) -> nn.Module:
+def build_loss(
+    task: str,
+    class_weight: str,
+    train_y: np.ndarray,
+    train_y_multiclass: np.ndarray,
+    device: torch.device,
+) -> nn.Module:
+    if task == "multiclass":
+        if class_weight == "none":
+            return nn.CrossEntropyLoss()
+        n_classes = int(train_y_multiclass.max()) + 1
+        counts = np.bincount(train_y_multiclass, minlength=n_classes).astype(np.float32)
+        weights = counts.sum() / np.maximum(counts, 1.0)
+        weights = weights / weights.mean()
+        print(f"Using CE class weights={np.round(weights, 4).tolist()}", flush=True)
+        return nn.CrossEntropyLoss(weight=torch.tensor(weights, dtype=torch.float32, device=device))
+
     if class_weight == "none":
         return nn.BCEWithLogitsLoss()
     positives = int((train_y == 1).sum())
@@ -388,6 +457,7 @@ def train_model(
     epochs: int,
     patience: int,
     early_stop_metric: str,
+    task: str,
 ) -> tuple[list[dict[str, float]], dict[str, torch.Tensor] | None]:
     history: list[dict[str, float]] = []
     best_state: dict[str, torch.Tensor] | None = None
@@ -398,7 +468,7 @@ def train_model(
     for epoch in range(1, epochs + 1):
         train_loss = run_epoch(model, train_loader, criterion, optimizer, device)
         scheduler.step()
-        val_loss, val_scores, val_targets = evaluate_validation(model, val_loader, criterion, device)
+        val_loss, val_scores, val_targets = evaluate_validation(model, val_loader, criterion, device, task)
         val_threshold = f1_optimal_threshold(val_scores, val_targets)
         val_pred = (val_scores > val_threshold).astype(np.int64)
         precision, recall, val_f1, _ = precision_recall_fscore_support(
@@ -468,9 +538,12 @@ def run_epoch(
     total_count = 0
     for batch_x, batch_y in loader:
         batch_x = batch_x.to(device=device, dtype=torch.float32, non_blocking=True)
-        batch_y = batch_y.to(device=device, dtype=torch.float32, non_blocking=True)
         optimizer.zero_grad(set_to_none=True)
         logits = model(batch_x)
+        if logits.ndim == 1:
+            batch_y = batch_y.to(device=device, dtype=torch.float32, non_blocking=True)
+        else:
+            batch_y = batch_y.to(device=device, dtype=torch.long, non_blocking=True)
         loss = criterion(logits, batch_y)
         loss.backward()
         torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm=1.0)
@@ -485,6 +558,7 @@ def evaluate_validation(
     loader: DataLoader[tuple[torch.Tensor, torch.Tensor]],
     criterion: nn.Module,
     device: torch.device,
+    task: str,
 ) -> tuple[float, np.ndarray, np.ndarray]:
     model.eval()
     total_loss = 0.0
@@ -494,13 +568,16 @@ def evaluate_validation(
     with torch.no_grad():
         for batch_x, batch_y in loader:
             batch_x = batch_x.to(device=device, dtype=torch.float32, non_blocking=True)
-            batch_y = batch_y.to(device=device, dtype=torch.float32, non_blocking=True)
+            if task == "multiclass":
+                batch_y = batch_y.to(device=device, dtype=torch.long, non_blocking=True)
+            else:
+                batch_y = batch_y.to(device=device, dtype=torch.float32, non_blocking=True)
             logits = model(batch_x)
             loss = criterion(logits, batch_y)
             total_loss += float(loss.detach().item()) * batch_x.shape[0]
             total_count += int(batch_x.shape[0])
-            scores.append(torch.sigmoid(logits).detach().cpu().numpy())
-            targets.append(batch_y.detach().cpu().numpy())
+            scores.append(logits_to_anomaly_score(logits, task).detach().cpu().numpy())
+            targets.append((batch_y != 0).detach().cpu().numpy())
     return (
         total_loss / max(total_count, 1),
         np.concatenate(scores).astype(np.float64),
@@ -514,6 +591,7 @@ def score_indices(
     indices: np.ndarray,
     batch_size: int,
     device: torch.device,
+    task: str,
 ) -> np.ndarray:
     model.eval()
     scores: list[np.ndarray] = []
@@ -522,9 +600,16 @@ def score_indices(
         for start in range(0, total, batch_size):
             batch_idx = indices[start : start + batch_size]
             batch = torch.from_numpy(x[batch_idx]).to(device=device, dtype=torch.float32)
-            scores.append(torch.sigmoid(model(batch)).detach().cpu().numpy())
+            scores.append(logits_to_anomaly_score(model(batch), task).detach().cpu().numpy())
             print(f"  scored {min(start + batch_size, total)}/{total}", flush=True)
     return np.concatenate(scores).astype(np.float64)
+
+
+def logits_to_anomaly_score(logits: torch.Tensor, task: str) -> torch.Tensor:
+    if task == "multiclass":
+        probabilities = torch.softmax(logits, dim=-1)
+        return 1.0 - probabilities[:, 0]
+    return torch.sigmoid(logits)
 
 
 def grouped_train_cal_test_split(
