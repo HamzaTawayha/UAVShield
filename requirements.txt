@@ -6,6 +6,10 @@ torch>=2.2
 transformers<5
 huggingface-hub>=0.23
 einops>=0.7
+u8darts>=0.41
+pyod>=3.4
+pytorch-lightning>=2.5,<2.6
+neuralforecast>=3.1
 
 # MOMENT note for Python 3.12:
 # install the package itself with:

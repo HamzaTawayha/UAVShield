@@ -39,6 +39,7 @@ data/uav_sead/bad_downloads/
 data/uav_sead/moment_windows/
 data/evaluation_summary*.csv
 data/evaluation_summary*.md
+data/.~lock.*#
 
 # Optional local model/download caches
 .cache/
