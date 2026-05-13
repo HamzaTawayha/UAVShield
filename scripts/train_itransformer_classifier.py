@@ -873,6 +873,8 @@ def log_final_to_wandb(
 ) -> None:
     if wandb_run is None:
         return
+    import wandb
+
     metrics = {
         "test/accuracy": eval_payload["test"]["accuracy"],
         "test/precision": eval_payload["test"]["precision"],
@@ -882,6 +884,7 @@ def log_final_to_wandb(
         "test/normal_flag_rate": eval_payload["test"]["normal_flag_rate"],
         "test/anomaly_flag_rate": eval_payload["test"]["anomaly_flag_rate"],
         "threshold": eval_payload["threshold"],
+        "eval_step": 1,
     }
     for label, stats in eval_payload["by_label"].items():
         prefix = f"by_label/{wandb_safe_name(label)}"
@@ -892,9 +895,60 @@ def log_final_to_wandb(
     wandb_run.log(metrics)
     wandb_run.summary.update(metrics)
 
-    if log_artifacts:
-        import wandb
+    final_metrics_table = wandb.Table(
+        columns=["metric", "value"],
+        data=[
+            ["accuracy", eval_payload["test"]["accuracy"]],
+            ["precision", eval_payload["test"]["precision"]],
+            ["recall", eval_payload["test"]["recall"]],
+            ["f1", eval_payload["test"]["f1"]],
+            ["roc_auc", eval_payload["test"]["roc_auc"]],
+            ["normal_flag_rate", eval_payload["test"]["normal_flag_rate"]],
+            ["anomaly_flag_rate", eval_payload["test"]["anomaly_flag_rate"]],
+            ["threshold", eval_payload["threshold"]],
+        ],
+    )
+    by_label_table = wandb.Table(
+        columns=["label", "n", "flagged_count", "flagged_rate", "mean_score", "p95_score"],
+        data=[
+            [
+                label,
+                stats["n"],
+                stats["flagged_count"],
+                stats["flagged_rate"],
+                stats["mean_score"],
+                stats["p95_score"],
+            ]
+            for label, stats in eval_payload["by_label"].items()
+        ],
+    )
+    predictions = eval_payload.get("predictions", [])
+    prediction_columns = list(predictions[0].keys()) if predictions else []
+    prediction_table = wandb.Table(
+        columns=prediction_columns,
+        data=[[row[column] for column in prediction_columns] for row in predictions],
+    )
+    wandb_run.log(
+        {
+            "tables/final_metrics": final_metrics_table,
+            "tables/by_label": by_label_table,
+            "tables/predictions": prediction_table,
+            "charts/flagged_rate_by_label": wandb.plot.bar(
+                by_label_table,
+                "label",
+                "flagged_rate",
+                title="Flagged Rate by Label",
+            ),
+            "charts/mean_score_by_label": wandb.plot.bar(
+                by_label_table,
+                "label",
+                "mean_score",
+                title="Mean Anomaly Score by Label",
+            ),
+        }
+    )
 
+    if log_artifacts:
         artifact = wandb.Artifact(artifact_name, type="model-evaluation")
         for path in artifact_paths:
             if path.exists():
