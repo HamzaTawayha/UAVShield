@@ -927,6 +927,11 @@ def log_final_to_wandb(
         "test/roc_auc": eval_payload["test"]["roc_auc"],
         "test/normal_flag_rate": eval_payload["test"]["normal_flag_rate"],
         "test/anomaly_flag_rate": eval_payload["test"]["anomaly_flag_rate"],
+        "accuracy": eval_payload["test"]["accuracy"],
+        "precision": eval_payload["test"]["precision"],
+        "recall": eval_payload["test"]["recall"],
+        "f1": eval_payload["test"]["f1"],
+        "roc_auc": eval_payload["test"]["roc_auc"],
         "threshold": eval_payload["threshold"],
         "eval_step": 1,
     }
@@ -977,6 +982,12 @@ def log_final_to_wandb(
             "tables/final_metrics": final_metrics_table,
             "tables/by_label": by_label_table,
             "tables/predictions": prediction_table,
+            "charts/final_metrics": wandb.plot.bar(
+                final_metrics_table,
+                "metric",
+                "value",
+                title="Final Test Metrics",
+            ),
             "charts/flagged_rate_by_label": wandb.plot.bar(
                 by_label_table,
                 "label",
