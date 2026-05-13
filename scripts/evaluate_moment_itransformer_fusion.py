@@ -10,7 +10,12 @@ from typing import Any
 import joblib
 import numpy as np
 import torch
-from sklearn.metrics import accuracy_score, precision_recall_fscore_support, roc_auc_score
+from sklearn.metrics import (
+    accuracy_score,
+    balanced_accuracy_score,
+    precision_recall_fscore_support,
+    roc_auc_score,
+)
 from sklearn.model_selection import GroupShuffleSplit
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
@@ -22,6 +27,7 @@ from scripts.train_itransformer_classifier import (
     ModelConfig,
     f1_optimal_threshold,
     score_indices,
+    threshold_candidates,
 )
 
 
@@ -55,11 +61,29 @@ def main() -> None:
         default=0.5,
         help="Fixed MOMENT weight. iTransformer receives 1 - alpha.",
     )
+    parser.add_argument(
+        "--alpha-strategy",
+        choices=["fixed", "grid"],
+        default="fixed",
+        help="fixed uses --alpha-moment; grid selects alpha on the calibration split.",
+    )
+    parser.add_argument(
+        "--alpha-grid-step",
+        type=float,
+        default=0.05,
+        help="Grid step for --alpha-strategy grid.",
+    )
+    parser.add_argument(
+        "--alpha-selection-metric",
+        choices=["accuracy", "balanced_accuracy", "f1"],
+        default="f1",
+        help="Calibration metric used to choose alpha when --alpha-strategy grid is enabled.",
+    )
     parser.add_argument("--test-size", type=float, default=0.30)
     parser.add_argument("--calibration-size", type=float, default=0.25)
     parser.add_argument(
         "--threshold-strategy",
-        choices=["normal_quantile", "f1_calibration"],
+        choices=["normal_quantile", "f1_calibration", "accuracy_calibration", "balanced_accuracy_calibration"],
         default="f1_calibration",
     )
     parser.add_argument("--threshold-quantile", type=float, default=0.95)
@@ -76,9 +100,11 @@ def main() -> None:
         "itransformer_dir": str(args.itransformer_dir),
         "output_dir": str(args.output_dir),
         "fusion": {
-            "method": "fixed_weight_average",
+            "method": f"{args.alpha_strategy}_weight_average",
             "alpha_moment": args.alpha_moment,
             "alpha_itransformer": 1.0 - args.alpha_moment,
+            "alpha_grid_step": args.alpha_grid_step,
+            "alpha_selection_metric": args.alpha_selection_metric,
         },
         "split": {
             "test_size": args.test_size,
@@ -127,14 +153,23 @@ def main() -> None:
         device=choose_device(args.device),
     )
 
-    alpha_itransformer = 1.0 - args.alpha_moment
-    cal_scores = args.alpha_moment * moment_cal_scores + alpha_itransformer * itr_cal_scores
-    test_scores = args.alpha_moment * moment_test_scores + alpha_itransformer * itr_test_scores
-
-    if args.threshold_strategy == "f1_calibration":
-        threshold = f1_optimal_threshold(cal_scores, y[cal_idx])
-    else:
-        threshold = normal_quantile_threshold(cal_scores, y[cal_idx], args.threshold_quantile)
+    fusion_choice = choose_fusion(
+        moment_cal_scores=moment_cal_scores,
+        moment_test_scores=moment_test_scores,
+        itr_cal_scores=itr_cal_scores,
+        itr_test_scores=itr_test_scores,
+        y_cal=y[cal_idx],
+        alpha_moment=args.alpha_moment,
+        alpha_strategy=args.alpha_strategy,
+        alpha_grid_step=args.alpha_grid_step,
+        alpha_selection_metric=args.alpha_selection_metric,
+        threshold_strategy=args.threshold_strategy,
+        threshold_quantile=args.threshold_quantile,
+    )
+    alpha_itransformer = 1.0 - fusion_choice["alpha_moment"]
+    cal_scores = fusion_choice["cal_scores"]
+    test_scores = fusion_choice["test_scores"]
+    threshold = fusion_choice["threshold"]
 
     eval_payload = evaluate(
         y_true=y[test_idx],
@@ -153,9 +188,13 @@ def main() -> None:
     eval_payload["threshold_strategy"] = args.threshold_strategy
     eval_payload["interpretation"] = "fused_anomaly_score > threshold is anomalous"
     eval_payload["fusion"] = {
-        "method": "fixed_weight_average",
-        "alpha_moment": args.alpha_moment,
+        "method": f"{args.alpha_strategy}_weight_average",
+        "alpha_strategy": args.alpha_strategy,
+        "alpha_selection_metric": args.alpha_selection_metric,
+        "alpha_grid_step": args.alpha_grid_step,
+        "alpha_moment": fusion_choice["alpha_moment"],
         "alpha_itransformer": alpha_itransformer,
+        "calibration_selection": fusion_choice["calibration_selection"],
         "moment_dir": str(args.moment_dir),
         "itransformer_dir": str(args.itransformer_dir),
         "itransformer_metadata": itr_metadata,
@@ -243,6 +282,141 @@ def score_itransformer(
     cal_scores = score_indices(model, x, cal_idx, batch_size, device, task)
     test_scores = score_indices(model, x, test_idx, batch_size, device, task)
     return cal_scores, test_scores, {"task": task, "config": config_payload}
+
+
+def choose_fusion(
+    moment_cal_scores: np.ndarray,
+    moment_test_scores: np.ndarray,
+    itr_cal_scores: np.ndarray,
+    itr_test_scores: np.ndarray,
+    y_cal: np.ndarray,
+    alpha_moment: float,
+    alpha_strategy: str,
+    alpha_grid_step: float,
+    alpha_selection_metric: str,
+    threshold_strategy: str,
+    threshold_quantile: float,
+) -> dict[str, Any]:
+    if alpha_strategy == "fixed":
+        candidate_alphas = [float(alpha_moment)]
+    else:
+        if not 0.0 < alpha_grid_step <= 1.0:
+            raise SystemExit("--alpha-grid-step must be in (0, 1].")
+        candidate_alphas = np.arange(0.0, 1.0 + (alpha_grid_step / 2.0), alpha_grid_step)
+        candidate_alphas = [float(np.clip(alpha, 0.0, 1.0)) for alpha in candidate_alphas]
+
+    best: dict[str, Any] | None = None
+    for alpha in candidate_alphas:
+        cal_scores = alpha * moment_cal_scores + (1.0 - alpha) * itr_cal_scores
+        threshold = choose_threshold(cal_scores, y_cal, threshold_strategy, threshold_quantile)
+        metrics = binary_metrics(y_cal, cal_scores, threshold)
+        key = selection_key(metrics, alpha_selection_metric)
+        if best is None or key > best["selection_key"]:
+            best = {
+                "alpha_moment": alpha,
+                "threshold": threshold,
+                "cal_scores": cal_scores,
+                "test_scores": alpha * moment_test_scores + (1.0 - alpha) * itr_test_scores,
+                "selection_key": key,
+                "calibration_selection": {
+                    "metric": alpha_selection_metric,
+                    "metrics": metrics,
+                    "threshold": threshold,
+                    "alpha_moment": alpha,
+                    "alpha_itransformer": 1.0 - alpha,
+                },
+            }
+
+    if best is None:
+        raise RuntimeError("No fusion candidates were evaluated.")
+    print(
+        "Selected fusion alpha on calibration: "
+        f"alpha_moment={best['alpha_moment']:.3f}, "
+        f"alpha_itransformer={1.0 - best['alpha_moment']:.3f}, "
+        f"threshold={best['threshold']:.6f}, "
+        f"{alpha_selection_metric}={best['calibration_selection']['metrics'][alpha_selection_metric]:.4f}",
+        flush=True,
+    )
+    return best
+
+
+def choose_threshold(
+    scores: np.ndarray,
+    y: np.ndarray,
+    threshold_strategy: str,
+    threshold_quantile: float,
+) -> float:
+    if threshold_strategy == "f1_calibration":
+        return f1_optimal_threshold(scores, y)
+    if threshold_strategy == "accuracy_calibration":
+        return metric_optimal_threshold(scores, y, "accuracy")
+    if threshold_strategy == "balanced_accuracy_calibration":
+        return metric_optimal_threshold(scores, y, "balanced_accuracy")
+    return normal_quantile_threshold(scores, y, threshold_quantile)
+
+
+def metric_optimal_threshold(scores: np.ndarray, y: np.ndarray, metric: str) -> float:
+    candidates = threshold_candidates(scores)
+    if candidates.size == 0:
+        return 0.0
+
+    best_threshold = float(candidates[0])
+    best_key: tuple[float, ...] | None = None
+    for threshold in candidates:
+        metrics = binary_metrics(y, scores, float(threshold))
+        key = selection_key(metrics, metric)
+        if best_key is None or key > best_key:
+            best_key = key
+            best_threshold = float(threshold)
+    return best_threshold
+
+
+def binary_metrics(y_true: np.ndarray, scores: np.ndarray, threshold: float) -> dict[str, float]:
+    y_pred = (scores > threshold).astype(np.int64)
+    precision, recall, f1, _ = precision_recall_fscore_support(
+        y_true,
+        y_pred,
+        average="binary",
+        zero_division=0,
+    )
+    try:
+        roc_auc = roc_auc_score(y_true, scores)
+    except ValueError:
+        roc_auc = 0.0
+    return {
+        "accuracy": float(accuracy_score(y_true, y_pred)),
+        "balanced_accuracy": float(balanced_accuracy_score(y_true, y_pred)),
+        "precision": float(precision),
+        "recall": float(recall),
+        "f1": float(f1),
+        "roc_auc": float(roc_auc),
+    }
+
+
+def selection_key(metrics: dict[str, float], metric: str) -> tuple[float, ...]:
+    if metric == "accuracy":
+        return (
+            metrics["accuracy"],
+            metrics["f1"],
+            metrics["balanced_accuracy"],
+            metrics["recall"],
+            metrics["precision"],
+        )
+    if metric == "balanced_accuracy":
+        return (
+            metrics["balanced_accuracy"],
+            metrics["f1"],
+            metrics["accuracy"],
+            metrics["recall"],
+            metrics["precision"],
+        )
+    return (
+        metrics["f1"],
+        metrics["balanced_accuracy"],
+        metrics["accuracy"],
+        metrics["recall"],
+        metrics["precision"],
+    )
 
 
 def grouped_train_cal_test_split(
