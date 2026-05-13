@@ -264,6 +264,7 @@ def main() -> None:
         early_stop_metric=args.early_stop_metric,
         task=args.task,
         wandb_run=wandb_run,
+        wandb_log_batches_every=args.wandb_log_batches_every,
     )
     if best_state is not None:
         model.load_state_dict(best_state)
@@ -479,6 +480,7 @@ def train_model(
     early_stop_metric: str,
     task: str,
     wandb_run: Any | None = None,
+    wandb_log_batches_every: int = 0,
 ) -> tuple[list[dict[str, float]], dict[str, torch.Tensor] | None]:
     history: list[dict[str, float]] = []
     best_state: dict[str, torch.Tensor] | None = None
@@ -487,11 +489,21 @@ def train_model(
     start_time = time.time()
 
     for epoch in range(1, epochs + 1):
-        train_loss = run_epoch(model, train_loader, criterion, optimizer, device)
+        train_loss = run_epoch(
+            model,
+            train_loader,
+            criterion,
+            optimizer,
+            device,
+            epoch=epoch,
+            wandb_run=wandb_run,
+            wandb_log_batches_every=wandb_log_batches_every,
+        )
         scheduler.step()
         val_loss, val_scores, val_targets = evaluate_validation(model, val_loader, criterion, device, task)
         val_threshold = f1_optimal_threshold(val_scores, val_targets)
         val_pred = (val_scores > val_threshold).astype(np.int64)
+        val_accuracy = accuracy_score(val_targets, val_pred)
         precision, recall, val_f1, _ = precision_recall_fscore_support(
             val_targets,
             val_pred,
@@ -521,6 +533,7 @@ def train_model(
                 "epoch": float(epoch),
                 "train_loss": float(train_loss),
                 "val_loss": float(val_loss),
+                "val_accuracy": float(val_accuracy),
                 "val_precision": float(precision),
                 "val_recall": float(recall),
                 "val_f1": float(val_f1),
@@ -535,14 +548,14 @@ def train_model(
                     "epoch": epoch,
                     "train/loss": float(train_loss),
                     "val/loss": float(val_loss),
+                    "val/accuracy": float(val_accuracy),
                     "val/precision": float(precision),
                     "val/recall": float(recall),
                     "val/f1": float(val_f1),
                     "val/roc_auc": float(val_auc),
                     "val/threshold": float(val_threshold),
                     "learning_rate": float(scheduler.get_last_lr()[0]),
-                },
-                step=epoch,
+                }
             )
 
         if epoch == 1 or epoch % 5 == 0 or epoch == epochs or stale_epochs >= patience:
@@ -550,7 +563,7 @@ def train_model(
             print(
                 f"  epoch {epoch:03d}/{epochs} "
                 f"train_loss={train_loss:.6f} val_loss={val_loss:.6f} "
-                f"val_f1={val_f1:.4f} val_auc={val_auc:.4f} "
+                f"val_acc={val_accuracy:.4f} val_f1={val_f1:.4f} val_auc={val_auc:.4f} "
                 f"elapsed={elapsed:.1f}s",
                 flush=True,
             )
@@ -568,11 +581,14 @@ def run_epoch(
     criterion: nn.Module,
     optimizer: torch.optim.Optimizer,
     device: torch.device,
+    epoch: int,
+    wandb_run: Any | None = None,
+    wandb_log_batches_every: int = 0,
 ) -> float:
     model.train()
     total_loss = 0.0
     total_count = 0
-    for batch_x, batch_y in loader:
+    for batch_index, (batch_x, batch_y) in enumerate(loader, start=1):
         batch_x = batch_x.to(device=device, dtype=torch.float32, non_blocking=True)
         optimizer.zero_grad(set_to_none=True)
         logits = model(batch_x)
@@ -584,8 +600,23 @@ def run_epoch(
         loss.backward()
         torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm=1.0)
         optimizer.step()
-        total_loss += float(loss.detach().item()) * batch_x.shape[0]
+        batch_loss = float(loss.detach().item())
+        total_loss += batch_loss * batch_x.shape[0]
         total_count += int(batch_x.shape[0])
+        if (
+            wandb_run is not None
+            and wandb_log_batches_every > 0
+            and (batch_index == 1 or batch_index % wandb_log_batches_every == 0 or batch_index == len(loader))
+        ):
+            batch_step = (epoch - 1) * len(loader) + batch_index
+            wandb_run.log(
+                {
+                    "batch_step": batch_step,
+                    "epoch": epoch,
+                    "train/batch_loss": batch_loss,
+                    "train/batch_progress": batch_index / max(len(loader), 1),
+                }
+            )
     return total_loss / max(total_count, 1)
 
 
@@ -827,6 +858,12 @@ def add_wandb_args(parser: argparse.ArgumentParser) -> None:
     parser.add_argument("--wandb-group", default="", help="Optional W&B run group.")
     parser.add_argument("--wandb-tags", nargs="*", default=[], help="Optional W&B tags.")
     parser.add_argument(
+        "--wandb-log-batches-every",
+        type=int,
+        default=10,
+        help="When W&B is enabled, log training batch loss every N batches. Use 0 to disable.",
+    )
+    parser.add_argument(
         "--wandb-mode",
         choices=["online", "offline", "disabled"],
         default="online",
@@ -860,6 +897,13 @@ def init_wandb(args: argparse.Namespace, config: dict[str, Any], job_type: str):
         mode=args.wandb_mode,
         config=config,
     )
+    run.define_metric("epoch")
+    run.define_metric("train/loss", step_metric="epoch")
+    run.define_metric("val/*", step_metric="epoch")
+    run.define_metric("learning_rate", step_metric="epoch")
+    run.define_metric("batch_step")
+    run.define_metric("train/batch_loss", step_metric="batch_step")
+    run.define_metric("train/batch_progress", step_metric="batch_step")
     print(f"W&B logging enabled: project={args.wandb_project}, run={run.name}", flush=True)
     return run
 
