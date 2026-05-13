@@ -10,6 +10,7 @@ u8darts>=0.41
 pyod>=3.4
 pytorch-lightning>=2.5,<2.6
 neuralforecast>=3.1
+wandb>=0.17
 
 # MOMENT note for Python 3.12:
 # install the package itself with:

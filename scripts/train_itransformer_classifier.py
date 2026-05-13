@@ -158,6 +158,7 @@ def main() -> None:
     parser.add_argument("--num-workers", type=int, default=0)
     parser.add_argument("--limit-windows", type=int, default=0, help="Optional quick smoke-test limit.")
     parser.add_argument("--seed", type=int, default=11)
+    add_wandb_args(parser)
     args = parser.parse_args()
 
     set_seed(args.seed)
@@ -221,6 +222,11 @@ def main() -> None:
     )
     print("\niTransformer classifier hyperparameters:")
     print(json.dumps(hyperparameters, indent=2), flush=True)
+    wandb_run = init_wandb(args, hyperparameters, job_type="itransformer-train")
+    if wandb_run is not None:
+        wandb_run.summary["train/windows"] = int(len(train_idx))
+        wandb_run.summary["calibration/windows"] = int(len(cal_idx))
+        wandb_run.summary["test/windows"] = int(len(test_idx))
 
     train_loader = make_loader(
         x,
@@ -257,6 +263,7 @@ def main() -> None:
         patience=args.patience,
         early_stop_metric=args.early_stop_metric,
         task=args.task,
+        wandb_run=wandb_run,
     )
     if best_state is not None:
         model.load_state_dict(best_state)
@@ -310,7 +317,20 @@ def main() -> None:
         encoding="utf-8",
     )
     write_predictions(args.output_dir / "predictions.csv", eval_payload["predictions"])
+    log_final_to_wandb(
+        wandb_run,
+        eval_payload,
+        artifact_paths=[
+            args.output_dir / "run_config.json",
+            args.output_dir / "evaluation.json",
+            args.output_dir / "predictions.csv",
+            args.output_dir / "itransformer_classifier.pt",
+        ],
+        artifact_name=f"{wandb_safe_name(args.output_dir.name)}-itransformer",
+        log_artifacts=args.wandb_log_artifacts,
+    )
     print_result(threshold, eval_payload, args.output_dir)
+    finish_wandb(wandb_run)
     checkpoint("run complete", run_start)
 
 
@@ -458,6 +478,7 @@ def train_model(
     patience: int,
     early_stop_metric: str,
     task: str,
+    wandb_run: Any | None = None,
 ) -> tuple[list[dict[str, float]], dict[str, torch.Tensor] | None]:
     history: list[dict[str, float]] = []
     best_state: dict[str, torch.Tensor] | None = None
@@ -508,6 +529,21 @@ def train_model(
                 "learning_rate": float(scheduler.get_last_lr()[0]),
             }
         )
+        if wandb_run is not None:
+            wandb_run.log(
+                {
+                    "epoch": epoch,
+                    "train/loss": float(train_loss),
+                    "val/loss": float(val_loss),
+                    "val/precision": float(precision),
+                    "val/recall": float(recall),
+                    "val/f1": float(val_f1),
+                    "val/roc_auc": float(val_auc),
+                    "val/threshold": float(val_threshold),
+                    "learning_rate": float(scheduler.get_last_lr()[0]),
+                },
+                step=epoch,
+            )
 
         if epoch == 1 or epoch % 5 == 0 or epoch == epochs or stale_epochs >= patience:
             elapsed = time.time() - start_time
@@ -782,6 +818,97 @@ def print_result(threshold: float, eval_payload: dict[str, Any], output_dir: Pat
             f"  {label}: n={stats['n']}, "
             f"flagged={stats['flagged_rate']:.2%}, mean_score={stats['mean_score']:.4f}"
         )
+
+
+def add_wandb_args(parser: argparse.ArgumentParser) -> None:
+    parser.add_argument("--wandb-project", default="", help="Enable W&B logging under this project.")
+    parser.add_argument("--wandb-entity", default="", help="Optional W&B entity/team.")
+    parser.add_argument("--wandb-run-name", default="", help="Optional W&B run name.")
+    parser.add_argument("--wandb-group", default="", help="Optional W&B run group.")
+    parser.add_argument("--wandb-tags", nargs="*", default=[], help="Optional W&B tags.")
+    parser.add_argument(
+        "--wandb-mode",
+        choices=["online", "offline", "disabled"],
+        default="online",
+        help="W&B mode used only when --wandb-project is set.",
+    )
+    parser.add_argument(
+        "--wandb-log-artifacts",
+        action="store_true",
+        help="Upload run_config/evaluation/predictions/model files to W&B artifacts.",
+    )
+
+
+def init_wandb(args: argparse.Namespace, config: dict[str, Any], job_type: str):
+    if not args.wandb_project or args.wandb_mode == "disabled":
+        return None
+    try:
+        import wandb
+    except ImportError as exc:
+        raise SystemExit(
+            "W&B logging requested, but wandb is not installed. "
+            "Run: python -m pip install wandb"
+        ) from exc
+
+    run = wandb.init(
+        project=args.wandb_project,
+        entity=args.wandb_entity or None,
+        name=args.wandb_run_name or None,
+        group=args.wandb_group or None,
+        tags=args.wandb_tags or None,
+        job_type=job_type,
+        mode=args.wandb_mode,
+        config=config,
+    )
+    print(f"W&B logging enabled: project={args.wandb_project}, run={run.name}", flush=True)
+    return run
+
+
+def log_final_to_wandb(
+    wandb_run,
+    eval_payload: dict[str, Any],
+    artifact_paths: list[Path],
+    artifact_name: str,
+    log_artifacts: bool,
+) -> None:
+    if wandb_run is None:
+        return
+    metrics = {
+        "test/accuracy": eval_payload["test"]["accuracy"],
+        "test/precision": eval_payload["test"]["precision"],
+        "test/recall": eval_payload["test"]["recall"],
+        "test/f1": eval_payload["test"]["f1"],
+        "test/roc_auc": eval_payload["test"]["roc_auc"],
+        "test/normal_flag_rate": eval_payload["test"]["normal_flag_rate"],
+        "test/anomaly_flag_rate": eval_payload["test"]["anomaly_flag_rate"],
+        "threshold": eval_payload["threshold"],
+    }
+    for label, stats in eval_payload["by_label"].items():
+        prefix = f"by_label/{wandb_safe_name(label)}"
+        metrics[f"{prefix}/n"] = stats["n"]
+        metrics[f"{prefix}/flagged_rate"] = stats["flagged_rate"]
+        metrics[f"{prefix}/mean_score"] = stats["mean_score"]
+        metrics[f"{prefix}/p95_score"] = stats["p95_score"]
+    wandb_run.log(metrics)
+    wandb_run.summary.update(metrics)
+
+    if log_artifacts:
+        import wandb
+
+        artifact = wandb.Artifact(artifact_name, type="model-evaluation")
+        for path in artifact_paths:
+            if path.exists():
+                artifact.add_file(str(path))
+        wandb_run.log_artifact(artifact)
+
+
+def finish_wandb(wandb_run) -> None:
+    if wandb_run is not None:
+        wandb_run.finish()
+
+
+def wandb_safe_name(value: str) -> str:
+    return "".join(char if char.isalnum() or char in "-_." else "_" for char in value)
 
 
 if __name__ == "__main__":
