@@ -16,6 +16,7 @@ wandb/
 *.log
 streamlit_stdout.log
 streamlit_stderr.log
+reports/
 
 # LaTeX/build byproducts
 *.aux
@@ -38,6 +39,8 @@ data/uav_sead/ulg_files/
 data/uav_sead/.gitattributes
 data/uav_sead/bad_downloads/
 data/uav_sead/moment_windows/
+data/alfa/
+data/combined_uav/
 data/evaluation_summary*.csv
 data/evaluation_summary*.md
 data/.~lock.*#
@@ -45,3 +48,4 @@ data/.~lock.*#
 # Optional local model/download caches
 .cache/
 models/
+external/

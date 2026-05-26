@@ -1,89 +1,199 @@
 # UAVShield
 
-UAVShield is a learned sanity-checker for UAV agent memory and telemetry. The
-current detector is meant to sit between an attack injector and the planner:
+UAVShield is Hamzeh's ML detector for Ibrahim's UAV planner attack logs. The current repo focus is the **supervised S1-S4 agent-log detector** trained on Ibrahim's `metrics.csv` plus per-run `events.jsonl` files.
+
+The detector answers:
 
 ```text
-telemetry / perception / memory update -> UAVShield detector -> allow or quarantine -> planner
+Given one completed UAV planner run, was it clean or attacked?
 ```
 
-## Current Defense Artifact
-
-The current best UAV-SEAD detector is:
+It currently predicts:
 
 ```text
-Statistical UAV telemetry features + HistGradientBoosting
-+ per-anomaly-family thresholds searched over 1000 calibration configs
+0 = clean / non-malicious
+1 = attacked / malicious
 ```
 
-Held-out UAV-SEAD result:
+It does not currently predict the attack family as a separate model output. The S1-S4 labels are used for per-scenario evaluation breakdowns.
+
+## Current Best Result
+
+Best supervised detector:
 
 ```text
-Accuracy:          93.76%
-Precision:         88.57%
-Recall:            71.26%
-F1:                0.7898
-ROC-AUC:           0.9591
-Normal flag rate:  1.81%
+Feature extractor: agent-log/runtime features from events.jsonl + safe metrics.csv columns
+Model:             ExtraTreesClassifier
+Split:             seed-heldout
+Threshold:         selected on validation accuracy
 ```
 
-Selected anomaly-family thresholds:
+Held-out test result:
 
 ```text
-External Position: 0.05
-Global Position:   0.75
-Altitude:          0.05
-Mechanical:        0.60
+Accuracy:   90.10%
+Precision:  85.98%
+Recall:     95.83%
+F1:         90.64%
+ROC-AUC:    97.45%
+PR-AUC:     97.54%
 ```
 
-## Rebuild The Detector
+Per-attack-family detection rate on the held-out test split:
 
-From the repository root:
+```text
+S1:  97.92%
+S2: 100.00%
+S3: 100.00%
+S4:  85.42%
+```
+
+## What Data Is Required
+
+The detector needs both:
+
+```text
+metrics.csv      -> run list, labels, safe aggregate fields
+events.jsonl     -> real per-step detector evidence
+```
+
+Expected full-log layout:
+
+```text
+results_parent/
+  metrics.csv
+  s1/.../<run_id>/events.jsonl
+  s2/.../<run_id>/events.jsonl
+  s3/.../<run_id>/events.jsonl
+  s4/.../<run_id>/events.jsonl
+```
+
+The local dataset is currently split across sibling folders, so the command uses the parent directory as `--results-dir`:
+
+```text
+../S1 and S2(2)/s1
+../S1 and S2(2)/s2
+../S3 and S4(1)/s3
+../S3 and S4(1)/s4
+```
+
+The script verifies this with:
+
+```text
+matched events.jsonl for 1920
+metrics-only rows for 0
+```
+
+## Run The Best Detector
+
+From the repo root:
 
 ```bash
-python -m venv .venv
+cd /home/tawayha/Desktop/UAVShield/UAVShield
 source .venv/bin/activate
-python -m pip install --upgrade pip
-python -m pip install -r requirements.txt
 
-python scripts/uav_sead_build_moment_windows.py \
-  --include-log-level-anomalies \
-  --output data/uav_sead/moment_windows/uav_sead_precise_windows.npz
-
-python scripts/augment_uav_sead_physics_features.py
-
-python scripts/search_family_threshold_configs.py \
-  --windows data/uav_sead/moment_windows/uav_sead_precise_physics_windows.npz \
-  --output-dir data/uav_sead/moment_windows/statistical_features_family_threshold_search_1000 \
-  --old-eval data/uav_sead/moment_windows/statistical_features_histgb/evaluation.json \
-  --model hist_gb \
-  --threshold-step 0.05 \
-  --trials 1000 \
-  --selection-metric accuracy
+python scripts/train_agent_log_detector.py \
+  --results-dir .. \
+  --metrics-csv ../metrics.csv \
+  --require-events \
+  --supervised-model extra_trees \
+  --threshold-metric accuracy \
+  --output-dir reports/agent_log_detector_supervised_only_extra_trees_accuracy
 ```
 
-The main local artifact is:
+Key outputs:
 
 ```text
-data/uav_sead/moment_windows/statistical_features_family_threshold_search_1000/family_threshold_search_model.joblib
+reports/agent_log_detector_supervised_only_extra_trees_accuracy/detection_metrics.csv
+reports/agent_log_detector_supervised_only_extra_trees_accuracy/supervised_evaluation.json
+reports/agent_log_detector_supervised_only_extra_trees_accuracy/supervised_predictions.csv
+reports/agent_log_detector_supervised_only_extra_trees_accuracy/supervised_top_features.csv
+reports/agent_log_detector_supervised_only_extra_trees_accuracy/*.png
+reports/agent_log_detector_supervised_only_extra_trees_accuracy/agent_log_detectors.joblib
 ```
 
-Raw UAV-SEAD logs and generated model artifacts are intentionally ignored by
-Git because they are large and machine-local.
+## Train/Test Split
 
-## For Attack Testing
+Default split is seed-heldout:
 
-If you are testing attacks against this defense, start here:
+```text
+Train seeds:      42, 123, 256, 512, 1024, 2048
+Validation seeds: 4096, 8192
+Test seeds:       111, 222
+```
 
-[PhD attack integration guide](docs/PHD_ATTACK_INTEGRATION.md)
+With the full S1-S4 dataset:
 
-The short version:
+```text
+Train:      1152 runs = 576 clean + 576 attack
+Validation: 384 runs  = 192 clean + 192 attack
+Test:       384 runs  = 192 clean + 192 attack
+Total:      1920 runs
+```
 
-1. Keep your attack runner unchanged until it is about to expose a telemetry,
-   perception, or memory update to the planner.
-2. Build/update a rolling UAV telemetry window.
-3. Call the UAVShield detector.
-4. If the detector flags the update, quarantine it and do not write it into the
-   planner memory.
-5. Report defense detection rate, false positive rate, false negative rate, and
-   mission recovery compared with the original attack-only baseline.
+This is the preferred split for reporting because the test seeds are never used during training or threshold calibration.
+
+## What Features Are Used
+
+The supervised detector extracts run-level features from the logs, including:
+
+```text
+tool-call counts
+memory-write counts
+memory types and keys
+planner repair/validation behavior
+safety-status changes
+true-vs-agent-visible observation differences
+detection-count changes
+telemetry summaries
+LLM rationale text as TF-IDF features
+safe aggregate runtime columns from metrics.csv
+```
+
+The detector explicitly excludes oracle/label leakage fields:
+
+```text
+attack
+injected_payload
+false_belief_label
+unsafe_tool_label
+termination_reason
+```
+
+For `metrics.csv`, it also avoids post-hoc attack/evaluation fields such as `fbar`, `rmfr`, `uter`, ghost counters, AIM-MCM defense metrics, and ground-truth person-distance columns.
+
+## Package For Ibrahim
+
+A small sendable package is included here:
+
+```text
+packages/agent_log_detector_for_ibrahim/
+packages/uavshield_agent_log_detector_for_ibrahim.zip
+```
+
+It contains only:
+
+```text
+train_agent_log_detector.py
+README.md
+requirements.txt
+run_detector.sh
+```
+
+See:
+
+[packages/agent_log_detector_for_ibrahim/README.md](packages/agent_log_detector_for_ibrahim/README.md)
+
+Ibrahim's integration guide:
+
+[docs/IBRAHIM_ATTACK_INTEGRATION.md](docs/IBRAHIM_ATTACK_INTEGRATION.md)
+
+## Older Telemetry Work
+
+The repository still contains earlier UAV-SEAD / MOMENT / telemetry anomaly detection scripts. Those are not the current Ibrahim handoff path. The current paper-facing detector is:
+
+```text
+scripts/train_agent_log_detector.py
+```
+
+The older telemetry detector can remain as background work, but it should not be presented to Ibrahim as the integration target for the current S1-S4 attack results.
