@@ -1,4 +1,4 @@
-# UAVShield Agent-Log Detector Package
+# Ibrahim Handoff: UAVShield Agent-Log Detector
 
 This is the minimal package for Ibrahim to train/evaluate Hamzeh's S1-S4 detector on UAV planner attack logs.
 

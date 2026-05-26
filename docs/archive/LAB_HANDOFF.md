@@ -169,7 +169,7 @@ Runtime integration uses `MomentStateSanityChecker` and adds an
 `ml.state_anomaly` violation when the learned whole-state model flags the
 rolling state window.
 
-## What To Tell The PhD Student
+## What To Tell Ibrahim
 
 The ROS2 side mainly needs adapters:
 

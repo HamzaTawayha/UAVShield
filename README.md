@@ -1,34 +1,45 @@
 # UAVShield
 
-UAVShield is Hamzeh's ML detector for Ibrahim's UAV planner attack logs. The current repo focus is the **supervised S1-S4 agent-log detector** trained on Ibrahim's `metrics.csv` plus per-run `events.jsonl` files.
+This repository is organized as Hamzeh's handoff to Ibrahim for the UAV planner attack detector.
 
-The detector answers:
+## Start Here
+
+Use this folder:
+
+[ibrahim_handoff](ibrahim_handoff)
+
+It contains the minimal runnable detector package:
 
 ```text
-Given one completed UAV planner run, was it clean or attacked?
+ibrahim_handoff/
+  README.md
+  train_agent_log_detector.py
+  run_detector.sh
+  requirements.txt
 ```
 
-It currently predicts:
+## What The Detector Does
+
+The current detector is a supervised S1-S4 agent-log detector trained on Ibrahim's attack-run outputs:
+
+```text
+Input:  metrics.csv + per-run events.jsonl files
+Output: clean vs attacked
+Model:  ExtraTreesClassifier
+```
+
+Prediction target:
 
 ```text
 0 = clean / non-malicious
 1 = attacked / malicious
 ```
 
-It does not currently predict the attack family as a separate model output. The S1-S4 labels are used for per-scenario evaluation breakdowns.
+The model is binary. It does not separately predict S1/S2/S3/S4, but the evaluation reports detection rate for each attack family.
 
 ## Current Best Result
 
-Best supervised detector:
-
-```text
-Feature extractor: agent-log/runtime features from events.jsonl + safe metrics.csv columns
-Model:             ExtraTreesClassifier
-Split:             seed-heldout
-Threshold:         selected on validation accuracy
-```
-
-Held-out test result:
+Seed-heldout test split:
 
 ```text
 Accuracy:   90.10%
@@ -39,7 +50,7 @@ ROC-AUC:    97.45%
 PR-AUC:     97.54%
 ```
 
-Per-attack-family detection rate on the held-out test split:
+Per-family detection:
 
 ```text
 S1:  97.92%
@@ -48,152 +59,60 @@ S3: 100.00%
 S4:  85.42%
 ```
 
-## What Data Is Required
-
-The detector needs both:
-
-```text
-metrics.csv      -> run list, labels, safe aggregate fields
-events.jsonl     -> real per-step detector evidence
-```
-
-Expected full-log layout:
-
-```text
-results_parent/
-  metrics.csv
-  s1/.../<run_id>/events.jsonl
-  s2/.../<run_id>/events.jsonl
-  s3/.../<run_id>/events.jsonl
-  s4/.../<run_id>/events.jsonl
-```
-
-The local dataset is currently split across sibling folders, so the command uses the parent directory as `--results-dir`:
-
-```text
-../S1 and S2(2)/s1
-../S1 and S2(2)/s2
-../S3 and S4(1)/s3
-../S3 and S4(1)/s4
-```
-
-The script verifies this with:
-
-```text
-matched events.jsonl for 1920
-metrics-only rows for 0
-```
-
-## Run The Best Detector
+## Run Command
 
 From the repo root:
 
 ```bash
-cd /home/tawayha/Desktop/UAVShield/UAVShield
 source .venv/bin/activate
 
 python scripts/train_agent_log_detector.py \
-  --results-dir .. \
-  --metrics-csv ../metrics.csv \
+  --results-dir /path/to/results_parent \
+  --metrics-csv /path/to/metrics.csv \
   --require-events \
   --supervised-model extra_trees \
   --threshold-metric accuracy \
   --output-dir reports/agent_log_detector_supervised_only_extra_trees_accuracy
 ```
 
-Key outputs:
+Expected data sanity check:
 
 ```text
-reports/agent_log_detector_supervised_only_extra_trees_accuracy/detection_metrics.csv
-reports/agent_log_detector_supervised_only_extra_trees_accuracy/supervised_evaluation.json
-reports/agent_log_detector_supervised_only_extra_trees_accuracy/supervised_predictions.csv
-reports/agent_log_detector_supervised_only_extra_trees_accuracy/supervised_top_features.csv
-reports/agent_log_detector_supervised_only_extra_trees_accuracy/*.png
-reports/agent_log_detector_supervised_only_extra_trees_accuracy/agent_log_detectors.joblib
+matched events.jsonl for 1920
+metrics-only rows for 0
 ```
 
-## Train/Test Split
-
-Default split is seed-heldout:
+## Repository Map
 
 ```text
-Train seeds:      42, 123, 256, 512, 1024, 2048
-Validation seeds: 4096, 8192
-Test seeds:       111, 222
+ibrahim_handoff/                  clean package to send/use
+scripts/train_agent_log_detector.py  source detector implementation
+docs/IBRAHIM_ATTACK_INTEGRATION.md   detailed integration notes
+docs/archive/                     old planning docs and paper drafts
+crossguard/                       older runtime/telemetry scaffolding
+data/                             older telemetry datasets/artifacts
+scripts/                          detector script plus older experiments
 ```
 
-With the full S1-S4 dataset:
+For Ibrahim, the only folder he should need is:
 
 ```text
-Train:      1152 runs = 576 clean + 576 attack
-Validation: 384 runs  = 192 clean + 192 attack
-Test:       384 runs  = 192 clean + 192 attack
-Total:      1920 runs
+ibrahim_handoff/
 ```
 
-This is the preferred split for reporting because the test seeds are never used during training or threshold calibration.
+## Notes On Data
 
-## What Features Are Used
+The detector requires the full per-run logs, not just `metrics.csv`.
 
-The supervised detector extracts run-level features from the logs, including:
+Required:
 
 ```text
-tool-call counts
-memory-write counts
-memory types and keys
-planner repair/validation behavior
-safety-status changes
-true-vs-agent-visible observation differences
-detection-count changes
-telemetry summaries
-LLM rationale text as TF-IDF features
-safe aggregate runtime columns from metrics.csv
+metrics.csv
+events.jsonl for every row in metrics.csv
 ```
 
-The detector explicitly excludes oracle/label leakage fields:
+`--require-events` is used so the run fails if any event log is missing.
 
-```text
-attack
-injected_payload
-false_belief_label
-unsafe_tool_label
-termination_reason
-```
+## Legacy Work
 
-For `metrics.csv`, it also avoids post-hoc attack/evaluation fields such as `fbar`, `rmfr`, `uter`, ghost counters, AIM-MCM defense metrics, and ground-truth person-distance columns.
-
-## Package For Ibrahim
-
-A small sendable package is included here:
-
-```text
-packages/agent_log_detector_for_ibrahim/
-packages/uavshield_agent_log_detector_for_ibrahim.zip
-```
-
-It contains only:
-
-```text
-train_agent_log_detector.py
-README.md
-requirements.txt
-run_detector.sh
-```
-
-See:
-
-[packages/agent_log_detector_for_ibrahim/README.md](packages/agent_log_detector_for_ibrahim/README.md)
-
-Ibrahim's integration guide:
-
-[docs/IBRAHIM_ATTACK_INTEGRATION.md](docs/IBRAHIM_ATTACK_INTEGRATION.md)
-
-## Older Telemetry Work
-
-The repository still contains earlier UAV-SEAD / MOMENT / telemetry anomaly detection scripts. Those are not the current Ibrahim handoff path. The current paper-facing detector is:
-
-```text
-scripts/train_agent_log_detector.py
-```
-
-The older telemetry detector can remain as background work, but it should not be presented to Ibrahim as the integration target for the current S1-S4 attack results.
+Older UAV-SEAD, MOMENT, telemetry, Darts, and iTransformer experiments are still in the repo for reference. They are not the current Ibrahim handoff path.

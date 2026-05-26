@@ -204,12 +204,12 @@ flagged = 0 -> detector treats it as clean
 
 This is currently an offline run-level detector over completed logs. To convert it into a live defense, Ibrahim's runner should call the same feature extractor before committing agent-visible observations/memory into the planner state, then quarantine updates whose score crosses the threshold.
 
-## Handoff Package
+## Handoff Folder
 
 For a minimal copy that can be sent without the full repo, use:
 
 ```text
-packages/uavshield_agent_log_detector_for_ibrahim.zip
+ibrahim_handoff/
 ```
 
 It contains the detector script, a README, requirements, and a runner shell script.
